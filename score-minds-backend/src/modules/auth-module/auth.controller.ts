@@ -100,10 +100,10 @@ export class AuthController {
         image: {
           type: 'string',
           format: 'binary',
-          description: 'Slika profila (jpg, jpeg, png, webp)'
+          description: 'Slika profila (jpgg, jpeg, png, webp)'
         }
       },
-      required: ['name', 'email', 'password']
+      required: ['username', 'email', 'password']
     }
   })
   @Post('register')
@@ -114,14 +114,14 @@ export class AuthController {
     }),
   )
   async register(
-    @Body() user: CreateUserDto,
+    @Body(ValidationPipe) user: CreateUserDto,
     @UploadedFile(
       new ParseFilePipe({
         fileIsRequired: false,
         validators:
           [
             new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
-            new FileTypeValidator({ fileType: /(jpg|jpeg|webp|png)%/ }),
+            new FileTypeValidator({ fileType: /(jpg|jpeg|webp|png)$/ }),
           ],
       })
     ) image?: Express.Multer.File

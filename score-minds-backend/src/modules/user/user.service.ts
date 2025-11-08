@@ -65,11 +65,11 @@ export class UserService extends BaseService<User> {
 
         async create(user:CreateUserDto) :Promise<FullUserDto>
         {
-            const passwordhased: string=await bcrypt.hash(user.passwordHash,10);
-            const newUser=await this.repo.create({...user,passwordHash: passwordhased});
+            const passwordhased: string=await bcrypt.hash(user.password,10);
+            const newUser=await this.repo.create({...user, passwordHash:passwordhased});
             const savedUser= await this.repo.save(newUser);
 
-            return(savedUser);
+             return(savedUser);
         }
 
         async update(id:number,user:UpdateUserDto) :Promise<FullUserDto>
