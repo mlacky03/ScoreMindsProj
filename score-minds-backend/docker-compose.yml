@@ -1,21 +1,57 @@
-
-version: '3.8'
 services:
   postgres-db:
     image: postgres:15-alpine
     container_name: scoredmind_postgres_db
     restart: always
-
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: nikola1234
       POSTGRES_DB: ScoreMinds
-
     ports:
       - "5432:5432"
-
+    
+    # 🚨 KORIŠĆENJE Named Volumena
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data 
+      
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  api:
+    build: 
+      context: . 
+      dockerfile: Dockerfile 
+    container_name: scoredmind_api
+    restart: always
+    
+    ports:
+      - "3000:3000" 
+    
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+        
+    # 📝 ISPRAVLJENE VARIJABLE ZA NESTJS
+    environment:
+      DB_HOST: postgres-db 
+      DB_PORT: 5432
+      DB_USER: postgres      
+      DB_PASSWORD: nikola1234
+      DB_NAME: ScoreMinds    
+      PORT: 3000
+      # ... (dodaj ostale varijable okruženja ovde, npr. JWT_SECRET, SUPABASE_KEY, itd.)
+      
+    volumes:
+      # Ostavljamo Bind Mount za razvojni rad (sync koda), ali sa isključenim node_modules
+      - .:/app 
+      - /app/node_modules 
+
+# ---------------------------------------------
+# DEFINICIJA GLOBALNOG Named Volumena
+# ---------------------------------------------
 volumes:
-  postgres-data:
+  pgdata: # 👈 OVO JE BILO KLJUČNO! SADA JE ISPRAVNO DEFINISANO
+    driver: local

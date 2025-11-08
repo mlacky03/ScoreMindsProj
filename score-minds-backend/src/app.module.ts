@@ -4,10 +4,12 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import {User } from './modules/user/user.entity';
-import {Prediction} from './modules/prediction/prediction.entity';
-import {PredictionEvent} from './modules/prediction-event/predictionEvent.entity';
-import {Group} from './modules/group/group.entity';
+import { StorageService } from './modules/storage/storage.service';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AuthModule } from './modules/auth-module/auth.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { UserModule } from './modules/user/user.module';
+import { SwaggerModule } from '@nestjs/swagger';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -16,7 +18,8 @@ import {Group} from './modules/group/group.entity';
     }),
   TypeOrmModule.forRootAsync({
       imports: [ConfigModule], 
-      inject: [ConfigService], 
+      inject: [ConfigService],
+       
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get<string>('DB_HOST'),
@@ -25,14 +28,24 @@ import {Group} from './modules/group/group.entity';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
 
-        entities: [User, Group, Prediction, PredictionEvent],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         
         synchronize: true, //samo sa production
       
     }),
-})
+    
+}),
+  MulterModule.register({limits: { fileSize: 5 * 1024 * 1024 }}),
+  ThrottlerModule.forRoot([{
+      ttl: 60000, // Time To Live (TTL): 60 sekundi (60000 milisekundi)
+      limit: 10,  // Maksimalno 10 zahteva po korisniku u 60 sekundi
+    }]),
+    AuthModule,
+    UserModule,
+    SwaggerModule
+
 ],
 controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, {provide: 'APP_GUARD', useClass: ThrottlerGuard}, StorageService],
 })
 export class AppModule {}

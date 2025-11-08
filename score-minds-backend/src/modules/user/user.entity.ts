@@ -15,7 +15,7 @@ import { Group } from '../group/group.entity';
 @Entity('users') 
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: number;
 
   @Column({ type: 'varchar', length: 50, unique: true })
   @Index() 
