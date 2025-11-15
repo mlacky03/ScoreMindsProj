@@ -9,7 +9,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './modules/auth-module/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserModule } from './modules/user/user.module';
-import { SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from './swaggers/swagger-module';
 
 @Module({
   imports: [ConfigModule.forRoot({

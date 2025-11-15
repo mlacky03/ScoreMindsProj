@@ -14,7 +14,7 @@ import { Group } from '../group/group.entity';
 
 @Entity('users') 
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 50, unique: true })
@@ -42,4 +42,6 @@ export class User {
 
   @OneToMany(() => Group, (group) => group.owner)
   ownedGroups: Group[];
+
+  
 }

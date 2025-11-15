@@ -10,8 +10,8 @@ import { Prediction } from '../prediction/prediction.entity';
 
 @Entity('predicted_events') 
 export class PredictionEvent {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ type: 'varchar', default: 'GOAL' })
   type: string;

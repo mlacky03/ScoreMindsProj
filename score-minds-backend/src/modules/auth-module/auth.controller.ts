@@ -100,7 +100,7 @@ export class AuthController {
         image: {
           type: 'string',
           format: 'binary',
-          description: 'Slika profila (jpgg, jpeg, png, webp)'
+          description: 'Slika profila (jpg, jpeg, png, webp)'
         }
       },
       required: ['username', 'email', 'password']

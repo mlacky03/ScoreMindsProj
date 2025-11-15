@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
+import { Controller, Logger } from '@nestjs/common';
 
 @Injectable()
 export class StorageService {
@@ -8,11 +9,12 @@ export class StorageService {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } }
   );
-  private bucket = process.env.SUPABASE_BUCKET || 'upload';
-
+  private logger = new Logger(StorageService.name);
+  private bucket = process.env.SUPABASE_BUCKET || "scoremindsavatar";
+  
   async uploadUserAvatar(userId: number | string, file: Express.Multer.File) {
     if (!file) throw new BadRequestException('No file');
-
+    this.logger.log(`Pokušaj uploada za korisnika ${userId} u kantu: ${this.bucket}`);
     const ext = (file.originalname.split('.').pop() || 'jpg').toLowerCase();
     const key = `users/${userId}/avatar_${Date.now()}.${ext}`;
 

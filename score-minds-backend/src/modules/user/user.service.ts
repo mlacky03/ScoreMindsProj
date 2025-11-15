@@ -20,7 +20,7 @@ export class UserService extends BaseService<User> {
             super(repo);
         };
 
-        async findAll(filter:FilterUserDto) :Promise<BaseUserDto[]>
+        async findAll(filter?:FilterUserDto) :Promise<BaseUserDto[]>
         {
             const qb=this.CreateBaseQueryBuilder("user")
                         .select(getSelectFields("user",COMMON_SELECT_FIELDS.USER));
@@ -50,7 +50,7 @@ export class UserService extends BaseService<User> {
         {
             const user:User | null=await  this.repo
                 .createQueryBuilder('user')
-                .leftJoinAndSelect('user.ownedGropus','ownedGropus')
+                .leftJoinAndSelect('user.ownedGroups','ownedGroups')
                 .leftJoinAndSelect('user.groups','groups')
                 .where('user.id= :id',{id})
                 .getOne();

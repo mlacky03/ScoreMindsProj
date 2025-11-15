@@ -7,13 +7,16 @@ import {
   CreateDateColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity'; 
 
 @Entity('groups') 
 export class Group {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ type: 'varchar', length: 100 })
   groupName: string;
@@ -21,8 +24,10 @@ export class Group {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'varchar', nullable: false   }) 
-  owner: User;
+  @ManyToOne(()=>User,(user)=>user.ownedGroups)
+  @JoinColumn({name:'ownerId'})
+  owner:User;
+
 
   @ManyToMany(() => User, (user) => user.groups)
   @JoinTable({

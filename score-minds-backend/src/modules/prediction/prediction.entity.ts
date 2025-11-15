@@ -16,8 +16,8 @@ import { PredictionEvent } from '../prediction-event/predictionEvent.entity';
 @Entity('predictions')
 @Index(['user', 'matchId'], { unique: true })
 export class Prediction {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ type: 'varchar' })
   matchId: string; 

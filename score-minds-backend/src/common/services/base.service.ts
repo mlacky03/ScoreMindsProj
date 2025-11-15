@@ -41,8 +41,8 @@ export abstract class BaseService<T extends ObjectLiteral> {
         
         if(searchTherm && search.length>0){
             const searchconditions=search.map(filed=>`${qb.alias}.${filed} LIKE :searchTherm`)
-            .join('OR');
-            qb.andWhere(`${searchconditions}`, {searchTherm: `%${searchTherm}%`});
+            .join(' OR ');
+            qb.andWhere(`(${searchconditions})`, {searchTherm: `%${searchTherm}%`});
         }
 
         return qb;

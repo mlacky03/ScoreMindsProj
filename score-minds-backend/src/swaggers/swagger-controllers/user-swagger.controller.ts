@@ -46,7 +46,7 @@ export class UserSwaggerController{
 
     @ApiOperation({ 
     summary: 'Pretraži korisnike',
-    description: 'Vraća listu korisnika na osnovu pretrage po imenu ili email-u'
+    description: 'Vraća listu korisnika na osnovu pretrage po username-u ili email-u'
   })
   @ApiResponse({ 
     status: 200, 
@@ -61,14 +61,14 @@ export class UserSwaggerController{
     name: 'query', 
     required: false, 
     description: 'Tekst za pretragu korisnika',
-    example: 'marko'
+    example: 'Mlacky'
   })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
   async findAll(
     @CurrentUser() userId:string,
-    @Query() query:string) :Promise<BaseUserSwaggerDto[]>
+    @Query('query') query:string) :Promise<BaseUserSwaggerDto[]>
   {
     const filters:FilterUserDto= {query};
 
@@ -125,10 +125,10 @@ export class UserSwaggerController{
     schema: {
       type: 'object',
       properties: {
-        name: {
+        username: {
           type: 'string',
-          description: 'Ime korisnika',
-          example: 'Marko Petrović'
+          description: 'Nadimak na sajtu',
+          example: 'Mlacky'
         },
         email: {
           type: 'string',
