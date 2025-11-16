@@ -60,7 +60,7 @@ export class UserService extends BaseService<User> {
                     throw new UserNotFoundException(id);
                 }
 
-            return user;
+            return new FullUserDto(user);
         }
 
         async create(user:CreateUserDto) :Promise<FullUserDto>
@@ -69,7 +69,7 @@ export class UserService extends BaseService<User> {
             const newUser=await this.repo.create({...user, passwordHash:passwordhased});
             const savedUser= await this.repo.save(newUser);
 
-             return(savedUser);
+             return new FullUserDto(savedUser);
         }
 
         async update(id:number,user:UpdateUserDto) :Promise<FullUserDto>
@@ -84,7 +84,7 @@ export class UserService extends BaseService<User> {
             const updateUser=await this.repo.merge(oldUser,user);
             const savedUser= await this.repo.save(updateUser);
 
-            return(savedUser);
+            return new FullUserDto(savedUser);
         }
 
         async findByEmail(email:string) : Promise<User|null>

@@ -9,26 +9,27 @@ import {
   OneToMany,
   ManyToMany,
 } from 'typeorm';
-import { Prediction } from '../prediction/prediction.entity'; 
-import { Group } from '../group/group.entity'; 
+import { Prediction } from '../prediction/prediction.entity';
+import { Group } from '../group/group.entity';
+import { GroupUser } from '../group-user/group-user.entity';
 
-@Entity('users') 
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 50, unique: true })
-  @Index() 
+  @Index()
   username: string;
 
   @Column({ type: 'varchar', length: 100, unique: true })
-  @Index() 
+  @Index()
   email: string;
 
   @Column({ type: 'varchar' })
   passwordHash: string;
 
-  @Column({ type: 'varchar', nullable: true }) 
+  @Column({ type: 'varchar', nullable: true })
   profileImageUrl: string;
 
   @CreateDateColumn()
@@ -37,11 +38,11 @@ export class User {
   @OneToMany(() => Prediction, (prediction) => prediction.user)
   predictions: Prediction[];
 
-  @ManyToMany(() => Group, (group) => group.members)
-  groups: Group[];
+  @OneToMany(() => GroupUser, (group) => group.user)
+  groups: GroupUser[];
 
   @OneToMany(() => Group, (group) => group.owner)
   ownedGroups: Group[];
 
-  
+
 }

@@ -39,6 +39,7 @@ export class Prediction {
 
   @ManyToOne(() => User, (user) => user.predictions)
   user: User;
+  
 
   @OneToMany(
     () => PredictionEvent,

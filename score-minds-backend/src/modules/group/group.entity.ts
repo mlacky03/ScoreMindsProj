@@ -1,5 +1,4 @@
 
-
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -11,9 +10,10 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity'; 
+import { User } from '../user/user.entity';
+import { GroupUser } from '../group-user/group-user.entity';
 
-@Entity('groups') 
+@Entity('groups')
 export class Group {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,16 +24,13 @@ export class Group {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(()=>User,(user)=>user.ownedGroups)
-  @JoinColumn({name:'ownerId'})
-  owner:User;
+  @ManyToOne(() => User, (user) => user.ownedGroups)
+  @JoinColumn({ name: 'ownerId' })
+  owner: User;
 
+  @Column({ type: 'varchar', nullable: true })
+  profileImageUrl: string;
 
-  @ManyToMany(() => User, (user) => user.groups)
-  @JoinTable({
-    name: 'group_members', 
-    joinColumn: { name: 'groupId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
-  })
+  @OneToMany(() => GroupUser, (user) => user.group)
   members: User[];
 }
