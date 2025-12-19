@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { User } from '../user/user.entity';
 import { PredictionEvent } from '../prediction-event/predictionEvent.entity'; 
+import { Match } from '../matches/matches.entity';
 
 @Entity('predictions')
 @Index(['user', 'matchId'], { unique: true })
@@ -19,8 +20,8 @@ export class Prediction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar' })
-  matchId: string; 
+  @ManyToOne(() => Match, (match) => match.predictions)
+  match: Match; 
 
   @Column({ type: 'integer' })
   predictedHomeScore: number; 
@@ -34,8 +35,8 @@ export class Prediction {
   @CreateDateColumn() 
   createdAt: Date;
 
-  @UpdateDateColumn() 
-  updatedAt: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  lastUserChange: Date
 
   @ManyToOne(() => User, (user) => user.predictions)
   user: User;

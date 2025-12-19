@@ -1,21 +1,24 @@
 import { BaseUserDto } from "src/modules/user/dto/base-user.dto";
 import { Group } from "../group.entity";
+import { BaseGroupUserDto } from "src/modules/group-user/dto/BaseGroupMember.dto";
 
 export class FullGroupDto
 {
-    groupName:string;
+    id:number
+    name:string;
     profileImageUrl?:string;
     points:number;
-    members:BaseUserDto[];
+    members:BaseGroupUserDto[];
     createdAt:Date;
     owner:BaseUserDto;
     
     constructor(entity:Group)
     {
-        this.groupName=entity.groupName;
+        this.id=entity.id;
+        this.name=entity.name;
         this.profileImageUrl=entity.profileImageUrl;
         this.points=0;
-        this.members=entity.members?.map(member=>new BaseUserDto(member)||[]);
+        this.members=entity.members?.map(member=>new BaseGroupUserDto(member)||[]);
 
     }
 

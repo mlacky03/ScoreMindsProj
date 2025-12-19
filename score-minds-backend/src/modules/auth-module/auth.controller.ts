@@ -48,7 +48,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Uspešno prijavljivanje',
+    description: 'Uspešno prijavljivsdsaanje',
     type: LoginSwaggerDto
   })
   @ApiResponse({

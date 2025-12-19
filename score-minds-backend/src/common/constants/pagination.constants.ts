@@ -13,7 +13,7 @@ export const ORDER_DIRECTION = {
 
 export const COMMON_SELECT_FIELDS = {
   USER: ['id', 'username', 'email', 'profileImageUrl'] as string[],
-  GROUP: ['id', 'name', 'imagePath', 'ownerId'] as string[],
+  GROUP: ['id', 'name', 'profileImageUrl', 'ownerId'] as string[],
 } as const;
 
 

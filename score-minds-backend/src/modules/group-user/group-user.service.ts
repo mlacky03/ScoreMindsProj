@@ -42,7 +42,7 @@ export class GroupUserService
         const members= await this.repo
             .createQueryBuilder('group_user')
             .leftJoinAndSelect('group_user.user','user')
-            .where('group_user.groupId=groupId',{groupId})
+            .where('group_user.groupId=:groupId',{groupId})
             .getMany();
         return  members;
     }
@@ -57,5 +57,5 @@ export class GroupUserService
         await this.repo.delete(id);
     }
 
-    
+
 }

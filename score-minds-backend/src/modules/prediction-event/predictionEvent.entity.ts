@@ -7,23 +7,24 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Prediction } from '../prediction/prediction.entity';
+import { Player } from '../players/player.entity';
 
 @Entity('predicted_events') 
 export class PredictionEvent {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', default: 'GOAL' })
+  @Column({ type: 'enum', enum: ['GOAL', 'ASSIST', 'YELLOW_CARD','RED_CARD'], default: 'GOAL' })
   type: string;
 
   @Column({ type: 'integer' }) 
   minute: number;
 
-  @Column({ type: 'varchar' }) 
-  scorerPlayerId: string;
+  @ManyToOne(() => Player)
+  scorer: Player
 
-  @Column({ type: 'varchar', nullable: true }) 
-  assisterPlayerId: string;
+  @ManyToOne(() => Player, { nullable: true }) 
+  assister: Player;
 
   @ManyToOne(() => Prediction, (prediction) => prediction.predictedEvents)
   prediction: Prediction;

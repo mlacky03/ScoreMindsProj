@@ -22,6 +22,7 @@ export function setupSwagger(app: INestApplication): void {
     .addTag('Groups', 'Endpoints za upravljanje grupama')
     .addTag('Group Members', 'Endpoints za upravljanje članovima grupa')
     .addTag('Storage', 'Endpoints za upravljanje fajlovima')
+    .addTag('Matches', 'Endpoints za upravljanje fajlovima')
     .addServer('http://localhost:3000', 'Development server')
     .build();
 

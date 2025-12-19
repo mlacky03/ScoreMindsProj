@@ -3,7 +3,7 @@ import { BaseUserDto } from "src/modules/user/dto/base-user.dto";
 
 export class BaseGroupDto {
   id: number;
-  groupName: string;
+  name: string;
   profileImageUrl? : string;
   points: number;
   owner: BaseUserDto;
@@ -11,7 +11,7 @@ export class BaseGroupDto {
   constructor(entity: Group) {
     this.id = entity.id;
     this.profileImageUrl = entity.profileImageUrl;
-    this.groupName = entity.groupName;
+    this.name = entity.name;
     this.owner = entity.owner;
     this.points=0;
   }

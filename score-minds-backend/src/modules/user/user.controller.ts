@@ -24,8 +24,10 @@ import { StorageService } from '../storage/storage.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { QueryResult } from 'typeorm';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('user')
+@ApiTags('Users')
+@Controller('users')
 export class UserController {
     constructor(
         private readonly userService: UserService,

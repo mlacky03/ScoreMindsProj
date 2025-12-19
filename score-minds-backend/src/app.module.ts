@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth-module/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { UserModule } from './modules/user/user.module';
 import { SwaggerModule } from './swaggers/swagger-module';
+import { GroupModule } from './modules/group/group.module';
+import { GroupUserModule } from './modules/group-user/group-user.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -42,7 +44,9 @@ import { SwaggerModule } from './swaggers/swagger-module';
     }]),
     AuthModule,
     UserModule,
-    SwaggerModule
+    SwaggerModule,
+    GroupModule,
+    GroupUserModule,
 
 ],
 controllers: [AppController],

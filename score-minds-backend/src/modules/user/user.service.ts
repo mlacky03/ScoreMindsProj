@@ -28,7 +28,7 @@ export class UserService extends BaseService<User> {
             this.applySearch(qb,
                 {
                     search:['username','email'],
-                    searchTherm:filter?.query
+                    searchTherm:typeof filter?.query === 'string' ? filter.query : ''
                 }
             );
 
