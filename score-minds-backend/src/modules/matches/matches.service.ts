@@ -24,12 +24,12 @@ export class MatchService {
   async findUpcoming(): Promise<BaseMatchDto[]> {
     const res= await this.matchRepository.find({
       where: {
-        startTime: MoreThan(new Date()), 
-        status: 'NS', 
+        status: 'NS',
       },
       order: { startTime: 'ASC' },
     });
 
+    
     return res.map((m)=>new BaseMatchDto(m));
   }
 

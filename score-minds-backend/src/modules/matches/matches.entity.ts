@@ -43,11 +43,11 @@ export class Match{
     @Column({ nullable: true })
     finalScoreAway: number;
 
-    @Column('simple-array', { nullable: true })
-    actualScorersIds: string[]; 
+    @Column("integer", { array: true, nullable: true })
+    actualScorersIds: number[];
 
-    @Column('simple-array', { nullable: true })
-    actualAssistantsIds: string[];
+    @Column("integer", { array: true, nullable: true })
+    actualAssistantsIds: number[];
 
     @OneToMany(() => Prediction, (prediction) => prediction.match)
     predictions: Prediction[];

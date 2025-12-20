@@ -26,7 +26,6 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { QueryResult } from 'typeorm';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Users')
 @Controller('users')
 export class UserController {
     constructor(

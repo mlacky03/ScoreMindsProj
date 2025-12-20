@@ -7,10 +7,11 @@ import { PlayerService } from "./player.service";
 import { PlayerController } from "./player.controller";
 import {StorageService} from "../storage/storage.service";
 import { UserValidationService } from "src/common/services/user-validation.service";
+import { UserModule } from "../user/user.module";
 @Module({
   imports: [
     TypeOrmModule.forFeature([Player]), 
-    forwardRef(() => AuthModule),
+    forwardRef(() => UserModule),
     
   ],
   providers: [PlayerService,StorageService,UserValidationService],

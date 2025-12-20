@@ -12,6 +12,9 @@ import { UserModule } from './modules/user/user.module';
 import { SwaggerModule } from './swaggers/swagger-module';
 import { GroupModule } from './modules/group/group.module';
 import { GroupUserModule } from './modules/group-user/group-user.module';
+import { MatchModule } from './modules/matches/matches.module';
+import { PlayerModule } from './modules/players/player.module';
+import { SyncModule } from './modules/sync/sync.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -47,6 +50,9 @@ import { GroupUserModule } from './modules/group-user/group-user.module';
     SwaggerModule,
     GroupModule,
     GroupUserModule,
+    MatchModule,
+    PlayerModule,
+    SyncModule
 
 ],
 controllers: [AppController],

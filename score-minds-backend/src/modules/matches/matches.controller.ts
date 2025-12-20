@@ -4,8 +4,8 @@ import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('matches') 
 @ApiTags('Matches')
+@Controller('matches') 
 export class MatchController {
   constructor(private readonly matchService: MatchService) {}
 

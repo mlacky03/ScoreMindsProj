@@ -11,12 +11,15 @@ export class SyncService {
     private footballApi: FootballApiService,
     @InjectRepository(Match) private matchRepo: Repository<Match>,
     @InjectRepository(Player) private playerRepo: Repository<Player>,
-  ) {}
+  ) { }
 
   async syncLeagueMatches(leagueId: number, season: number) {
     const apiMatches = await this.footballApi.getMatches(leagueId, season);
 
+    console.log(`API je vratio ${apiMatches?.length} mečeva.`);
+
     for (const m of apiMatches) {
+     
       await this.matchRepo.upsert({
         externalId: m.fixture.id,
         homeTeamName: m.teams.home.name,
@@ -27,12 +30,14 @@ export class SyncService {
         status: m.fixture.status.short,
         finalScoreHome: m.goals.home,
         finalScoreAway: m.goals.away,
-      }, ['externalId']); 
+      }, ['externalId']);
     }
   }
 
   async syncPlayersForTeam(teamId: number) {
     const apiPlayers = await this.footballApi.getPlayersByTeam(teamId);
+
+    console.log(`API je vratio ${apiPlayers?.length} igraca.`);
 
     for (const p of apiPlayers) {
       await this.playerRepo.upsert({
@@ -40,8 +45,28 @@ export class SyncService {
         name: p.name,
         photo: p.photo,
         position: p.position,
-        teamId: teamId, 
+        teamId: teamId,
       }, ['externalId']);
+    }
+  }
+
+  async checkApiStatus() {
+    const url = "https://v3.football.api-sports.io/status";
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "x-apisports-key": "56e0bea445d94bc6110e6e51fdcb9136"
+        }
+      });
+
+      const data = await response.json();
+      console.log("STATUS PROVERA:", JSON.stringify(data, null, 2));
+
+      return data;
+    } catch (err) {
+      console.error("STATUS GREŠKA:", err.message);
     }
   }
 }

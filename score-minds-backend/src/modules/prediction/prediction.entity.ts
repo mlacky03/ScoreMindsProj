@@ -15,7 +15,7 @@ import { PredictionEvent } from '../prediction-event/predictionEvent.entity';
 import { Match } from '../matches/matches.entity';
 
 @Entity('predictions')
-@Index(['user', 'matchId'], { unique: true })
+@Index(['user', 'match'], { unique: true })
 export class Prediction {
   @PrimaryGeneratedColumn()
   id: number;
