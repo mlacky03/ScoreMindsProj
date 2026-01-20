@@ -1,10 +1,12 @@
-import { Controller, Get, Query, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Query, Param, ParseIntPipe, Put, Body } from '@nestjs/common';
 import { SyncService } from './sync.service';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import {UseGuards} from '@nestjs/common';
-
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { UpdateMatchDto } from '../matches/dto/update-match.dto';
 @ApiTags('Sync Data')
+@ApiBearerAuth('JWT-auth') //Mora se promeni da bude samo za admina
 @Controller('sync')
 export class SyncController {
   constructor(private readonly syncService: SyncService) { }
@@ -36,5 +38,13 @@ export class SyncController {
   ) {
     await this.syncService.syncLeagueMatches(leagueId, season);
     return { message: 'Rezultati su osveženi.' };
+  }
+
+  @Put('match/:id/score')
+  async updateScore(
+    @Param('id') id: number, 
+    @Body() dto: UpdateMatchDto
+  ) {
+    return this.syncService.simulateMatchUpdate(id, dto);
   }
 }

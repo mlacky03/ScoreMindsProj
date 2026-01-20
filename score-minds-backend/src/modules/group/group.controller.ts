@@ -34,7 +34,7 @@ import { IsAlpha, Max } from 'class-validator';
 import { fileURLToPath } from 'url';
 import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('Groups')
 @Controller('groups')
 export class GroupController {
     constructor(

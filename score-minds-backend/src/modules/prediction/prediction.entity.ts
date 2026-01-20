@@ -11,22 +11,24 @@ import {
   Index,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-import { PredictionEvent } from '../prediction-event/predictionEvent.entity'; 
+import { PredictionEvent } from '../prediction-event/prediction-event.entity'; 
 import { Match } from '../matches/matches.entity';
 
+export enum WinnerOption {
+  HOME = 'HOME',
+  AWAY = 'AWAY',
+  DRAW = 'DRAW'
+}
 @Entity('predictions')
 @Index(['user', 'match'], { unique: true })
 export class Prediction {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Match, (match) => match.predictions)
-  match: Match; 
-
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer',nullable: true })
   predictedHomeScore: number; 
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer',nullable: true })
   predictedAwayScore: number;
 
   @Column({ type: 'integer', default: 0 })
@@ -35,11 +37,23 @@ export class Prediction {
   @CreateDateColumn() 
   createdAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
-  lastUserChange: Date
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.predictions)
+  @Column({ type: 'enum', enum: WinnerOption, nullable: true })
+  winner: WinnerOption;
+
+  @ManyToOne(() => User, (user) => user.predictions,{ onDelete: 'CASCADE' })
   user: User;
+
+  @Column({ name: 'user_id' })
+  userId: number;
+
+  @Column({type:'integer'})
+  matchId:number;
+
+  @ManyToOne(() => Match, (match) => match.predictions,{ onDelete: 'CASCADE' })
+  match: Match; 
   
 
   @OneToMany(

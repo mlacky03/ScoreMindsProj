@@ -3,8 +3,10 @@ import { PlayerService } from './player.service';
 import { ApiTags } from '@nestjs/swagger';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Players')
+@ApiBearerAuth('JWT-auth')
 @Controller('players')
 export class PlayerController {
     constructor(private readonly playerService: PlayerService) { }

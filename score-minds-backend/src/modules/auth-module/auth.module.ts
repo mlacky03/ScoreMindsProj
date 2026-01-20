@@ -22,6 +22,6 @@ import { StorageService } from '../storage/storage.service';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, StorageService], 
-    exports: [AuthService, JwtModule],
+    exports: [AuthService, JwtModule,PassportModule, JwtStrategy],
 })
 export class AuthModule {}

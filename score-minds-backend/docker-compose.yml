@@ -1,7 +1,12 @@
+version: '3.8'
+
 services:
+  # ---------------------------------------------
+  # 1. BAZA PODATAKA (PostgreSQL)
+  # ---------------------------------------------
   postgres-db:
     image: postgres:15-alpine
-    container_name: scoredmind_postgres_db
+    container_name: scoreminds_db
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -9,49 +14,81 @@ services:
       POSTGRES_DB: ScoreMinds
     ports:
       - "5432:5432"
-    
-    # 🚨 KORIŠĆENJE Named Volumena
     volumes:
-      - pgdata:/var/lib/postgresql/data 
-      
-    healthcheck: 
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ScoreMinds"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # ---------------------------------------------
+  # 2. MESSAGE BROKER (RabbitMQ) - NOVO!
+  # ---------------------------------------------
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: scoreminds_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   # Port za komunikaciju (NestJS se kači ovde)
+      - "15672:15672" # Management UI (ulaziš preko browsera)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # ---------------------------------------------
+  # 3. BACKEND API (NestJS u Dev Modu)
+  # ---------------------------------------------
   api:
-    build: 
-      context: . 
-      dockerfile: Dockerfile 
-    container_name: scoredmind_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build  # 👈 OVO JE KLJUČNO: Koristimo prvu fazu Dockerfile-a gde su svi alati
+    container_name: scoreminds_api
     restart: always
     
+    # Ovde mapiramo portove (3000 za API, dodajemo i WebSocket port ako je različit)
     ports:
-      - "3000:3000" 
+      - "3000:3000"
     
+    # "depends_on" osigurava da se API ne pali pre baze i rabbita
     depends_on:
       postgres-db:
         condition: service_healthy
-        
-    # 📝 ISPRAVLJENE VARIJABLE ZA NESTJS
+      rabbitmq:
+        condition: service_started
+
+    # Varijable koje NestJS čita (ConfigService)
     environment:
-      DB_HOST: postgres-db 
+      # Baza
+      DB_HOST: postgres-db
       DB_PORT: 5432
-      DB_USER: postgres      
+      DB_USER: postgres
       DB_PASSWORD: nikola1234
-      DB_NAME: ScoreMinds    
-      PORT: 3000
-      # ... (dodaj ostale varijable okruženja ovde, npr. JWT_SECRET, SUPABASE_KEY, itd.)
+      DB_NAME: ScoreMinds
       
+      # Server
+      PORT: 3000
+      
+      # RabbitMQ (URL format: amqp://user:pass@host:port)
+      RABBITMQ_URI: amqp://guest:guest@rabbitmq:5672
+      
+      # Ostalo
+      JWT_SECRET: tvoj_super_tajni_kljuc_123
+
+    # Volumeni za "Hot Reload" (da ne moraš da restartuješ kontejner kad menjaš kod)
     volumes:
-      # Ostavljamo Bind Mount za razvojni rad (sync koda), ali sa isključenim node_modules
-      - .:/app 
-      - /app/node_modules 
+      - .:/app               # Mapira tvoj lokalni folder u kontejner
+      - /app/node_modules    # Čuva node_modules unutar kontejnera netaknutim
+
+    # Komanda koja pokreće dev server
+    command: npm run start:dev
 
 # ---------------------------------------------
-# DEFINICIJA GLOBALNOG Named Volumena
+# GLOBALNI VOLUMENI (Za trajno čuvanje podataka)
 # ---------------------------------------------
 volumes:
-  pgdata: # 👈 OVO JE BILO KLJUČNO! SADA JE ISPRAVNO DEFINISANO
-    driver: local
+  pgdata:
+  rabbitmq_data:

@@ -165,7 +165,7 @@ export class GroupSwaggerController {
       limits: { fileSize: PAGINATION.MAX_LIMIT * 1024 * 1024 },
     }),
   )
-  @Post()
+  @Post("create")
   async create(
     @CurrentUser() userId: number,
     @Body(ValidationPipe) group: CreateGroupDto,

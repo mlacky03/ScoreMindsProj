@@ -9,6 +9,7 @@ import { FootballApiService } from 'src/common/services/football-api.service';
 import { UserValidationService } from 'src/common/services/user-validation.service';
 import { UserModule } from '../user/user.module';
 import { ConfigModule } from '@nestjs/config';
+import { Adapter } from 'src/common/patterns/Adapter';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { ConfigModule } from '@nestjs/config';
     forwardRef(()=>UserModule)
   ],
   controllers: [SyncController],
-  providers: [SyncService, FootballApiService,UserValidationService],
+  providers: [SyncService, FootballApiService,UserValidationService,Adapter],
   exports:[SyncService]
 })
 export class SyncModule {}

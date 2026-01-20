@@ -1,36 +1,39 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Match } from "src/modules/matches/matches.entity";
 import { Repository } from "typeorm";
 import { Player } from "src/modules/players/player.entity";
 import { FootballApiService } from "../../common/services/football-api.service";
-
+import { Adapter } from "../../common/patterns/Adapter";
+import { UpdateMatchDto } from "../matches/dto/update-match.dto";
 @Injectable()
 export class SyncService {
   constructor(
     private footballApi: FootballApiService,
     @InjectRepository(Match) private matchRepo: Repository<Match>,
     @InjectRepository(Player) private playerRepo: Repository<Player>,
+    private adapter: Adapter,
   ) { }
 
   async syncLeagueMatches(leagueId: number, season: number) {
     const apiMatches = await this.footballApi.getMatches(leagueId, season);
 
     console.log(`API je vratio ${apiMatches?.length} mečeva.`);
-
+    let scheduleTime = new Date();
+    scheduleTime.setDate(scheduleTime.getDate() + 1);
+    scheduleTime.setHours(18, 0, 0, 0);
     for (const m of apiMatches) {
-     
-      await this.matchRepo.upsert({
-        externalId: m.fixture.id,
-        homeTeamName: m.teams.home.name,
-        awayTeamName: m.teams.away.name,
-        homeTeamLogo: m.teams.home.logo,
-        awayTeamLogo: m.teams.away.logo,
-        startTime: new Date(m.fixture.date),
-        status: m.fixture.status.short,
-        finalScoreHome: m.goals.home,
-        finalScoreAway: m.goals.away,
-      }, ['externalId']);
+
+
+      const matchEntityData = this.adapter.adaptToMatchEntity(m);
+
+
+      matchEntityData.startTime = new Date(scheduleTime);
+      matchEntityData.status = 'NS';
+      matchEntityData.finalScoreHome = null;
+      matchEntityData.finalScoreAway = null;
+
+      await this.matchRepo.upsert(matchEntityData, ['externalId']);
     }
   }
 
@@ -40,13 +43,8 @@ export class SyncService {
     console.log(`API je vratio ${apiPlayers?.length} igraca.`);
 
     for (const p of apiPlayers) {
-      await this.playerRepo.upsert({
-        externalId: p.id,
-        name: p.name,
-        photo: p.photo,
-        position: p.position,
-        teamId: teamId,
-      }, ['externalId']);
+      const playerEntityData = this.adapter.adaptToPlayerEntity(p, teamId);
+      await this.playerRepo.upsert(playerEntityData, ['externalId']);
     }
   }
 
@@ -68,5 +66,25 @@ export class SyncService {
     } catch (err) {
       console.error("STATUS GREŠKA:", err.message);
     }
+  }
+  async simulateMatchUpdate(matchId: number, dto: UpdateMatchDto) {
+
+    const match = await this.matchRepo.findOne({ where: { id: matchId } });
+    if (!match) throw new NotFoundException('Utakmica nije pronađena');
+
+
+    match.finalScoreHome = dto.homeScore;
+    match.finalScoreAway = dto.awayScore;
+    match.status = dto.status;
+    match.actualScorersIds = dto.scorerIds;
+    match.actualAssistantsIds = dto.assistIds;
+
+
+    const savedMatch = await this.matchRepo.save(match);
+
+
+    console.log(`📢 SIMULACIJA: Rezultat promenjen na ${dto.homeScore}:${dto.awayScore} (${dto.status})`);
+
+    return savedMatch;
   }
 }

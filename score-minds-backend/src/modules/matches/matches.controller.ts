@@ -3,8 +3,10 @@ import { MatchService } from './matches.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Matches')
+@ApiBearerAuth('JWT-auth')
 @Controller('matches') 
 export class MatchController {
   constructor(private readonly matchService: MatchService) {}

@@ -15,6 +15,7 @@ import { Prediction } from "../prediction/prediction.entity";
     TypeOrmModule.forFeature([Match]), 
     TypeOrmModule.forFeature([Prediction]), 
     forwardRef(() => UserModule),
+    AuthModule,
   ],
   providers: [MatchService,StorageService,UserValidationService],
   controllers: [MatchController], 

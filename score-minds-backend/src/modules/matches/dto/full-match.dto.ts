@@ -9,10 +9,10 @@ export class FullMatchDto{
     homeTeamLogo:string;
     startTime:Date;
     status:string;
-    finalScoreHome: number;
-    finalScoreAway: number;
-    actualScorersIds: string[];
-    actualAssistantsIds: string[];
+    finalScoreHome: number|null;
+    finalScoreAway: number|null;
+    actualScorersIds: number[];
+    actualAssistantsIds: number[];
 
     constructor(m:Match){
         this.id=m.id;

@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Player } from './player.entity';   
 import { FullPlayerDto } from './dto/full-player.dto';
-
+import { BaseService } from 'src/common/services/base.service';
 @Injectable()
-export class PlayerService {
+export class PlayerService extends BaseService<Player> {
   constructor(
     @InjectRepository(Player)
     private readonly playerRepository: Repository<Player>,
-  ) {}
+  ) {super(playerRepository)}
 
   
   async findByTeam(teamId: number): Promise<FullPlayerDto[]> {

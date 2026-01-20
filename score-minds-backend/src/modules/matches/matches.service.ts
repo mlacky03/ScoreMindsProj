@@ -4,13 +4,16 @@ import { Repository, MoreThan } from 'typeorm';
 import { Match } from './matches.entity';
 import { FullMatchDto } from './dto/full-match.dto';
 import {BaseMatchDto} from './dto/base-match.dto';
+import {BaseService} from 'src/common/services/base.service';
 
 @Injectable()
-export class MatchService {
+export class MatchService extends BaseService<Match> {
+
   constructor(
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
-  ) {}
+    
+  ) {super(matchRepository)}
 
  
   async findAll(): Promise<BaseMatchDto[]> {

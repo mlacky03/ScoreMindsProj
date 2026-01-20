@@ -31,17 +31,18 @@ export class Match{
     @Column({ nullable: true })
     awayTeamLogo: string;
 
+    @Index()
     @Column()
     startTime: Date; 
 
     @Column({ default: 'NS' }) 
     status: string;
 
-    @Column({ nullable: true })
-    finalScoreHome: number;
+    @Column({ type: 'integer', nullable: true })
+    finalScoreHome: number|null;
 
-    @Column({ nullable: true })
-    finalScoreAway: number;
+    @Column({ type: 'integer', nullable: true })
+    finalScoreAway: number|null;
 
     @Column("integer", { array: true, nullable: true })
     actualScorersIds: number[];

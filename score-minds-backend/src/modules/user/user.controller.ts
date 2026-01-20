@@ -26,6 +26,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { QueryResult } from 'typeorm';
 import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
     constructor(
@@ -51,7 +52,7 @@ export class UserController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get("profil")
+    @Get("profile")
     async findOne(
         @CurrentUser() userId: number
     ): Promise<FullUserDto> {
@@ -93,25 +94,25 @@ export class UserController {
     }
 
 
-    @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FileInterceptor("file"))
-    @Post()
-    async updateAvatar(
-        @CurrentUser() userId:number,
-        @UploadedFile() file: Express.Multer.File
-    ) {
-        if(!file)
-        {
-            throw new BadRequestException("No file provided");
-        }
+    // @UseGuards(JwtAuthGuard)
+    // @UseInterceptors(FileInterceptor("file"))
+    // @Post()
+    // async updateAvatar(
+    //     @CurrentUser() userId:number,
+    //     @UploadedFile() file: Express.Multer.File
+    // ) {
+    //     if(!file)
+    //     {
+    //         throw new BadRequestException("No file provided");
+    //     }
 
-        const {path,url}= await this.storageService.uploadUserAvatar(userId,file);
-        await this.userService.updateAvatar(userId,path);
+    //     const {path,url}= await this.storageService.uploadUserAvatar(userId,file);
+    //     await this.userService.updateAvatar(userId,path);
 
         
-        return {image_path:path,image_url:url};
+    //     return {image_path:path,image_url:url};
         
-    }
+    // }
 
 
 }
