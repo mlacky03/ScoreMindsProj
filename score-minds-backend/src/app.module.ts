@@ -4,17 +4,20 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
-import { StorageService } from './modules/storage/storage.service';
+import { StorageService } from './application/services/storage.service';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { AuthModule } from './modules/auth-module/auth.module';
+import { AuthModule } from './modules/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
-import { UserModule } from './modules/user/user.module';
+import { UserModule } from './modules/user.module';
 import { SwaggerModule } from './swaggers/swagger-module';
-import { GroupModule } from './modules/group/group.module';
-import { GroupUserModule } from './modules/group-user/group-user.module';
-import { MatchModule } from './modules/matches/matches.module';
-import { PlayerModule } from './modules/players/player.module';
-import { SyncModule } from './modules/sync/sync.module';
+import { GroupModule } from './modules/group.module';
+import { GroupUserModule } from './modules/group-user.module';
+import { MatchModule } from './modules/matches.module';
+import { PlayerModule } from './modules/player.module';
+import { SyncModule } from './modules/sync.module';
+import { PersonalPredictionModule } from './modules/personal-predictition.module';
+import { PredictionAuditModule } from './modules/prediction-audit.module';
+import { GroupPredictionModule } from './modules/group-prediction.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -52,7 +55,10 @@ import { SyncModule } from './modules/sync/sync.module';
     GroupUserModule,
     MatchModule,
     PlayerModule,
-    SyncModule
+    SyncModule,
+    PersonalPredictionModule,
+    PredictionAuditModule,
+    GroupPredictionModule
 
 ],
 controllers: [AppController],

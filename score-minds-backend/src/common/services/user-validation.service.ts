@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { UserService } from '../../modules/user/user.service';
+import { UserService } from '../../application/services/user.service';
 
 @Injectable()
 export class UserValidationService {

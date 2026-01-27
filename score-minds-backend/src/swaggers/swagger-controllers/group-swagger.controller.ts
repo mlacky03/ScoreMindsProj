@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   ForbiddenException,
   Get,
@@ -15,30 +16,31 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiResponse, 
-  ApiBearerAuth, 
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
   ApiConsumes,
   ApiBody,
   ApiParam,
   ApiQuery
 } from '@nestjs/swagger';
-import { GroupService } from 'src/modules/group/group.service';
-import { BaseGroupDto } from 'src/modules/group/dto/base-group.dto';
-import { Group } from 'src/modules/group/group.entity';
-import { CreateGroupDto } from 'src/modules/group/dto/create-group.dto';
-import { GroupUser } from 'src/modules/group-user/group-user.entity';
-import { BaseGroupUserDto } from 'src/modules/group-user/dto/BaseGroupMember.dto';
-import { GroupUserService } from 'src/modules/group-user/group-user.service';
+import { GroupService } from 'src/application/services/group.service';
+import { BaseGroupDto } from 'src/application/dtos/group-dto/base-group.dto';
+import { Group } from 'src/infrastucture/persistence/entities/group.entity';
+import { CreateGroupDto } from 'src/application/dtos/group-dto/create-group.dto';
+import { GroupUser } from 'src/infrastucture/persistence/entities/group-user.entity';
+import { BaseGroupUserDto } from 'src/application/dtos/group-user-dto/BaseGroupMember.dto';
+import { GroupUserService } from 'src/application/services/group-user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { StorageService } from '../../modules/storage/storage.service';
-import { UpdateGroupDto } from 'src/modules/group/dto/update-group.dto';
+import { StorageService } from '../../application/services/storage.service';
+import { UpdateGroupDto } from 'src/application/dtos/group-dto/update-group.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PAGINATION } from '../../common/constants/pagination.constants';
+import { FullGroupDto } from 'src/application/dtos/group-dto/full-group.dto';
 
 @ApiTags('Groups')
 @Controller('groups')
@@ -47,20 +49,20 @@ export class GroupSwaggerController {
     private readonly groupService: GroupService,
     private readonly groupUserService: GroupUserService,
     private readonly storage: StorageService,
-  ) {}
+  ) { }
 
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Dobij sve grupe korisnika',
     description: 'Vraća listu svih grupa u kojima je korisnik član'
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista grupa korisnika',
     type: [BaseGroupDto]
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Neautorizovan pristup' 
+  @ApiResponse({
+    status: 401,
+    description: 'Neautorizovan pristup'
   })
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
@@ -76,25 +78,25 @@ export class GroupSwaggerController {
     }));
   }
 
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Dobij detalje grupe',
     description: 'Vraća detaljne informacije o grupi'
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Detalji grupe',
     type: BaseGroupDto
   })
-  @ApiResponse({ 
-    status: 403, 
-    description: 'Nema pristupa ovoj grupi' 
+  @ApiResponse({
+    status: 403,
+    description: 'Nema pristupa ovoj grupi'
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Neautorizovan pristup' 
+  @ApiResponse({
+    status: 401,
+    description: 'Neautorizovan pristup'
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'ID grupe',
     example: 1
   })
@@ -104,38 +106,32 @@ export class GroupSwaggerController {
   async findOne(
     @CurrentUser() userId: number,
     @Param('id') id: string,
-  ): Promise<BaseGroupDto> {
-    const validated = await this.groupService.chackMembership(userId, +id);
-    if (!validated) {
-      throw new ForbiddenException('You do not have access to this resource');
-    }
-    
-    const group = await this.groupService.findOne(userId,+id);
+  ): Promise<FullGroupDto> {
 
-    return {
-      ...group,
-      profileImageUrl: group.profileImageUrl
-        ? this.storage.getPublicUrl(group.profileImageUrl)
-        : undefined,
-    };
+
+    const group = await this.groupService.findOne(userId, +id);
+    if (group.profileImageUrl) {
+      group.profileImageUrl = this.storage.getPublicUrl(group.profileImageUrl);
+    }
+    return group;
   }
 
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Kreiraj novu grupu',
     description: 'Kreira novu grupu sa opcionom slikom'
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Grupa je uspešno kreirana',
     type: Group
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Neispravni podaci' 
+  @ApiResponse({
+    status: 400,
+    description: 'Neispravni podaci'
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Neautorizovan pristup' 
+  @ApiResponse({
+    status: 401,
+    description: 'Neautorizovan pristup'
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -179,35 +175,35 @@ export class GroupSwaggerController {
       }),
     )
     image?: Express.Multer.File,
-  ): Promise<Group> {
+  ): Promise<{ message: string }> {
     const created = await this.groupService.create(group, userId);
 
     if (image) {
       const { path } = await this.storage.uploadGroupCover(created.id, image);
       await this.groupService.updateCover(created.id, path);
     }
-    return created;
+    return { message: "Group created successfully" };
   }
 
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Dobij članove grupe',
     description: 'Vraća listu svih članova grupe'
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Lista članova grupe',
     type: [BaseGroupUserDto]
   })
-  @ApiResponse({ 
-    status: 403, 
-    description: 'Nema pristupa ovoj grupi' 
+  @ApiResponse({
+    status: 403,
+    description: 'Nema pristupa ovoj grupi'
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Neautorizovan pristup' 
+  @ApiResponse({
+    status: 401,
+    description: 'Neautorizovan pristup'
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'ID grupe',
     example: 1
   })
@@ -218,41 +214,41 @@ export class GroupSwaggerController {
     @CurrentUser() userId: number,
     @Param('id') id: string,
   ): Promise<BaseGroupUserDto[]> {
-    const validated = await this.groupService.chackMembership(userId,+id);
+    const validated = await this.groupService.chackMembership(userId, +id);
     if (!validated) {
       throw new ForbiddenException('You do not have access to this resource');
     }
     return this.groupUserService.getGroupMembers(+id)
   }
 
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Dodaj člana u grupu',
     description: 'Dodaje novog člana u grupu'
   })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Član je uspešno dodat u grupu',
     type: GroupUser
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Neispravni podaci ili korisnik već postoji u grupi' 
+  @ApiResponse({
+    status: 400,
+    description: 'Neispravni podaci ili korisnik već postoji u grupi'
   })
-  @ApiResponse({ 
-    status: 403, 
-    description: 'Nema dozvolu za dodavanje članova' 
+  @ApiResponse({
+    status: 403,
+    description: 'Nema dozvolu za dodavanje članova'
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Neautorizovan pristup' 
+  @ApiResponse({
+    status: 401,
+    description: 'Neautorizovan pristup'
   })
-  @ApiParam({ 
-    name: 'group_id', 
+  @ApiParam({
+    name: 'group_id',
     description: 'ID grupe',
     example: 1
   })
-  @ApiParam({ 
-    name: 'member_id', 
+  @ApiParam({
+    name: 'member_id',
     description: 'ID korisnika koji se dodaje',
     example: 5
   })
@@ -263,59 +259,38 @@ export class GroupSwaggerController {
     @CurrentUser() userId: number,
     @Param('group_id') groupId: string,
     @Param('member_id') memberId: string,
-  ): Promise<GroupUser> {
+  ): Promise<BaseGroupUserDto> {
     if (isNaN(+groupId) || isNaN(+memberId)) {
       throw new BadRequestException('Invalid group or member ID');
     }
 
-    console.log('--------------------------------');
-    console.log('KO SALJE ZAHTEV (UserID1):', userId);
-    console.log('U KOJU GRUPU (GroupId):', groupId, '-> kao broj:', +groupId);
-    console.log('KOGA DODAJE (MemberId):', memberId);
-    const validated = await this.groupService.chackMembership(userId, +groupId);
-    if (!validated) {
-      throw new ForbiddenException(
-        'You do not have permission to add members to this group',
-      );
-    }
 
-    const memberExists = await this.groupService.chackMembership(
-      +memberId,
-      +groupId,
-    );
-
-    if (memberExists) {
-      throw new BadRequestException(
-        'User is already a member of this group',
-      );
-    }
-
-    return this.groupService.addMemberToGroup(+groupId, +memberId);
+    return this.groupService.addMemberToGroup(+groupId, +memberId,userId);
   }
 
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Ažuriraj grupu',
     description: 'Ažurira informacije o grupi i opciono sliku'
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Grupa je uspešno ažurirana',
     type: BaseGroupDto
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Neispravni podaci' 
+  @ApiResponse({
+    status: 400,
+    description: 'Neispravni podaci'
   })
-  @ApiResponse({ 
-    status: 403, 
-    description: 'Nema dozvolu za ažuriranje grupe' 
+  @ApiResponse({
+    status: 403,
+    description: 'Nema dozvolu za ažuriranje grupe'
   })
-  @ApiResponse({ 
-    status: 401, 
-    description: 'Neautorizovan pristup' 
+  @ApiResponse({
+    status: 401,
+    description: 'Neautorizovan pristup'
   })
-  @ApiParam({ 
-    name: 'id', 
+  @ApiParam({
+    name: 'id',
     description: 'ID grupe',
     example: 1
   })
@@ -362,19 +337,27 @@ export class GroupSwaggerController {
     )
     image?: Express.Multer.File,
   ): Promise<BaseGroupDto> {
-    const validated = await this.groupService.chackMembership(userId, +id);
-    if (!validated) {
-      throw new ForbiddenException(
-        'You do not have permission to update this group',
-      );
-    }
 
-    const updated = await this.groupService.update(+id, group);
+    const updated = await this.groupService.update(+id, group, userId);
 
     if (image) {
-      const { path } = await this.storage.uploadGroupCover(updated.id, image);
-      await this.groupService.updateCover(updated.id, path);
+      const { path } = await this.storage.uploadGroupCover(+id, image);
+      await this.groupService.updateCover(+id, path);
     }
     return updated;
+  }
+  @ApiBearerAuth('JWT-auth')
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('kick_member/:memberId/:groupId')
+  async kickMember(@Param('memberId') memberId: number, @Param('groupId') groupId: number, @CurrentUser() adminId: number): Promise<{ message: string }> {
+    return await this.groupService.kickMemberFromGroup(memberId, groupId, adminId);
+  }
+  @ApiBearerAuth('JWT-auth')
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete_group/:id')
+  async deleteGroup(@Param('id') id: number, @CurrentUser() adminId: number): Promise<{ message: string }> {
+    return await this.groupService.delete(id, adminId);
   }
 }

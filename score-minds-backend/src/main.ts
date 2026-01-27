@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import corsOptions from './modules/config/corsOptions';
 import morgan from 'morgan';
 import { setupSwagger } from './modules/config/swagger.config';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,9 +17,20 @@ async function bootstrap() {
     methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
   });
 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: ['amqp://guest:guest@rabbitmq:5672'], // Koristimo 'rabbitmq' ime servisa iz Dockera
+      queue: 'prediction_queue', // ⚠️ PAŽNJA: Ovo ime mora biti identično onom u RabbitMQModule!
+      queueOptions: {
+        durable: true,
+      },
+    },
+  });
   //Za swagger
   setupSwagger(app);
 
+  await app.startAllMicroservices();
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 
   console.log(`Application is running on: ${await app.getUrl()}`);

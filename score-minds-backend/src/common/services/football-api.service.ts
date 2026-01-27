@@ -34,8 +34,8 @@ export class FootballApiService {
 
       console.log("Status:", data.get);
       console.log("Podaci sa API-ja:", data.response.length);
-      
-   
+
+
       return data.response || [];
 
 
@@ -56,12 +56,27 @@ export class FootballApiService {
   // }
 
   async getPlayersByTeam(teamId: number) {
-    const response = await lastValueFrom(
-      this.httpService.get(`${this.baseUrl}/players/squads`, {
-        params: { team: teamId },
-        headers: { 'x-apisports-key': this.apiKey }
-      })
-    );
-    return response.data.response[0].players;
+    try {
+      const response = await lastValueFrom(
+        this.httpService.get(`${this.baseUrl}/players/squads`, {
+          params: { team: teamId },
+          headers: { 'x-apisports-key': this.apiKey }
+        })
+      );
+      
+      if (response.data.errors && Object.keys(response.data.errors).length > 0) {
+        console.error(`❌ API GREŠKA za tim ${teamId}:`, JSON.stringify(response.data.errors, null, 2));
+        return [];
+      }
+      if (!response.data.response || response.data.response.length === 0) {
+        console.warn(`⚠️ Nema podataka o igračima za tim ID: ${teamId}. Preskačem.`);
+        return [];
+      }
+      return response.data.response[0]?.players || [];
+    } catch (error) {
+      console.error("Greška:", error.message);
+      return [];
+    }
+
   }
 }

@@ -20,11 +20,13 @@ export function setupSwagger(app: INestApplication): void {
     .addTag('Authentication', 'Endpoints za autentifikaciju korisnika')
     .addTag('Users', 'Endpoints za upravljanje korisnicima')
     .addTag('Groups', 'Endpoints za upravljanje grupama')
-    .addTag('Group Members', 'Endpoints za upravljanje članovima grupa') 
+    .addTag('Group Members', 'Endpoints za upravljanje članovima grupa')
+    .addTag('Personal Predictions', 'Endpoints za upravljanje predikcijama')
     .addTag('Matches', 'Endpoints za upravljanje mecevima')
     .addTag('Players', 'Endpoints za upravljanje igracima')
     .addTag('Sync Data', 'Endpoints za punjnje tabela preko API')
     .addTag('Storage', 'Endpoints za upravljanje fajlovima')
+    .addTag('Predictions Audit', 'Endpoints za praćenje promena predikcija')
     .addServer('http://localhost:3000', 'Development server')
     .build();
 

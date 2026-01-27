@@ -24,16 +24,16 @@ import {
   ApiBody,
   ApiParam
 } from '@nestjs/swagger';
-import { UserService } from 'src/modules/user/user.service';
-import { UpdateUserDto } from 'src/modules/user/dto/update-user.dto';
-import { FullUserDto } from 'src/modules/user/dto/full-user.dto';
+import { UserService } from 'src/application/services/user.service';
+import { UpdateUserDto } from 'src/application/dtos/user-dto/update-user.dto';
+import { FullUserDto } from 'src/application/dtos/user-dto/full-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BaseUserSwaggerDto } from '../swagger-dto/base-user-swagger.dto';
-import { FilterUserDto } from 'src/modules/user/dto/fileter-user.dto';
-import { StorageService } from '../../modules/storage/storage.service';
+import { FilterUserDto } from 'src/application/dtos/user-dto/fileter-user.dto';
+import { StorageService } from '../../application/services/storage.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { User } from 'src/modules/user/user.entity';
+import { User } from 'src/infrastucture/persistence/entities/user.entity';
 
 @ApiTags('Users')
 @Controller('users')
@@ -165,7 +165,8 @@ export class UserSwaggerController{
   {
     if(file)
     {
-      const {path}= await this.storageService.uploadUserAvatar(userId,file);
+      const user=await this.userSerivce.findOne(userId)
+      const {path}= await this.storageService.uploadUserAvatar(user.username,file);
       await this.userSerivce.updateAvatar(userId,path);
     }
 
@@ -227,11 +228,11 @@ export class UserSwaggerController{
       throw new BadRequestException("No file provided");
     }
 
-    const {path,url}= await this.storageService.uploadUserAvatar(userId,file);
+    //const {path,url}= await this.storageService.uploadUserAvatar(userId,file);
 
-    await this.userSerivce.updateAvatar(userId,path);
+    
 
-    return {image_path:path,image_url:url};
+    //return await this.userSerivce.updateAvatar(userId,path);
 
   }
 }
