@@ -56,7 +56,7 @@ export class GroupService  {
     async chackMembership(userId: number, groupId: number): Promise<boolean> {
         const gs = await this.groupUserService.getMemberById(userId, groupId);
         if (!gs) {
-            return false;
+            throw new ForbiddenException("You do not have access to this resource");
         }
 
         return true;

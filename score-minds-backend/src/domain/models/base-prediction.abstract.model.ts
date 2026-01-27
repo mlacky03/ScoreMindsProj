@@ -10,7 +10,7 @@ export abstract class BasePrediction{
             private _predictedHomeScore: number | null,
             private _predictedAwayScore: number | null,
             private _winner: WinnerOption ,
-            private _totalPoints: number = 0,
+            private _pointsWon: number = 0,
             private _createdAt: Date = new Date(),
             private _updatedAt: Date | null = null,
             private _predictedEvents: PredictionEvent[] = [] ,
@@ -38,11 +38,11 @@ export abstract class BasePrediction{
 
         public addPoints(points: number): void {
                 if (points < 0) throw new Error("Poeni ne mogu biti negativni.");
-                this._totalPoints += points;
+                this._pointsWon += points;
             }
         
             public resetPoints(): void {
-                this._totalPoints = 0;
+                this._pointsWon = 0;
             }
         
             private validateScores(home: number | null, away: number | null): void {
@@ -77,7 +77,7 @@ export abstract class BasePrediction{
             get predictedHomeScore() { return this._predictedHomeScore; }
             get predictedAwayScore() { return this._predictedAwayScore; }
             get winner() { return this._winner; }
-            get totalPoints() { return this._totalPoints; }
+            get pointsWon() { return this._pointsWon; }
             get createdAt() { return this._createdAt; }
             get updatedAt() { return this._updatedAt; }
             get predictedEvents() { return this._predictedEvents; }

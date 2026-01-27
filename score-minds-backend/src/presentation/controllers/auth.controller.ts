@@ -129,12 +129,12 @@ export class AuthController {
       throw new ConflictException('Email already in use');
     }
 
+    const created = await this.authService.register(user);
     
     if (image) {
-      const { path } = await this.storageService.uploadUserAvatar(user.username, image);
+      const { path } = await this.storageService.uploadUserAvatar(created.id.toString(), image);
       user.profileImageUrl=path
     }
-    const created = await this.authService.register(user);
 
 
 

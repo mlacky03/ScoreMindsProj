@@ -33,8 +33,6 @@ export abstract class BasePrediction {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'integer', default: 0 })
-  totalPoints: number;
 
   @Column({ type: 'enum', enum: WinnerOption, nullable: true })
     winner: WinnerOption;

@@ -11,14 +11,14 @@ export class PersonalPrediction extends BasePrediction{
         predictedHomeScore: number | null,
         predictedAwayScore: number | null,
         winner: WinnerOption,
-        totalPoints: number = 0,
+        pointsWon: number = 0,
         createdAt: Date = new Date(),
         updatedAt: Date | null = null,
         predictedEvents: PredictionEvent[] = [],
         match:Match|null,
         private _userId: number,     
     ) {
-        super(id,matchId,predictedHomeScore,predictedAwayScore,winner,totalPoints,createdAt,updatedAt,predictedEvents,match);
+        super(id,matchId,predictedHomeScore,predictedAwayScore,winner,pointsWon,createdAt,updatedAt,predictedEvents,match);
     }
 
 

@@ -84,7 +84,7 @@ export class UserController {
 
         const updatedUser=await this.userService.update(userId, user);
         if (file) {
-            const { path } = await this.storageService.uploadUserAvatar(updatedUser.username, file);
+            const { path } = await this.storageService.uploadUserAvatar(userId.toString(), file);
 
             return await this.userService.updateAvatar(userId, path);
         }

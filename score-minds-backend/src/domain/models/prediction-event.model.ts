@@ -7,7 +7,8 @@ export class PredictionEvent {
         private _id: number | null,
         private _type: EventType,
         private _playerId: number,
-        private _predictionId: number,
+        private _personalPredictionId: number | null,
+        private _groupPredictionId: number | null,
         private _minute: number | null = null
     ) {
         this.validateMinute(_minute);
@@ -34,14 +35,23 @@ export class PredictionEvent {
         this._playerId = newPlayerId;
     }
 
-    public updatePredictionEvent(newPrediction: UpdatePredictionEventDto): void {
-        this._type = newPrediction.type||this._type;
-        this._minute = newPrediction.minute||null;
+    public updatePredictionEvent(type:EventType,minute:number): void {
+        this._type = type||this._type;
+        this._minute = minute||null;
+    }
+
+    public updatePredictionId(newPredictionId: number): void {
+        this._personalPredictionId = newPredictionId;
+    }
+
+    public updateGroupPredictionId(newGroupPredictionId: number): void {
+        this._groupPredictionId = newGroupPredictionId;
     }
 
     get id() { return this._id; }
     get type() { return this._type; }
     get playerId() { return this._playerId; }
-    get predictionId() { return this._predictionId; }
+    get personalPredictionId() { return this._personalPredictionId; }
+    get groupPredictionId() { return this._groupPredictionId; }
     get minute() { return this._minute; }
 }

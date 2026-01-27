@@ -29,7 +29,6 @@ export class CreatePredictionDto {
     @IsNumber()
     matchId: number;
 
-    @IsNumber()
-    groupId: number;
+   
 
 }

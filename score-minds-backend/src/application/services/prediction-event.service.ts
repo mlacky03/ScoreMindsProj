@@ -18,16 +18,19 @@ export class PredictionEventService  {
        
     }
 
-    async createPredictionEvent(predictionEvent: CreatePredictionEventDto, hometeamId: number, awayteamId: number): Promise<PredictionEvent> {
+    async createPredictionEvent(predictionEvent: CreatePredictionEventDto,group:boolean): Promise<PredictionEvent> {
         const pe= new PredictionEvent(
             null,
             predictionEvent.type,
             predictionEvent.playerId,
-            predictionEvent.predictionId,
+            null,
+            null,
             predictionEvent.minute
         )
+        group?pe.updateGroupPredictionId(predictionEvent.predictionId):pe.updatePredictionId(predictionEvent.predictionId);
         return this.repo.save(pe);
     }
+    
     async findAll(predictionId: number): Promise<BasePredictionEventDto[]> {
         const data = await this.repo.findByPredictionId(predictionId);
         return data.map(event => new BasePredictionEventDto(event));
@@ -48,7 +51,7 @@ export class PredictionEventService  {
         return new FullPredictionEventDto(data,player);
     }
 
-    async update(id: number, predictionEvent: UpdatePredictionEventDto, hometeamId: number, awayteamId: number): Promise<FullPredictionEventDto | BasePredictionEventDto|null> {
+    async update(id: number, predictionEvent: UpdatePredictionEventDto): Promise<FullPredictionEventDto | BasePredictionEventDto|null> {
         const data = await this.repo.findById(id);
         if (!data) return null;
         const cleanData = Object.fromEntries(
@@ -57,15 +60,15 @@ export class PredictionEventService  {
         const { playerId, ...rest } = cleanData;
         let player: FullPlayerDto | null = null;
         //Object.assign(data, rest); // ovo radi samo za podatke koji nisu relacije zato mora za player posebno
-       data.updatePredictionEvent(rest);
+       data.updatePredictionEvent(rest.type,rest.minute);
         if (playerId) {
-            player = await this.playerService.findOne(playerId);
-            if (!player) {
-                throw new Error(`Igrač sa ID-jem ${playerId} nije pronađen.`);
-            }
-            if (player.teamId !== hometeamId && player.teamId !== awayteamId) {
-                throw new Error(`Igrač sa ID-jem ${predictionEvent.playerId} nije u niti jednoj ekipi.`);
-            }
+            // player = await this.playerService.findOne(playerId);
+            // if (!player) {
+            //     throw new Error(`Igrač sa ID-jem ${playerId} nije pronađen.`);
+            // }
+            // if (player.teamId !== hometeamId && player.teamId !== awayteamId) {
+            //     throw new Error(`Igrač sa ID-jem ${predictionEvent.playerId} nije u niti jednoj ekipi.`);
+            // }
             
             data.updatePlayerId(playerId);
         }

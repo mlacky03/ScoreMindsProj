@@ -66,7 +66,7 @@ export class PersonalPredictionService {
 
         if (prediction.events && prediction.events.length > 0) {
             for (const eventDto of prediction.events) {
-                await this.predictionEventService.createPredictionEvent({ ...eventDto, predictionId: savedPrediction.id! }, match.hometeamId, match.awayteamId);
+                await this.predictionEventService.createPredictionEvent({ ...eventDto, predictionId: savedPrediction.id! },false);
             }
         }
 
@@ -137,15 +137,13 @@ export class PersonalPredictionService {
                 if (!exists) {
                     return this.predictionEventService.createPredictionEvent(
                         { ...p, predictionId: prediction.id },
-                        match.awayteamId,
-                        match.hometeamId
+                        false
                     );
                 } else {
                     return this.predictionEventService.update(
                         p.id,
                         p,
-                        match.awayteamId,
-                        match.hometeamId
+
                     );
                 }
             });

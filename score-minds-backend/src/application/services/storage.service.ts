@@ -12,11 +12,11 @@ export class StorageService {
   private logger = new Logger(StorageService.name);
   private bucket = process.env.SUPABASE_BUCKET || "scoremindsavatar";
   
-  async uploadUserAvatar(username: string | string, file: Express.Multer.File) {
+  async uploadUserAvatar(id: string | string, file: Express.Multer.File) {
     if (!file) throw new BadRequestException('No file');
-    this.logger.log(`Pokušaj uploada za korisnika ${username} u kantu: ${this.bucket}`);
+    this.logger.log(`Pokušaj uploada za korisnika ${id} u kantu: ${this.bucket}`);
     const ext = (file.originalname.split('.').pop() || 'jpg').toLowerCase();
-    const key = `users/${username}/avatar_${Date.now()}.${ext}`;
+    const key = `users/${id}/avatar_${Date.now()}.${ext}`;
 
     const { error } = await this.supabase.storage
       .from(this.bucket)

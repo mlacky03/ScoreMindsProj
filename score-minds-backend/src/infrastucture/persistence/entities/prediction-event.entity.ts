@@ -5,7 +5,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
+  Check
 } from 'typeorm';
 import { PersonalPrediction } from './personal-prediction.entity';
 import { Player } from './player.entity';
@@ -20,6 +21,11 @@ export enum EventType {
 
 
 @Entity('predicted_events') 
+@Check(`
+    ("personal_prediction_id" IS NOT NULL AND "group_prediction_id" IS NULL) 
+    OR 
+    ("personal_prediction_id" IS NULL AND "group_prediction_id" IS NOT NULL)
+`)
 export class PredictionEvent {
   @PrimaryGeneratedColumn()
   id: number;
@@ -37,15 +43,18 @@ export class PredictionEvent {
   @JoinColumn({ name: 'player_id' })
   player: Player
 
-  @Column({ name: 'prediction_id' })
-  predictionId: number;
+  @Column({ name: 'personal_prediction_id', nullable: true })
+  personalPredictionId: number | null;
+
+  @Column({ name: 'group_prediction_id', nullable: true })
+  groupPredictionId: number | null;
   
   @ManyToOne(() => PersonalPrediction, p => p.predictedEvents, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'personal_prediction_id' })
-  personalPrediction: PersonalPrediction;
+  personalPrediction: PersonalPrediction|null;
 
 
   @ManyToOne(() => GroupPrediction, p => p.predictedEvents, { onDelete: 'CASCADE', nullable: true })
   @JoinColumn({ name: 'group_prediction_id' })
-  groupPrediction: GroupPrediction;
+  groupPrediction: GroupPrediction|null;
 }

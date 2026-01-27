@@ -63,6 +63,7 @@ export class GroupController {
             group.profileImageUrl = this.storage.getPublicUrl(group.profileImageUrl);
         }
 
+        group.owner.profileImageUrl=this.storage.getPublicUrl(group.owner.profileImageUrl!);
         // if (group.members) {
         //     group.members = group.members.map((m) => ({
         //         ...m,
