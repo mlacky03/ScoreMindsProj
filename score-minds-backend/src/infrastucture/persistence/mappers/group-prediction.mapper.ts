@@ -22,7 +22,7 @@ export class GroupPredictionMapper extends BaseMapper<GroupPrediction, GroupPred
             entity.predictedHomeScore,
             entity.predictedAwayScore,
             entity.winner,
-            entity.totalPoints,
+            entity.pointsWon,
             entity.createdAt,
             entity.updatedAt,
             events ,
@@ -40,7 +40,7 @@ export class GroupPredictionMapper extends BaseMapper<GroupPrediction, GroupPred
         
         entity.predictedHomeScore = domain.predictedHomeScore;
         entity.predictedAwayScore = domain.predictedAwayScore;
-        entity.totalPoints = domain.totalPoints;
+        entity.pointsWon = domain.pointsWon;
         entity.winner = domain.winner;
         
         

@@ -18,7 +18,7 @@ export class FullGroupDto
         this.id=entity.id!;
         this.name=entity.name;
         this.profileImageUrl=entity.profileImageUrl;
-        this.points=0;
+        this.points=entity.groupPoints;
         this.members=members;
     }
 

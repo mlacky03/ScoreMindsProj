@@ -16,7 +16,7 @@ export class BasePredictionDto{
         this.predictedHomeScore=p.predictedHomeScore;
         this.predictedAwayScore=p.predictedAwayScore;
         this.matchId=p.matchId;
-        this.totalPoints=p.totalPoints;
+        this.totalPoints=p.pointsWon;
         this.winner=p.winner;
         this.predictionEvents=p.predictedEvents?.map(event => new BasePredictionEventDto(event)) || [];
     }

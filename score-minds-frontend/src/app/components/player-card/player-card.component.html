@@ -1,0 +1,54 @@
+<div class="player" tabindex="0" role="button">
+
+  <div class="player-container">
+    <div class="player-info">
+      <div class="player-logo">
+        <img *ngIf="player.photo; else playerFallback" [src]="player.photo" alt="{{ player.name }}"
+          (error)="onImgError($event)" />
+        <ng-template #playerFallback>
+          <div class="fallback-icon">👤</div>
+        </ng-template>
+      </div>
+      <span class="player-name">{{ player.name }}</span>
+      <span class="player-position">{{ player.position }}</span>
+    </div>
+
+    <div class="player-actions">
+      <div class="action-icon" (click)="openModal('GOAL')" title="Add Goal">
+        ⚽
+      </div>
+
+      <div class="action-icon" (click)="openModal('ASSIST')" title="Add Assist">
+        👟
+      </div>
+    </div>
+    <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+
+      <div class="modal-content" (click)="$event.stopPropagation()">
+
+        <h3 class="modal-title">
+          Add {{ activeEventType === 'GOAL' ? 'Goal' : 'Assist' }}
+        </h3>
+
+        <p class="modal-subtitle">Do you want to add the minute?</p>
+
+        <input type="number" class="modal-input" placeholder="min'" [(ngModel)]="inputMinute"
+          (keydown.enter)="confirmWithMinute()" autofocus>
+
+        <div class="modal-buttons">
+          <button class="btn-confirm" [disabled]="!inputMinute" (click)="confirmWithMinute()">
+            ✅ Yes, Add {{ inputMinute ? '(' + inputMinute + '\')' : '' }}
+          </button>
+
+          <button class="btn-skip" (click)="confirmWithoutMinute()">
+            ❌ No, just add event
+          </button>
+        </div>
+
+        <button class="btn-close" (click)="closeModal()">✕</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>

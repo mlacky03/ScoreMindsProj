@@ -1,0 +1,147 @@
+.prediction-card {
+  background: #1e1e1e;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  overflow: hidden;
+
+  // --- 1. DEFAULT STATE (GRID / KOCKA) ---
+  // Vertikalni raspored: Timovi su gore i dole (ili levo/desno ali veliki)
+  display: flex;
+  flex-direction: column; // Slažemo elemente vertikalno
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-height: 220px; // Visina kocke
+  gap: 15px;
+
+  &:hover {
+    background: #252525;
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px);
+  }
+
+  // Zajednički stilovi za timove
+  .team-container {
+    display: flex;
+    flex-direction: column; // Grb gore, ime dole
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    gap: 8px;
+
+    .team-logo {
+      width: 60px; // Veliki logo
+      height: 60px;
+      object-fit: contain;
+      img { width: 100%; height: 100%; object-fit: contain; }
+    }
+    .score-badge {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+      background: #333; // Tamna pozadina okvira
+      padding: 4px 12px; // Unutrašnji razmak da bude širi
+      border-radius: 8px; // Zaobljene ivice
+      border: 1px solid #444; // Tanak okvir
+      min-width: 40px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+      // Ako je pobednik, oboj pozadinu u zeleno
+      &.winner-bg {
+        background: #166534; // Tamno zelena
+        border-color: #22c55e; // Svetlo zelena ivica
+        color: #fff;
+      }
+    }
+
+    .team-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      max-width: 120px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prediction-score {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #ddd;
+    }
+  }
+
+  // Sredina (VS i Datum)
+  .match-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+
+    .vs-badge {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #666;
+    }
+
+    .match-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #888;
+    }
+  }
+
+  .card-arrow { display: none; } // Ne treba nam strelica u kocki
+
+  // --- 2. COMPACT STATE (SIDEBAR / LISTA) ---
+  // Ovo se aktivira kad je [compact]="true"
+  &.compact-mode {
+    flex-direction: row; // Vraćamo u red (horizontalno)
+    justify-content: space-between;
+    padding: 10px 15px;
+    min-height: auto; // Reset visine
+    gap: 10px;
+
+    // Resetujemo timove da budu horizontalni
+    .team-container {
+      flex-direction: row; // Logo pored imena
+      width: auto;
+      gap: 10px;
+      
+      // Za goste (desna strana) obrćemo redosled (Ime pa Logo)
+      &.away { flex-direction: row-reverse; text-align: right; }
+      &.home { text-align: left; }
+
+      .team-logo {
+        width: 30px; // Mali logo
+        height: 30px;
+      }
+
+      .team-name {
+        font-size: 0.85rem;
+        max-width: 70px; // Kraće ime da stane u sidebar
+      }
+      
+      .prediction-score {
+          font-size: 1rem;
+      }
+      .score-badge {
+        font-size: 1rem; // Manji font u listi
+        padding: 2px 8px;
+        min-width: 30px;
+      }
+    }
+
+    // Sredina u sidebaru
+    .match-center {
+      .vs-badge { font-size: 0.9rem; margin: 0; }
+      .match-meta { display: none; } // Sakrivamo datum da ne guši prostor
+    }
+  }
+}

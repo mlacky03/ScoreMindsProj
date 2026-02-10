@@ -7,6 +7,7 @@ export class Group {
         private _ownerId: number,
         private _createdAt: Date=new Date(),
         private _profileImageUrl: string|undefined,
+        private _groupPoints: number=0,
         // Opciono: Možemo čuvati listu članova ako nam treba za logiku
         private _members: GroupUser[] = [] 
     ) {
@@ -43,6 +44,7 @@ export class Group {
     get ownerId() { return this._ownerId; }
     get createdAt() { return this._createdAt; }
     get profileImageUrl() { return this._profileImageUrl; }
+    get groupPoints() { return this._groupPoints; }
     get members() { return this._members; }
     
 }

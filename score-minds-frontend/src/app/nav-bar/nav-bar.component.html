@@ -1,0 +1,35 @@
+<nav class="nav" role="navigation" aria-label="Main">
+  <div class="nav__inner">
+    <a class="nav__brand" routerLink="/" (click)="close()">ScoreMinds</a>
+
+    <button
+      class="nav__toggle"
+      type="button"
+      aria-label="Toggle menu"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="toggle()">
+      ☰
+    </button>
+
+    <ul class="nav__links" [class.nav__links--open]="menuOpen()">
+      <li *ngFor="let item of links"
+          [class.hidden]="item.authOnly && !isAuth()">
+        <a routerLink="{{ item.path }}"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }"
+           (click)="onNavClick(item.path, $event)">
+          {{ item.label }}
+        </a>
+      </li>
+
+      <li *ngIf="!isAuth()">
+        <a routerLink="/login" routerLinkActive="active" (click)="close()">Log in</a>
+      </li>
+
+      <li *ngIf="!isAuth()">
+        <a routerLink="/register" routerLinkActive="active" (click)="close()">Register</a>
+      </li>
+
+    </ul>
+  </div>
+</nav>

@@ -26,7 +26,7 @@ export class FullPredictionDto{
         this.matchId=p.matchId;
         this.groupId=p.groupId;
         this.createdAt=p.createdAt;
-        this.totalPoints=p.totalPoints;
+        this.totalPoints=p.pointsWon;
         this.predictedEvents=p.predictedEvents.map(pe=>new BasePredictionEventDto(pe));
         this.winner=p.winner;
         this.lastUpdatedById=p.lastUpdatedById;

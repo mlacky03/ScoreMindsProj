@@ -98,7 +98,7 @@ export class PersonalPredictionService {
         const snapshotBeforeUpdate = { ...prediction } as PersonalPrediction;
         const { events, matchId, ...restData } = cleanData;
         let match;
-        if (matchId) {
+        if (matchId&&matchId!==prediction.matchId) {
             match = await this.matchService.findOne(matchId);
             prediction.updateMatchId(matchId);
             const p=prediction.predictedEvents.map(e=>e.id as number);
@@ -128,7 +128,7 @@ export class PersonalPredictionService {
         }
 
         //Object.assign(prediction, restData);
-        prediction.updatePrediction(restData.predictedHomeScore,restData.predictedAwayScore,restData.winner);
+        const changed=prediction.updatePrediction(restData.predictedHomeScore,restData.predictedAwayScore,restData.winner);
 
         if (events) {
             const promises = events.map(async (p) => {
@@ -140,6 +140,15 @@ export class PersonalPredictionService {
                         false
                     );
                 } else {
+                    const isSame = 
+                        exists.playerId === p.playerId &&
+                        exists.type === p.type &&
+                        exists.minute == p.minute; 
+
+   
+                    if (isSame) {
+                        return Promise.resolve(exists); 
+                    }
                     return this.predictionEventService.update(
                         p.id,
                         p,
@@ -152,10 +161,12 @@ export class PersonalPredictionService {
         }
         
         prediction.setEventsNull();
-        await this.repo.save(prediction);
-
-
-        await this.predictionAuditService.createUpdateAudit(snapshotBeforeUpdate, prediction);
+        if(changed)
+        {
+            await this.repo.save(prediction);
+            await this.predictionAuditService.createUpdateAudit(snapshotBeforeUpdate, prediction);
+        }
+            
 
         const freshPrediction = await this.repo.findPredictionByUserWithRelations(userId, predictionId);
 

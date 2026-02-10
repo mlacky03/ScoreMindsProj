@@ -13,6 +13,6 @@ export class BaseGroupDto {
     this.profileImageUrl = entity.profileImageUrl;
     this.name = entity.name;
     this.owner = entity.ownerId;
-    this.points=0;
+    this.points=entity.groupPoints;
   }
 }

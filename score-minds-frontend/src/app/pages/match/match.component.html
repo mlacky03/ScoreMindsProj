@@ -1,0 +1,51 @@
+<div class="match-page-container">
+  
+  <header class="page-header">
+    <div class="filter-tabs">
+      <button 
+        class="filter-btn" 
+        [class.active]="filter() === 'upcoming'" 
+        (click)="setFilter('upcoming')">
+        📅 Upcoming
+      </button>
+
+      <button 
+        class="filter-btn" 
+        [class.active]="filter() === 'live'" 
+        (click)="setFilter('live')">
+        🔴 Live
+      </button>
+
+      <button 
+        class="filter-btn" 
+        [class.active]="filter() === 'all'" 
+        (click)="setFilter('all')">
+        📋 All
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="allMatches().length === 0" class="loading-state">
+    <div class="spinner">⏳</div>
+    <p>Loading matches...</p>
+  </div>
+
+  <div *ngIf="displayedMatches().length > 0" class="matches-content">
+    <app-match-list
+      [matches]="displayedMatches()" 
+      (matchSelected)="onSelect($event)">
+
+    </app-match-list>
+  </div>
+
+  <div class="empty-state" *ngIf="allMatches().length > 0 && displayedMatches().length === 0">
+    <div class="empty-icon">
+      <span *ngIf="filter() === 'live'">⚽</span>
+      <span *ngIf="filter() === 'upcoming'">📅</span>
+    </div>
+    <h3>No matches found</h3>
+    <p *ngIf="filter() === 'live'">There are no live matches at the moment.</p>
+    <p *ngIf="filter() === 'upcoming'">No upcoming matches scheduled.</p>
+  </div>
+
+</div>

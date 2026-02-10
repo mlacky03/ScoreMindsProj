@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan, SelectQueryBuilder } from 'typeorm';
+import { Repository, MoreThan, SelectQueryBuilder, In } from 'typeorm';
 import { BaseRepository, PagginationOptions } from './base.repository';
 import { Match } from 'src/domain/models/match.model';
 import { Match as MatchEntity } from '../entities/matches.entity';
@@ -13,6 +13,18 @@ export class MatchRepository extends BaseRepository<Match, MatchEntity> {
         typeOrmRepo: Repository<MatchEntity>
     ) {
         super(typeOrmRepo, new MatchMapper());
+    }
+
+    async findMatchesByIds(ids:number[]): Promise<Match[]> {
+        const entities = await this.typeOrmRepo.find({
+            where: { id: In(ids)}
+        });
+        return this.mapper.toDomainList(entities);
+    }
+    
+    async findAll(): Promise<Match[]> {
+        const entities = await this.typeOrmRepo.find({order:{startTime: 'ASC'}});
+        return this.mapper.toDomainList(entities);
     }
 
     async findUpcoming(): Promise<Match[]> {

@@ -19,7 +19,7 @@ import { BasePrediction } from './base-prediction.abstract';
 
 
 @Entity('predictions')
-@Index(['userId', 'matchId'])
+@Index(['userId', 'matchId'],{ unique: true })
 export class PersonalPrediction extends BasePrediction {
 
   @Column({ name: 'user_id'})

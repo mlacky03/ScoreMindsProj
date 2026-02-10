@@ -1,0 +1,346 @@
+// Promenljive za boje (prilagodi svojoj temi)
+$bg-dark: #121212;
+$bg-card: #1e1e1e;
+$text-main: #ffffff;
+$text-muted: #aaaaaa;
+$color-winner: #2ecc71; // Zelena za pobednika
+$color-loser: #e74c3c;
+$color-draw: #f1c40f;
+$color-accent: #3b82f6;
+
+.prediction-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+// --- HEADER (Match Score & Logos) ---
+.prediction-header {
+  background: $bg-card;
+  border-radius: 16px;
+  padding: 30px 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+
+  .match-container {
+    display: flex;
+    justify-content: center; // Centriramo sve
+    align-items: center; // Poravnanje po vertikali
+    gap: 15px;
+    
+    @media (max-width: 650px) {
+        flex-direction: column; // Na mobilnom jedan ispod drugog
+        gap: 30px;
+    }
+  }
+}
+
+.team-section {
+  display: flex;
+  flex-direction: column; // 🔥 Ime IZNAD tela (grb+skor)
+  align-items: center;    // Centrira ime
+  flex: 1;                
+  
+  .team-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 15px 0; // Razmak između imena i grba
+    color: $text-main;
+    text-align: center;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  // Novi wrapper koji drži Grb i Skor u istoj liniji
+  .team-body {
+    display: flex;
+    align-items: center; 
+    gap: 20px; // Razmak između grba i rezultata
+  }
+
+  // Stil za rezultat
+  .prediction-score {
+    font-size: 2.5rem; // Veliki rezultat
+    font-weight: 800;
+    color: $text-main;
+    line-height: 1;
+    min-width: 30px;
+    text-align: center;
+  }
+}
+
+.team-logo-wrapper {
+  position: relative;
+  width: 80px;  // Povećan grb
+  height: 80px;
+  border-radius: 50%;
+  padding: 4px;
+  background: #2a2a2a;
+  transition: all 0.3s ease;
+
+  img.team-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    // border-radius: 50%; // Nije nužno ako je slika transparentan PNG
+  }
+
+  // ✨ WINNER GLOW EFEKAT ✨
+  &.winner-glow {
+    background: transparent;
+    box-shadow: 0 0 20px rgba($color-winner, 0.6); // Jači sjaj
+    border: 2px solid $color-winner;
+    transform: scale(1.05);
+  }
+
+  .winner-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+    animation: bounce 1s infinite;
+  }
+}
+
+.match-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 25px; // Malo spuštanje zbog imena iznad
+  padding: 0 20px;
+  min-width: 100px;
+
+  .vs-badge {
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #555; // Tamnija boja
+    margin-bottom: 5px;
+  }
+
+  .match-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .match-date {
+      font-size: 0.85rem;
+      color: $text-muted;
+      margin-bottom: 4px;
+    }
+    
+    .match-status {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: #333;
+
+        &.status-finished { color: $color-winner; }
+        &.status-scheduled, &.status-ns { color: $color-accent; }
+        &.status-live { color: #ef4444; animation: pulse 1.5s infinite; }
+    }
+    .btn-action {
+      margin-top: 8px; // Razmak od statusa
+      background-color: #3b82f6; // Tvoja plava boja
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+      &:hover:not(:disabled) {
+        background-color: #2563eb; // Tamnija plava na hover
+        transform: translateY(-1px);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+
+      // 🔒 KAD JE DISABLED (Status nije NS)
+      &:disabled {
+        background-color: #333; // Tamno siva
+        color: #666; // Svetlo siva slova
+        cursor: not-allowed;
+        box-shadow: none;
+        opacity: 0.7;
+      }
+    }
+  
+
+  }
+  
+}
+
+// --- EVENTS SECTION ---
+.events-section {
+  background: $bg-card;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 10px;
+
+  .section-title { margin: 0; font-size: 1.1rem; color: $text-main; }
+  
+  .event-count {
+      background: rgba(255,255,255,0.1);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      
+      .count-number { font-weight: bold; color: $text-main; margin-right: 4px; }
+      .count-label { color: $text-muted; }
+  }
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); // Responsive grid
+  gap: 15px;
+}
+
+.event-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s;
+
+  &:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+  }
+}
+
+.player-avatar {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0; // Da se ne spljeska
+
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #333;
+    background-color: #333;
+  }
+  
+  .avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border: 2px solid #444;
+  }
+
+  .event-type-icon {
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      border: 1px solid #444;
+      z-index: 2;
+      
+      &.goal { background: #166534; border-color: #22c55e; }
+      &.assist { background: #854d0e; border-color: #eab308; }
+  }
+}
+
+.event-details {
+  .player-name {
+      font-weight: 600;
+      color: $text-main;
+      font-size: 0.9rem;
+  }
+  
+  .event-meta {
+      display: flex;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: $text-muted;
+      
+      .event-minute { color: $color-accent; font-weight: bold; }
+  }
+}
+
+// Empty State
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: $text-muted;
+  
+  .empty-icon { font-size: 2rem; margin-bottom: 10px; }
+  .empty-title { color: $text-main; margin: 0 0 5px 0; }
+  .empty-description { font-size: 0.9rem; }
+}
+
+// Loading State
+.loading-container {
+    text-align: center;
+    padding: 50px;
+    color: $text-muted;
+    
+    .spinner {
+        // Dodaj stil za spinner ako ga nemaš globalno
+        border: 4px solid rgba(255,255,255,0.1);
+        border-left-color: $color-accent;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+}
+
+// --- ANIMATIONS ---
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

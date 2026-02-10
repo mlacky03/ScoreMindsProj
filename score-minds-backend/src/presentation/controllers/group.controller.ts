@@ -89,7 +89,7 @@ export class GroupController {
             limits: { fileSize: PAGINATION.MAX_LIMIT * 1024 * 1024 },
         })
     )
-    @Post('create')
+    @Post()
     async create(
         @CurrentUser() userId: number,
         @Body(ValidationPipe) group: CreateGroupDto,

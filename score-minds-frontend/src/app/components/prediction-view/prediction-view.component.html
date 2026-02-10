@@ -1,0 +1,101 @@
+<div class="prediction-view" *ngIf="match() && prediction(); else loading">
+
+    <div class="prediction-header">
+        <div class="match-container">
+
+            <div class="team-section home">
+                <h2 class="team-name">{{ match()?.homeTeamName }}</h2>
+
+                <div class="team-body">
+                    <div class="team-logo-wrapper" [class.winner-glow]="prediction()?.winner === 'HOME'">
+                        <img [src]="match()?.homeTeamLogo || 'assets/shield-placeholder.png'" alt="Home Team"
+                            class="team-logo" (error)="onImgError($event)">
+                        <div *ngIf="prediction()?.winner === 'HOME'" class="winner-badge">🏆</div>
+                    </div>
+
+                    <span class="prediction-score">{{ prediction()?.predictedHomeScore ?? '-' }}</span>
+                </div>
+            </div>
+
+            <div class="match-center">
+                <div class="vs-badge">VS</div>
+                <div class="match-meta">
+                    <span class="match-date">{{ match()?.startTime | date:'dd.MM HH:mm' }}</span>
+                    <span class="match-status" [ngClass]="'status-' + match()?.status?.toLowerCase()">
+                        {{ match()?.status }}
+                    </span>
+                    <button class="btn-action" [disabled]="match()?.status !== 'NS'" (click)="onUpdate()"
+                        title="Edit Prediction">
+                        Edit ✏️
+                    </button>
+                </div>
+            </div>
+
+            <div class="team-section away">
+                <h2 class="team-name">{{ match()?.awayTeamName }}</h2>
+
+                <div class="team-body">
+                    <span class="prediction-score">{{ prediction()?.predictedAwayScore ?? '-' }}</span>
+
+                    <div class="team-logo-wrapper" [class.winner-glow]="prediction()?.winner === 'AWAY'">
+                        <img [src]="match()?.awayTeamLogo || 'assets/shield-placeholder.png'" alt="Away Team"
+                            class="team-logo" (error)="onImgError($event)">
+                        <div *ngIf="prediction()?.winner === 'AWAY'" class="winner-badge">🏆</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="events-section">
+        <div class="section-header">
+            <h2 class="section-title">Predicted Events</h2>
+            <div class="event-count">
+                <span class="count-number">{{ prediction()?.predictedEvents?.length || 0 }}</span>
+                <span class="count-label">events</span>
+            </div>
+        </div>
+
+        <div class="events-grid" *ngIf="prediction()?.predictedEvents?.length ?? 0 > 0; else noEvents">
+            <div class="event-card" *ngFor="let event of prediction()?.predictedEvents">
+
+                <div class="player-avatar">
+                    <img *ngIf="getPlayerPhoto(event.playerId) as photoUrl; else placeholder" [src]="photoUrl"
+                        alt="Player" class="avatar-img" (error)="onImgError($event)"> <ng-template #placeholder>
+                        <div class="avatar-placeholder">👤</div>
+                    </ng-template>
+
+                    <div class="event-type-icon" [title]="event.type" [class.goal]="event.type === 'GOAL'"
+                        [class.assist]="event.type === 'ASSIST'">
+                        {{ event.type === 'GOAL' ? '⚽' : '👟' }}
+                    </div>
+                </div>
+
+                <div class="event-details">
+                    <div class="player-name">{{ getPlayerName(event.playerId) }}</div>
+                    <div class="event-meta">
+                        <span class="event-minute" *ngIf="event.minute">{{ event.minute }}'</span>
+                        <span class="event-type-text">{{ event.type }}</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <ng-template #noEvents>
+            <div class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3 class="empty-title">No Events Predicted</h3>
+                <p class="empty-description">Only the final score was predicted for this match.</p>
+            </div>
+        </ng-template>
+    </div>
+</div>
+
+<ng-template #loading>
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading prediction...</p>
+    </div>
+</ng-template>

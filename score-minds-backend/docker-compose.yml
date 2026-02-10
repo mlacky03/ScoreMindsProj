@@ -86,6 +86,30 @@ services:
     # Komanda koja pokreće dev server
     command: npm run start:dev
 
+    # ---------------------------------------------
+  # 4. FRONTEND (Angular)
+  # ---------------------------------------------
+  frontend:
+    build:
+      context: ../score-minds-frontend  # 👈 Ovde stavi tačno ime foldera gde ti je Angular
+      dockerfile: Dockerfile
+    container_name: scoreminds_frontend
+    restart: always
+    ports:
+      - "4200:4200"  # Mapiramo port 4200
+    volumes:
+      - ../score-minds-frontend:/app          # Mapira tvoj kod (Hot Reload)
+      - /app/node_modules         # Čuva node_modules
+    
+    # ⚠️ KLJUČNO ZA DOCKER: Moraš dodati --host 0.0.0.0
+    # Ako to ne staviš, Angular se vezuje za localhost unutar kontejnera 
+    # i ti ne možeš da mu pristupiš iz browsera.
+    command: npm start -- --host 0.0.0.0 --poll 2000 
+    
+    # Opciono: Da frontend krene tek kad API bude spreman
+    depends_on:
+      - api
+
 # ---------------------------------------------
 # GLOBALNI VOLUMENI (Za trajno čuvanje podataka)
 # ---------------------------------------------

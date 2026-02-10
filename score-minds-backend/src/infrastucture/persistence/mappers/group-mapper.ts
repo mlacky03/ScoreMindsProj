@@ -10,7 +10,8 @@ export class GroupMapper extends BaseMapper<Group, GroupEntity> {
             entity.name,
             entity.ownerId, 
             entity.createdAt,
-            entity.profileImageUrl
+            entity.profileImageUrl,
+            entity.groupPoints
         );
     }
 
@@ -19,6 +20,7 @@ export class GroupMapper extends BaseMapper<Group, GroupEntity> {
         if (domain.id) entity.id = domain.id;
         entity.name = domain.name;
         entity.profileImageUrl = domain.profileImageUrl!;
+        entity.groupPoints = domain.groupPoints;
         entity.owner = { id: domain.ownerId } as User;
         return entity;
     }

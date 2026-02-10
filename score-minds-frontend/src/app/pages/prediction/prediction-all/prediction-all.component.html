@@ -1,0 +1,21 @@
+<div class="layout-container" [class.is-split-view]="isDetailsOpen()">
+
+    <div class="list-panel">
+
+        <div class="loading-state" *ngIf="loading(); else listContent">
+            <div class="spinner"></div>
+        </div>
+        <ng-template #listContent>
+            <app-prediction-list [predictions]="predictions()" [matches]="matches()"
+                [mode]="isDetailsOpen() ? 'sidebar' : 'grid'"
+                (predictionSelected)="onSelect($event.predictionId, $event.matchId)">
+            </app-prediction-list>
+        </ng-template>
+    </div>
+
+    <div class="detail-panel">
+        <router-outlet (activate)="onActivate()" (deactivate)="onDeactivate()">
+        </router-outlet>
+    </div>
+
+</div>

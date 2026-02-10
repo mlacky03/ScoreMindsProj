@@ -1,0 +1,21 @@
+<div class="prediction-list-container" [class.sidebar-mode]="mode === 'sidebar'">
+  
+  <ng-container *ngFor="let prediction of predictions()">
+    <div class="prediction-item" >
+      
+      <app-prediction-card 
+          [prediction]="prediction" 
+          [match]="getMatch(prediction.matchId)!"
+          [compact]="mode === 'sidebar'"
+          (predictionUpdated)="onPredictionSelected(prediction.id, prediction.matchId)"> 
+      </app-prediction-card>
+
+    </div>
+  </ng-container>
+  
+  <div class="empty-state" *ngIf="(!predictions() || predictions().length === 0)">
+    <div class="empty-icon">❌</div>
+    <h3 class="empty-title">No Matches</h3>
+  </div>
+
+</div>

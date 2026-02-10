@@ -93,25 +93,25 @@ export class UserController {
     }
 
 
-    // @UseGuards(JwtAuthGuard)
-    // @UseInterceptors(FileInterceptor("file"))
-    // @Post()
-    // async updateAvatar(
-    //     @CurrentUser() userId:number,
-    //     @UploadedFile() file: Express.Multer.File
-    // ) {
-    //     if(!file)
-    //     {
-    //         throw new BadRequestException("No file provided");
-    //     }
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor("file"))
+    @Post("avatar")
+    async updateAvatar(
+        @CurrentUser() userId:number,
+        @UploadedFile() file: Express.Multer.File
+    ) {
+        if(!file)
+        {
+            throw new BadRequestException("No file provided");
+        }
 
-    //     const {path,url}= await this.storageService.uploadUserAvatar(userId,file);
-    //     await this.userService.updateAvatar(userId,path);
+        const {path,url}= await this.storageService.uploadUserAvatar(userId.toString(),file);
+        await this.userService.updateAvatar(userId,path);
 
 
-    //     return {image_path:path,image_url:url};
+        return {image_path:path,image_url:url};
 
-    // }
+    }
 
 
 }

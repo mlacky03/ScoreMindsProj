@@ -1,0 +1,148 @@
+<div class="dialog-container">
+
+    <div class="dialog-header">
+        <h2 class="title">Update Prediction</h2>
+        <p class="subtitle">Change your score prediction</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="scores-grid">
+
+            <div class="form-group">
+                <label for="homeScore">{{match?.homeTeamName}}</label>
+                <input id="homeScore" type="number" formControlName="predictedHomeScore" class="score-input home"
+                    min="0">
+            </div>
+
+            <div class="vs-divider">VS</div>
+
+            <div class="form-group">
+                <label for="awayScore">{{match?.awayTeamName}}</label>
+                <input id="awayScore" type="number" formControlName="predictedAwayScore" class="score-input away"
+                    min="0">
+            </div>
+
+        </div>
+
+        <div class="form-group winner-section">
+            <label>Predicted Winner</label>
+            <select formControlName="predictedWinner" class="winner-select">
+                <option value="HOME">{{match?.homeTeamName}}</option>
+                <option value="DRAW">Draw</option>
+                <option value="AWAY">{{match?.awayTeamName}}</option>
+            </select>
+        </div>
+        <div class="events-section">
+            <div class="section-header" (click)="toggleEventsSection()">
+
+                <div class="header-left">
+                    <h3 class="section-title">Predicted Events</h3>
+                    <span class="event-count-badge" *ngIf="!isEventsOpen && eventsArray.length > 0">
+                        {{ eventsArray.length }}
+                    </span>
+                </div>
+
+                <span class="arrow-icon" [class.open]="isEventsOpen">
+                    ▼
+                </span>
+                
+            </div>
+            <div class="player-search-container" *ngIf="isEventsOpen">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" [formControl]="playerSearchControl"
+                            placeholder="Search player to add event..." class="player-search-input"
+                            (focus)="isSearchFocused = true" (blur)="onSearchBlur()">
+                        <button *ngIf="playerSearchControl.value" type="button" class="clear-search"
+                            (click)="clearSearch()">
+                            ✕
+                        </button>
+                    </div>
+
+                    <div class="search-results-dropdown" *ngIf="isSearchFocused && filteredPlayers.length > 0">
+                        <div class="search-result-item" *ngFor="let player of filteredPlayers"
+                            (mousedown)="addEventForPlayer(player)">
+
+                            <img [src]="player.photo || 'assets/default-avatar.png'" class="player-mini-avatar" alt="">
+
+                            <div class="player-info">
+                                <span class="name">{{ player.name }}</span>
+                                <span class="position">{{ player.position }}</span>
+                            </div>
+                            <span class="add-icon">+</span>
+                        </div>
+                    </div>
+                </div>
+            <div class="events-list-container" *ngIf="isEventsOpen">
+                <div class="events-list" formArrayName="events">
+
+                    <div *ngFor="let eventGroup of eventsArray.controls; let i = index" [formGroupName]="i"
+                        class="event-row">
+
+                        <ng-container *ngIf="!editingStates[i]">
+                            <div class="event-info">
+                                <img [src]="getPlayerPhoto(eventGroup.get('playerId')?.value) || 'assets/default-avatar.png'" class="player-mini-avatar" alt="">
+                                <span class="player-name">{{ getPlayerName(eventGroup.get('playerId')?.value) }}</span>
+                                <div class="event-meta">
+                                    <span class="badge" [class.goal]="eventGroup.get('type')?.value === 'GOAL'">
+                                        {{ eventGroup.get('type')?.value }}
+                                    </span>
+                                    <span class="minute" *ngIf="eventGroup.get('minute')?.value">
+                                        {{ eventGroup.get('minute')?.value }}'
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-icon edit" (click)="toggleEdit(i)" title="Edit">
+                                ✏️
+                            </button>
+                        </ng-container>
+
+                        <ng-container *ngIf="editingStates[i]">
+                            <div class="edit-controls">
+                                <select formControlName="type" class="mini-input">
+                                    <option value="GOAL">⚽ Goal</option>
+                                    <option value="ASSIST">👟 Assist</option>
+                                </select>
+
+                                <input type="number" formControlName="minute" class="mini-input minute"
+                                    placeholder="Min">
+                            </div>
+
+                            <div class="edit-actions">
+                                <button type="button" class="btn-icon save" (click)="toggleEdit(i)" title="Save">
+                                    ✅
+                                </button>
+                                <button type="button" class="btn-icon delete" (click)="removeEvent(i)" title="Remove">
+                                    🗑️
+                                </button>
+                            </div>
+                        </ng-container>
+
+                    </div>
+
+                    <div *ngIf="eventsArray.length === 0" class="no-events">
+                        No events predicted yet.
+                    </div>
+
+                </div>
+            </div>
+            <div class="error-message" *ngIf="error">
+                {{ error }}
+            </div>
+
+            <div class="dialog-actions">
+                <button type="button" class="btn-cancel" (click)="onCancel()">
+                    Cancel
+                </button>
+
+                <button type="submit" class="btn-submit" [disabled]="form.invalid || loading|| editingStatesChack()">
+                    <span *ngIf="!loading">Update</span>
+                    <span *ngIf="loading" class="spinner"></span>
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>

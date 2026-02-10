@@ -1,0 +1,104 @@
+<div class="auth-page">
+  <!-- Background Pattern -->
+  <div class="background-pattern"></div>
+  
+  <!-- Content Container -->
+  <div class="auth-container">
+    <!-- Header Section -->
+    <div class="auth-header">
+      <div class="logo-section">
+        <div class="logo-icon">⚽️</div>
+        <h1 class="app-title">ScoreMinds</h1>
+      </div>
+      <h2 class="page-title">Create Account</h2>
+      <p class="page-subtitle">Join us to start competing with others and creating predictions</p>
+    </div>
+
+    <!-- Registration Form Card -->
+    <div class="auth-card">
+      <!-- Registration Form -->
+      <app-form #f="appForm" 
+                [form]="form" 
+                [submitLabel]="loading ? 'Creating Account...' : 'Create Account'" 
+                [loading]="loading"
+                [cancelLabel]="'Reset'" 
+                (formSubmit)="onSubmit($event, form.controls.confirmPassword.value)">
+        
+        <app-input-field 
+          label="Username" 
+          type="text" 
+          [required]="true" 
+          [submitted]="f.submitted"
+          [placeholder]="'Enter your username'" 
+          [value]="form.controls.username.value"
+          (valueChange)="onInputString('username', $event)">
+        </app-input-field>
+
+        <app-input-field 
+          label="Email Address" 
+          type="email" 
+          [required]="true" 
+          [submitted]="f.submitted"
+          [placeholder]="'Enter your email address'" 
+          [value]="form.controls.email.value"
+          (valueChange)="onInputString('email', $event)">
+        </app-input-field>
+
+        <app-input-field 
+          label="Password" 
+          type="password" 
+          [required]="true" 
+          [submitted]="f.submitted"
+          [value]="form.controls.password.value" 
+          [placeholder]="'Create a strong password'"
+          (valueChange)="onInputString('password', $event)">
+        </app-input-field>
+
+        <app-input-field 
+          label="Confirm Password" 
+          type="password" 
+          [required]="true" 
+          [submitted]="f.submitted"
+          [value]="form.controls.confirmPassword.value" 
+          [placeholder]="'Confirm your password'"
+          (valueChange)="onInputString('confirmPassword', $event)">
+        </app-input-field>
+
+        <!-- Avatar Upload -->
+        <div class="avatar-section">
+          <label class="avatar-label">Profile Picture (Optional)</label>
+          <app-image-uploader 
+            [emitOnSelect]="true" 
+            [disabled]="loading" 
+            accept="image/png,image/jpeg,image/webp"
+            label="Avatar" 
+            (fileChange)="onAvatarSelected($event)" 
+            (error)="onAvatarError($event)">
+          </app-image-uploader>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="error">
+          <div class="error-icon">❌</div>
+          <div class="error-content">
+            <h4 class="error-title">Registration Failed</h4>
+            <p class="error-text">{{ error }}</p>
+          </div>
+        </div>
+      </app-form>
+
+      <!-- Additional Links -->
+      <div class="auth-links">
+        <p class="link-text">
+          Already have an account? 
+          <a routerLink="/login" class="link-button">Sign in here</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="auth-footer">
+      <p class="footer-text">Secure registration with modern encryption standards</p>
+    </div>
+  </div>
+</div>

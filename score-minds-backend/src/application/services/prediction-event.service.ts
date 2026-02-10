@@ -61,7 +61,7 @@ export class PredictionEventService  {
         let player: FullPlayerDto | null = null;
         //Object.assign(data, rest); // ovo radi samo za podatke koji nisu relacije zato mora za player posebno
        data.updatePredictionEvent(rest.type,rest.minute);
-        if (playerId) {
+        if (playerId&&playerId!==data.playerId) {
             // player = await this.playerService.findOne(playerId);
             // if (!player) {
             //     throw new Error(`Igrač sa ID-jem ${playerId} nije pronađen.`);

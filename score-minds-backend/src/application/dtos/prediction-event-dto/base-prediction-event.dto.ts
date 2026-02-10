@@ -15,7 +15,7 @@ export class BasePredictionEventDto {
         this.type=event.type;
         this.minute=event.minute!;
         this.playerId=event.playerId;
-        this.predictionId=event.predictionId;
+        this.predictionId=event.personalPredictionId?event.personalPredictionId:event.groupPredictionId!;
         
     }
 }

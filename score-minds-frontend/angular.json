@@ -5,7 +5,15 @@
   "projects": {
     "RW": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -13,6 +21,11 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/app/styles" 
+              ]
+            },
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
@@ -25,7 +38,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/custom-theme.scss",
+              "src/styles.scss"
             ]
           },
           "configurations": {
@@ -76,7 +90,9 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
+
               {
+                
                 "glob": "**/*",
                 "input": "public"
               }

@@ -7,7 +7,7 @@ export class BaseUserDto {
     email: string;
     profileImageUrl?: string;
     
-    constructor(user: User | Partial<BaseUserDto>) {
+    constructor(user: User | Partial<BaseUserDto>|FullUserDto) {
         this.id = user.id!;
         this.username = user.username!;
         this.email = user.email!;

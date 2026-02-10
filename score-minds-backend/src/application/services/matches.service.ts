@@ -12,7 +12,11 @@ export class MatchService  {
   
   ) {}
 
- 
+  async findMatchesByIds(ids:number[]):Promise<BaseMatchDto[]>{
+    const res=await this.matchRepository.findMatchesByIds(ids);
+    return res.map((m)=>new BaseMatchDto(m));
+  }
+
   async findAll(): Promise<BaseMatchDto[]> {
     const res=await this.matchRepository.findAll();
     return res.map((m)=>new BaseMatchDto(m));
@@ -31,5 +35,10 @@ export class MatchService  {
       throw new NotFoundException(`Meč sa ID-jem ${id} nije pronađen.`);
     }
     return new FullMatchDto(match);
+  }
+
+  async findLiveMatches(): Promise<BaseMatchDto[]> {
+    const res= await this.matchRepository.findLiveMatches();
+    return res.map((m)=>new BaseMatchDto(m));
   }
 }

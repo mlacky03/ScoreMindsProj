@@ -7,7 +7,7 @@ export class FullUserDto {
     id: number;
     username: string;
     email: string;
-    profileImageUrl: string;
+    profileImageUrl: string|undefined;
     createdAt: Date;
     predictions: (number|null)[];
     groups: (number|null)[];

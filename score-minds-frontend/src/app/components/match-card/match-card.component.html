@@ -1,0 +1,52 @@
+<div class="match-card" 
+     (click)="handleClick()" 
+     tabindex="0" 
+     role="button" 
+     (keydown.enter)="handleClick()">
+
+  <div class="team-container home">
+    <div class="team-logo">
+      <img *ngIf="match.homeTeamLogo; else homeFallback"
+           [src]="match.homeTeamLogo" 
+           alt="{{ match.homeTeamName }}"
+           (error)="onImgError($event)" />
+      
+      <ng-template #homeFallback>
+        <div class="fallback-icon">🛡️</div>
+      </ng-template>
+    </div>
+    <span class="team-name">{{ match.homeTeamName }}</span>
+  </div>
+
+  <div class="match-center">
+    <div class="vs-badge">VS</div>
+    
+    <div class="match-meta">
+      <span class="match-date">
+        {{ match.startTime }}
+      </span>
+      
+      <span class="match-status" 
+            [ngClass]="'status-' + match.status.toLowerCase()">
+        {{ match.status }}
+      </span>
+    </div>
+  </div>
+
+  <div class="team-container away">
+    <span class="team-name">{{ match.awayTeamName }}</span>
+    <div class="team-logo">
+      <img *ngIf="match.awayTeamLogo; else awayFallback"
+           [src]="match.awayTeamLogo" 
+           alt="{{ match.awayTeamName }}"
+           (error)="onImgError($event)" />
+
+      <ng-template #awayFallback>
+        <div class="fallback-icon">🛡️</div>
+      </ng-template>
+    </div>
+  </div>
+
+
+  
+</div>

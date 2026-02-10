@@ -1,0 +1,63 @@
+<div class="prediction-card" (click)="handleClick()" tabindex="0" role="button" (keydown.enter)="handleClick()"
+  [class.compact-mode]="compact">
+<div class="team-details">
+      <span class="team-name" [class.winner-text]="prediction?.winner === 'HOME'"
+        [class.loser-text]="prediction?.winner === 'AWAY'">
+        {{ match?.homeTeamName }}
+      </span>
+    </div>
+  <div class="team-container home">
+    <div class="team-logo">
+      <img *ngIf="match?.homeTeamLogo; else homeFallback" [src]="match?.homeTeamLogo" alt="{{ match.homeTeamName }}"
+        (error)="onImgError($event)" />
+      <ng-template #homeFallback>
+        <div class="fallback-icon">🛡️</div>
+      </ng-template>
+    </div>
+    <div class="score-badge" [class.winner-bg]="prediction?.winner === 'HOME'"
+      *ngIf="prediction?.predictedHomeScore !== undefined">
+      {{ prediction?.predictedHomeScore||'X' }}
+    </div>
+    
+  </div>
+
+  <div class="match-center">
+    <div class="vs-badge" [class.draw-badge]="prediction?.winner === 'DRAW'">
+      {{ prediction?.winner === 'DRAW' ? 'X' : 'VS' }}
+    </div>
+
+    <div class="match-meta">
+      <span class="match-date">{{ match?.startTime | date:'dd.MM HH:mm' }}</span>
+      <span class="match-status" [ngClass]="'status-' + match.status.toLowerCase()">
+        {{ match?.status }}
+      </span>
+    </div>
+  </div>
+
+  <div class="team-container away">
+    <div class="score-badge" [class.winner-bg]="prediction?.winner === 'AWAY'"
+      *ngIf="prediction?.predictedAwayScore !== undefined">
+      {{ prediction?.predictedAwayScore||'X' }}
+    </div>
+    <div class="team-details">
+      <span class="team-name" [class.winner-text]="prediction?.winner === 'AWAY'"
+        [class.loser-text]="prediction?.winner === 'HOME'">
+        {{ match?.awayTeamName }}
+      </span>
+
+    </div>
+
+    <div class="team-logo">
+      <img *ngIf="match?.awayTeamLogo; else awayFallback" [src]="match?.awayTeamLogo" alt="{{ match?.awayTeamName }}"
+        (error)="onImgError($event)" />
+      <ng-template #awayFallback>
+        <div class="fallback-icon">🛡️</div>
+      </ng-template>
+    </div>
+  </div>
+
+  <div class="card-arrow" *ngIf="!compact">
+    <span class="arrow-icon">→</span>
+  </div>
+
+</div>

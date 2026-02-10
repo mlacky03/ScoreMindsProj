@@ -23,7 +23,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 export class PredictionAuditController {
     constructor(private readonly predictionAuditService: PredictionAuditService) { }
 
-    @Get("get/:predictionId")
+    @Get(":predictionId")
     @UseGuards(JwtAuthGuard)
     async FindById(@Param('predictionId') predictionId: number, @CurrentUser() id: number) {
         return this.predictionAuditService.getAuditByPredictionId(predictionId, id);

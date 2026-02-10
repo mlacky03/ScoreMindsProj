@@ -18,5 +18,7 @@ export class BaseMatchDto {
        this.homeTeamName=m.homeTeamName;
        this.startTime=m.startTime;
        this.status=m.status;
+       this.awayTeamLogo=m.awayTeamLogo;
+       this.homeTeamLogo=m.homeTeamLogo;
     }
 }

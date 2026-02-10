@@ -1,0 +1,251 @@
+// --- GLAVNI STIL ZA KARTICU IGRAČA ---
+.player {
+  cursor: pointer;
+  padding: 10px 15px; // Malo veći padding za lepši izgled
+  border-radius: 12px; // Modernije zaobljenje
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid transparent; // Rezerviše mesto za border
+  background-color: transparent; // Default
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05); // Suptilno svetljenje na tamnoj pozadini
+    transform: translateX(5px); // Mali pomak desno na hover
+  }
+
+  // Kontejner koji drži sve (levo i desno)
+  .player-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; // Razdvaja info (levo) i akcije (desno) do ivica
+    gap: 15px;
+  }
+}
+
+// --- LEVA STRANA: INFO (Slika + Ime + Pozicija) ---
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px; // Razmak između slike i teksta
+}
+
+// Slika (Logo)
+.player-logo {
+  width: 45px; // Malo veća slika
+  height: 45px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #333; // Tamna pozadina dok se ne učita
+  border: 2px solid #444; // Okvir oko slike
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .fallback-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    background-color: #444;
+    color: #888;
+  }
+}
+
+// Tekstualni detalji
+.player-details {
+  display: flex;
+  flex-direction: column; // Ime gore, pozicija dole
+  justify-content: center;
+  line-height: 1.2;
+
+  .player-name {
+    font-weight: 700;
+    color: #fff; // Bela boja za tamnu temu
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+
+  .player-position { // Ispravio sam typo "postion" u "position"
+    font-size: 0.8rem;
+    color: #aaa; // Sivilo
+    font-weight: 500;
+    margin-top: 2px;
+  }
+}
+
+// --- DESNA STRANA: AKCIJE (Ikonice) ---
+.player-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px; // Razmak između lopte i patike
+}
+
+.action-icon {
+  font-size: 1.4rem; // Veličina emotikona
+  cursor: pointer;
+  opacity: 0.4; // Bledo po defaultu
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); // Bouncy efekat
+  user-select: none;
+  padding: 5px;
+  border-radius: 50%;
+
+  &:hover {
+    opacity: 1;
+    transform: scale(1.25); // Povećanje na hover
+    background-color: rgba(255,255,255,0.1); // Pozadina na hover
+  }
+
+  &:active {
+    transform: scale(0.95); // Klik efekat
+  }
+}
+
+
+// --- 🔥 NOVI STILOVI ZA MODAL (POPUP) ---
+// Ovo ide van .player bloka jer je overlay preko celog ekrana
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); // Tamnija pozadina
+  backdrop-filter: blur(4px); // Blur efekat
+  z-index: 9999; // Mora biti iznad svega
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: #1e1e1e; // Tamna pozadina modala
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  border: 1px solid #333;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  .modal-title {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+  }
+
+  .modal-subtitle {
+    color: #aaa;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+  }
+
+  // Dugme "X" za zatvaranje
+  .btn-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+    
+    &:hover { color: #fff; }
+  }
+}
+
+// Input u modalu
+.modal-input {
+  width: 120px;
+  height: 60px;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #444;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  outline: none;
+  transition: border-color 0.2s;
+  
+  &:focus {
+    border-color: #3b82f6; // Plava na fokus
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+  }
+  
+  // Sklanjanje strelica
+  &::-webkit-outer-spin-button, &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  appearance: textfield;
+}
+
+// Dugmići u modalu
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  button {
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-confirm {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+    
+    &:disabled {
+      background: #333;
+      color: #666;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  }
+
+  .btn-skip {
+    background-color: transparent;
+    border: 1px solid #444;
+    color: #ccc;
+    
+    &:hover {
+      background-color: rgba(255,255,255,0.05);
+      border-color: #666;
+      color: #fff;
+    }
+  }
+}
+
+// Animacije
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

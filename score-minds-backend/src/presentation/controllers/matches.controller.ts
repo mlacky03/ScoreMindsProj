@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { MatchService } from '../../application/services/matches.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -7,28 +7,41 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('Matches')
 @ApiBearerAuth('JWT-auth')
-@Controller('matches') 
+@Controller('matches')
 export class MatchController {
-  constructor(private readonly matchService: MatchService) {}
+  constructor(private readonly matchService: MatchService) { }
 
 
- @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getAllMatches() {
     return await this.matchService.findAll();
   }
 
- 
- @UseGuards(JwtAuthGuard)
+  @Get('ids')
+  async getMatchesByIds(@Query('ids') ids: string) {
+    if (!ids) return [];
+    const idsArray = ids.split(',').map(id => parseInt(id));
+    return await this.matchService.findMatchesByIds(idsArray);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
   @Get('upcoming')
   async getUpcomingMatches() {
     return await this.matchService.findUpcoming();
   }
 
-  
- @UseGuards(JwtAuthGuard)
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getMatchById(@Param('id', ParseIntPipe) id: number) {
     return await this.matchService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('live')
+  async getLiveMatches() {
+    return await this.matchService.findLiveMatches();
   }
 }

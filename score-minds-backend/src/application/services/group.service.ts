@@ -45,7 +45,7 @@ export class GroupService  {
         if (!group) {
             throw new GroupNotFoundException(groupId);
         }
-
+        //members.map(m=>console.log(m.user.profileImageUrl))
         const owner = await this.userService.findOne(group.ownerId);
         const groupS = new FullGroupDto(group, members);
         groupS.owner = new BaseUserDto(owner);

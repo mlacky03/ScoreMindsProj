@@ -1,0 +1,120 @@
+<div class="profile-page">
+  <!-- Header Section -->
+  <div class="page-header">
+    <h1 class="page-title">My Profile</h1>
+    <p class="page-subtitle">Manage your account information and preferences</p>
+  </div>
+
+  <!-- Content Section -->
+  <ng-container *ngIf="user; else loading">
+    <div class="content-section">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <!-- Avatar Section -->
+        <div class="avatar-section">
+          <ng-container *ngIf="user.profileImageUrl; else initials">
+            <div class="avatar-image">
+              <img [src]="user.profileImageUrl" alt="User avatar" />
+            </div>
+          </ng-container>
+          <ng-template #initials>
+            <div class="avatar-initials" aria-hidden="true">
+              {{ (user.username || user.email).charAt(0) | uppercase }}
+            </div>
+          </ng-template>
+          
+          <div class="avatar-info">
+            <h2 class="user-name">{{ user.username || 'User' }}</h2>
+            <p class="user-email">{{ user.email }}</p>
+          </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="profile-details">
+          <div class="detail-section">
+            <h3 class="section-title">Account Information</h3>
+            
+            <div class="detail-grid">
+              <div class="detail-item">
+                <div class="detail-label">
+                  <span class="label-icon">👤</span>
+                  Username
+                </div>
+                <div class="detail-value">{{ user.username || 'Not provided' }}</div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-label">
+                  <span class="label-icon">📧</span>
+                  Email Address
+                </div>
+                <div class="detail-value">{{ user.email }}</div>
+              </div>
+
+              <div class="detail-item">
+                <div class="detail-label">
+                  <span class="label-icon">📅</span>
+                  Member Since
+                </div>
+                <div class="detail-value">{{ user.createdAt | date:'longDate' }}</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Account Stats -->
+          <div class="stats-section">
+            <h3 class="section-title">Account Statistics</h3>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ user.predictions.length || 0 }}</div>
+                  <div class="stat-label">Total Predictions</div>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ user.ownedGroups.length || 0 }}</div>
+                  <div class="stat-label">Groups Owned</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-actions">
+          <button class="action-button primary" (click)="onUpdateProfile()">
+            <span class="button-icon">✏️</span>
+            Update Profile
+          </button>
+          
+          <button class="action-button secondary" (click)="onUpdateProfile()">
+            <span class="button-icon">⚙️</span>
+            Settings
+          </button>
+          
+          <button class="action-button danger" (click)="onLogout()">
+            <span class="button-icon">🚪</span>
+            Log Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-template #loading>
+    <div class="loading-state">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+      <p class="loading-text">Loading your profile...</p>
+    </div>
+  </ng-template>
+</div>

@@ -8,9 +8,10 @@ export class BaseGroupUserDto {
     user: BaseUserDto;
     groupId:number;
 
-    constructor(e: GroupUser) {
+    constructor(e: GroupUser,user:BaseUserDto) {
         this.id = e.id!;
         this.userId = e.userId;
         this.groupId = e.groupId;
+        this.user=user;
     }
 }

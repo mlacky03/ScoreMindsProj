@@ -1,0 +1,128 @@
+<div class="group-view" *ngIf="group(); else loading">
+  <!-- Group Header -->
+  <div class="group-header">
+    <div class="group-image">
+      <img [ngSrc]="group()?.profileImageUrl || 'assets/group-placeholder.webp'" 
+           width="320" height="180"
+           ngSrcset="320w, 640w"
+           sizes="(max-width: 768px) 100vw, 320px"
+           alt="{{ group()?.name }}" 
+           (error)="onImgError($event)" />
+      <div class="image-overlay">
+        <button class="overlay-button" (click)="onUpdate()">
+          <span class="button-icon">✏️</span>
+          Edit
+        </button>
+      </div>
+    </div>
+    
+    <div class="group-info">
+      <h1 class="group-title">{{ group()?.name  }}</h1>
+      
+      <div class="group-meta">
+        <div class="meta-item">
+          <span class="meta-label">Owner:</span>
+          <span class="meta-value">{{ group()?.owner?.username }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Members:</span>
+          <span class="meta-value">{{ membersCount }}</span>
+        </div>
+      </div>
+      
+      <div class="group-actions">
+        <!-- <button class="action-button primary" (click)="onAddExpense()">
+          <span class="button-icon">💰</span>
+          Add Expense
+        </button> -->
+        <button class="action-button secondary" (click)="onAddMember()">
+          <span class="button-icon">👥</span>
+          Add Member
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members Section -->
+  <div class="members-section">
+    <div class="section-header">
+      <h2 class="section-title">Group Members</h2>
+      <div class="member-count">
+        <span class="count-number">{{ membersCount }}</span>
+        <span class="count-label">members</span>
+      </div>
+    </div>
+
+    <div class="members-grid" *ngIf="membersCount > 0; else noMembers">
+      <div class="member-card" 
+           *ngFor="let m of group()?.members; trackBy: trackByMemberId">
+        <div class="member-avatar">
+          <img [ngSrc]="m.user.profileImageUrl || 'assets/avatar-placeholder.webp'" 
+               width="48" height="48"
+               ngSrcset="48w, 96w"
+               sizes="48px"
+               alt="{{ m.user.username || 'Member' }}" 
+               (error)="onMemberImgError($event)"
+               style="object-fit: cover; border-radius: 50%;" />
+          <div class="member-status" [class]="m.user.id === group()?.owner?.id ? 'owner' : 'member'">
+            <span class="status-dot"></span>
+          </div>
+        </div>
+        
+        <div class="member-details">
+          <div class="member-name">{{ m.user.username }}</div>
+          <div class="member-email">{{ m.user.email }}</div>
+        </div>
+        
+      </div>
+    </div>
+
+    <ng-template #noMembers>
+      <div class="empty-members">
+        <div class="empty-icon">👥</div>
+        <h3 class="empty-title">No Members Yet</h3>
+        <p class="empty-description">This group doesn't have any members yet. Start by adding some friends!</p>
+        <button class="empty-action-button" (click)="onAddMember()">
+          <span class="button-icon">➕</span>
+          Add First Member
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Loading State -->
+<ng-template #loading>
+  <div class="loading-skeleton">
+    <div class="skeleton-header">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-meta">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+        </div>
+        <div class="skeleton-actions">
+          <div class="skeleton-button"></div>
+          <div class="skeleton-button"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="skeleton-members">
+      <div class="skeleton-section-header">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-badge"></div>
+      </div>
+      <div class="skeleton-member-list">
+        <div class="skeleton-member" *ngFor="let i of [1,2,3]">
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-member-info">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

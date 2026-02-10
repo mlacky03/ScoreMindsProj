@@ -1,0 +1,17 @@
+<div class="player-list">
+  <ng-container *ngFor="let player of players">
+    <div class="player-item" *ngFor="let player of players; trackBy: trackByPlayer">
+
+      <app-player-card [player]="player" (eventCreated)="onEvent($event)">
+      </app-player-card>
+
+    </div>
+  </ng-container>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!players || players.length === 0">
+    <div class="empty-icon">❌</div>
+    <h3 class="empty-title">No Player for this team</h3>
+    <p class="empty-description">There are no players for this team yet</p>
+  </div>
+</div>

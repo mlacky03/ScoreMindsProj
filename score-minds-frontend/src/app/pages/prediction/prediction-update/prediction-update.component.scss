@@ -1,0 +1,475 @@
+.dialog-container {
+  background-color: #1e1e1e;
+  color: #fff;
+  padding: 24px;
+  width: 100%;
+  border-radius: 8px; // Ako dialog već nema border-radius
+  box-sizing: border-box;
+}
+
+.dialog-header {
+  margin-bottom: 24px;
+  text-align: center;
+
+  .title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin: 5px 0 0;
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+}
+
+.dialog-actions {
+  margin-top: 20px;
+}
+
+.scores-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 15px;
+
+  .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    label {
+      font-size: 0.85rem;
+      color: #ccc;
+      margin-bottom: 8px;
+    }
+
+    .score-input {
+      width: 80px;
+      height: 60px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: #3b82f6;
+      }
+
+      /* Hide number arrows */
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+  }
+
+  .vs-divider {
+    font-weight: bold;
+    color: #555;
+    font-size: 1.2rem;
+    margin-top: 15px; // Align visually with inputs
+  }
+}
+
+.winner-section {
+  margin-bottom: 25px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+
+  .winner-select {
+    width: 100%;
+    padding: 12px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+
+    &:focus {
+      border-color: #3b82f6;
+    }
+  }
+}
+
+.error-message {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+
+    &.btn-cancel {
+      background: transparent;
+      color: #aaa;
+      border: 1px solid #444;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+    }
+
+    &.btn-submit {
+      background: #3b82f6;
+      color: white;
+      min-width: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &:hover:not(:disabled) {
+        background: #2563eb;
+      }
+
+      &:disabled {
+        background: #1e3a8a;
+        color: #6b7280;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Simple spinner
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.events-section {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  // Sklonili smo padding-top da bi header (klikabilni deo) imao lepši prostor
+
+  // --- HEADER (Klikabilni deo) ---
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0; // Ovde dajemo prostor za klik
+    cursor: pointer; // Pokazuje ruku (pointer)
+    user-select: none; // Da se ne selektuje tekst kad klikaš
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .section-title {
+        font-size: 1rem;
+        color: #fff;
+        margin: 0;
+      }
+
+      .event-count-badge {
+        font-size: 0.75rem;
+        background: #333;
+        color: #aaa;
+        padding: 2px 8px;
+        border-radius: 10px;
+      }
+    }
+
+    // --- STRELICA ---
+    .arrow-icon {
+      font-size: 0.8rem;
+      color: #888;
+      transition: transform 0.3s ease; // Animacija rotacije
+
+      // Kad je otvoreno, rotiraj
+      &.open {
+        transform: rotate(180deg);
+        color: #3b82f6;
+      }
+    }
+  }
+
+  .events-list-container {
+    animation: slideDown 0.3s ease-out;
+  }
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 150px; // Scroll ako ih ima puno
+  overflow-y: auto;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+// --- READ MODE STYLES ---
+.event-info {
+  display: flex;
+  min-width: 50px;
+  flex-direction: row;
+  gap: 4px;
+
+  .player-mini-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+    background: #333;
+  }
+
+  .player-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #eee;
+  }
+
+  .event-meta {
+    //display: flex;
+    gap: 8px;
+    font-size: 0.75rem;
+
+    .badge {
+      background: #444;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #aaa;
+
+      &.goal {
+        color: #2ecc71;
+        background: rgba(46, 204, 113, 0.15);
+      }
+    }
+
+    .minute {
+      color: #3b82f6;
+    }
+  }
+}
+
+// --- EDIT MODE STYLES ---
+.edit-controls {
+  display: flex;
+  min-width: 50px;
+
+  gap: 8px;
+  flex: 1;
+
+  .mini-input {
+    background: #1e1e1e;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 0.85rem;
+
+    &.minute {
+      width: 50px;
+      text-align: center;
+    }
+  }
+}
+
+.edit-actions {
+  display: flex;
+  gap: 5px;
+}
+
+// Dugmići (ikonice)
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px;
+  border-radius: 4px;
+  //transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  &.delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+}
+
+.no-events {
+  text-align: center;
+  color: #666;
+  font-size: 0.85rem;
+  padding: 10px;
+  font-style: italic;
+}
+
+
+.player-search-container {
+  padding: 10px 15px;
+  position: relative; // Bitno za pozicioniranje dropdown-a
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .search-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0 10px;
+
+    &:focus-within {
+      border-color: #7b1fa2; // Tvoja ljubičasta boja
+      box-shadow: 0 0 0 2px rgba(123, 31, 162, 0.2);
+    }
+
+    .search-icon {
+      opacity: 0.5;
+      margin-right: 8px;
+    }
+
+    .player-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 10px 0;
+      outline: none;
+      font-size: 14px;
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .clear-search {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      font-size: 16px;
+
+      &:hover {
+        color: white;
+      }
+    }
+  }
+
+  // Padajuća lista
+  .search-results-dropdown {
+    position: absolute;
+    top: 100%; // Odmah ispod inputa
+    left: 15px;
+    right: 15px;
+    background: #1e1e1e; // Tamna pozadina
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      cursor: pointer;
+      //transition: background 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .player-mini-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-right: 10px;
+        object-fit: cover;
+        background: #333;
+      }
+
+      .player-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .name {
+          color: white;
+          font-weight: 500;
+          font-size: 14px;
+        }
+
+        .position {
+          color: rgba(255, 255, 255, 0.5);
+          font-size: 11px;
+        }
+      }
+
+      .add-icon {
+        color: #7b1fa2;
+        font-weight: bold;
+        font-size: 18px;
+      }
+    }
+  }
+}

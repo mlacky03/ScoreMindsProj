@@ -18,6 +18,7 @@ import { SyncModule } from './modules/sync.module';
 import { PersonalPredictionModule } from './modules/personal-predictition.module';
 import { PredictionAuditModule } from './modules/prediction-audit.module';
 import { GroupPredictionModule } from './modules/group-prediction.module';
+import { AppGateway } from './gateway/app.gateway';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -46,7 +47,7 @@ import { GroupPredictionModule } from './modules/group-prediction.module';
   MulterModule.register({limits: { fileSize: 5 * 1024 * 1024 }}),
   ThrottlerModule.forRoot([{
       ttl: 60000, // Time To Live (TTL): 60 sekundi (60000 milisekundi)
-      limit: 10,  // Maksimalno 10 zahteva po korisniku u 60 sekundi
+      limit: 100,  // Maksimalno 10 zahteva po korisniku u 60 sekundi
     }]),
     AuthModule,
     UserModule,
@@ -62,6 +63,6 @@ import { GroupPredictionModule } from './modules/group-prediction.module';
 
 ],
 controllers: [AppController],
-  providers: [AppService, {provide: 'APP_GUARD', useClass: ThrottlerGuard}, StorageService],
+  providers: [AppService, {provide: 'APP_GUARD', useClass: ThrottlerGuard}, StorageService,AppGateway],
 })
 export class AppModule {}

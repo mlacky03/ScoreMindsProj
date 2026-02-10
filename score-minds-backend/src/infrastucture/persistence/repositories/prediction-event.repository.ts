@@ -27,7 +27,7 @@ export class PredictionEventRepository extends BaseRepository<PredictionEvent, P
 
     async findByPredictionId(predictionId:number):Promise<PredictionEvent[]>
     {
-        const data=await this.typeOrmRepo.find({where:{predictionId}})
+        const data=await this.typeOrmRepo.find({where:{personalPrediction:{id:predictionId},groupPrediction:{id:predictionId}}})
         if(!data) return [];
         return this.mapper.toDomainList(data);
     }
