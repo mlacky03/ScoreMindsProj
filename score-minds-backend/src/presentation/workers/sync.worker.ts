@@ -23,12 +23,12 @@ export class SyncWorker {
         await this.playerRepo.upsert(data);
     }
 
-    @EventPattern('update_match')
-    async updateMatch(@Payload() data: any) {
-        const match = await this.matchRepo.findById(data.id);
-        if(!match) return;
-        match.updateMatch(data);
-        await this.matchRepo.save(match);
-    }
+    // @EventPattern('update_match')
+    // async updateMatch(@Payload() data: any) {
+    //     const match = await this.matchRepo.findById(data.id);
+    //     if(!match) return;
+    //     match.updateMatch(data);
+    //     await this.matchRepo.save(match);
+    // }
 }
 

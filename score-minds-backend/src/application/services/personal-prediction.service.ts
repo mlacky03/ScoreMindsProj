@@ -10,6 +10,7 @@ import { PredictionAuditService } from "./prediction-audit.service";
 import { PersonalPredictionRepository } from "src/infrastucture/persistence/repositories/personal-prediction.repository";
 import { PlayerService } from "./player.service";
 import { FullMatchDto } from "../dtos/matches-dto/full-match.dto";
+import { PredictionStatus } from "src/infrastucture/persistence/entities/personal-prediction.entity";
 @Injectable()
 export class PersonalPredictionService {
     constructor(
@@ -64,7 +65,8 @@ export class PersonalPredictionService {
             null,
             [],
             null,
-            userId
+            userId,
+            PredictionStatus.SUBMITTED
         );
         const savedPrediction = await this.repo.save(data);
 

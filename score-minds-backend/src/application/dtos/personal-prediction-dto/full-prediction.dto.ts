@@ -13,6 +13,7 @@ export class FullPredictionDto{
     totalPoints:number;
     predictedEvents:BasePredictionEventDto[];
     winner:string;
+    status:string;
     constructor(p:PersonalPrediction)
     {
         this.id=p.id!;
@@ -24,5 +25,6 @@ export class FullPredictionDto{
         this.totalPoints=p.pointsWon;
         this.predictedEvents=p.predictedEvents.map(pe=>new BasePredictionEventDto(pe));
         this.winner=p.winner;
+        this.status=p.status
     }
 }

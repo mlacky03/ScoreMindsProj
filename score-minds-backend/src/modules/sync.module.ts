@@ -12,6 +12,7 @@ import { RabbitMQModule } from 'src/infrastucture/messaging/rabbitmq.module';
 import { MatchModule } from './matches.module';
 import { SyncWorker } from 'src/presentation/workers/sync.worker';
 import { PlayerModule } from './player.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -21,7 +22,9 @@ import { PlayerModule } from './player.module';
     RabbitMQModule,
     MatchModule,
     PlayerModule,
-    UserModule
+    UserModule,
+    ScheduleModule.forRoot(),
+    RabbitMQModule
   ],
   controllers: [SyncController,SyncWorker],
   providers: [SyncService, FootballApiService,UserValidationService,Adapter],

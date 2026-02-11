@@ -1,13 +1,16 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { FootballApiService } from "../../common/services/football-api.service";
 import { Adapter } from "../../common/patterns/Adapter";
 import { UpdateMatchDto } from "../dtos/matches-dto/update-match.dto";
 import { ClientProxy } from "@nestjs/microservices";
 import { MatchRepository } from "src/infrastucture/persistence/repositories/match.repository";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { Match } from "src/domain/models/match.model";
 
 
 @Injectable()
 export class SyncService {
+  private readonly logger = new Logger(SyncService.name);
   constructor(
     private footballApi: FootballApiService,
     @Inject(MatchRepository)
@@ -16,6 +19,83 @@ export class SyncService {
     private readonly rabbitClient: ClientProxy,
     private adapter: Adapter,
   ) { }
+
+  @Cron(CronExpression.EVERY_MINUTE) 
+  async startMatches() {
+    const now = new Date();
+
+   
+    const matchesToStart = await this.matchRepo.findMatchToStart();
+
+    if (matchesToStart.length === 0) return;
+
+    this.logger.log(`Starting ${matchesToStart.length} matches... ⚽`);
+
+    for (const match of matchesToStart) {
+      match.updateStart();
+      
+      await this.matchRepo.save(match);
+      this.notifySystem(match);
+      this.logger.log(`Match STARTED: ${match.homeTeamName} vs ${match.awayTeamName}`);
+    }
+  }
+
+  @Cron('*/30 * * * * *') 
+  async simulateLiveMatches() {
+ 
+    const liveMatches = await this.matchRepo.findLiveMatches();
+    if (liveMatches.length === 0) return;
+
+    for (const match of liveMatches) {
+      const now = new Date();
+      
+      const minutesPlayed = Math.floor((now.getTime() - match.startTime.getTime()) / 60000);
+
+      const MATCH_DURATION = 1; 
+      
+      if (minutesPlayed >= MATCH_DURATION) {
+        match.finishMatch();
+        await this.matchRepo.save(match);
+
+        this.notifySystem(match);
+        this.logger.log(`Match FINISHED: ${match.homeTeamName} ${match.finalScoreHome}-${match.finalScoreAway} ${match.awayTeamName} 🏁`);
+        continue; 
+      }
+
+      //Math.random() < 0.1
+      let b=0;
+      if (b===0) { 
+        this.scoreGoal(match,minutesPlayed);
+        await this.matchRepo.save(match);
+        this.notifySystem(match);
+        b++;
+      }
+    }
+  }
+
+  private scoreGoal(match: Match,minuts:number) {
+    // const isHomeGoal = Math.random() > 0.5;
+
+    // if (isHomeGoal) {
+    //   match.updateHomeScore((match.finalScoreHome || 0) + 1);
+    //   match.updateGoalscorer(123, minuts);
+    //   match.updateAssistant(456, minuts);
+    //   this.logger.log(`GOAL! ${match.homeTeamName} scores! ⚽`);
+      
+
+    // } else {
+    //   match.updateAwayScore((match.finalScoreAway || 0) + 1);
+    //   match.updateGoalscorer(123, minuts);
+    //   match.updateAssistant(456, minuts);
+    //   this.logger.log(`GOAL! ${match.awayTeamName} scores! ⚽`);
+    // }
+        match.updateAwayScore((match.finalScoreAway   || 0) + 1);
+        match.updateGoalscorer(85, 23);
+        match.updateAssistant(80, 66);
+
+        match.updateHomeScore(3);
+
+  }
 
   async syncLeagueMatches(leagueId: number, season: number): Promise<{ message: string }> {
     const apiMatches = await this.footballApi.getMatches(leagueId, season);
@@ -106,6 +186,24 @@ export class SyncService {
 
     return { message: "Utakmica je uspesno poslata u RabbitMQ." };
   }
+
+  private notifySystem(match: Match) {
+    const payload = {
+      id: match.id, 
+      status: match.status,
+      finalScoreHome: match.finalScoreHome,
+      finalScoreAway: match.finalScoreAway,
+      events: match.events
+    };
+
+    if(match.status === 'FINISHED') {
+      this.rabbitClient.emit('match_finished', payload);
+    }
+    this.rabbitClient.emit('update_match', payload);
+
+  }
+
+
 }
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];

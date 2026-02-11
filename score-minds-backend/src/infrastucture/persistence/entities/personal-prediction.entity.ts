@@ -17,6 +17,10 @@ import { PredictionEvent } from './prediction-event.entity';
 import { Match } from './matches.entity';
 import { BasePrediction } from './base-prediction.abstract';
 
+export enum PredictionStatus {
+  SUBMITTED = 'SUBMITTED',
+  PROCESSED = 'PROCESSED'
+}
 
 @Entity('predictions')
 @Index(['userId', 'matchId'],{ unique: true })
@@ -28,6 +32,13 @@ export class PersonalPrediction extends BasePrediction {
   @ManyToOne(() => User, (user) => user.personalPredictions, { onDelete: 'CASCADE'})
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+   @Column({
+      type: 'enum',
+      enum: PredictionStatus,
+      default: PredictionStatus.SUBMITTED
+    })
+    status: PredictionStatus;
 
   @OneToMany(() => PredictionEvent, e => e.personalPrediction, { cascade: true })
   predictedEvents: PredictionEvent[];

@@ -1,3 +1,5 @@
+import { EventRecord } from "src/application/interfaces/event-record";
+
 export class Match {
     constructor(
         private _id: number | null,
@@ -12,23 +14,19 @@ export class Match {
         private _finalScoreAway: number | null = null,
         private _homeTeamLogo: string ,
         private _awayTeamLogo: string ,
-        private _actualScorersIds: number[] = [],
-        private _actualAssistantsIds: number[] = []
+        private _events: EventRecord[] = [],
+        private _isComputed: boolean = false
     ) {}
 
     
-    public finishMatch(homeScore: number, awayScore: number): void {
-        if (homeScore < 0 || awayScore < 0) {
-            throw new Error("Rezultat ne može biti negativan.");
-        }
-        this._finalScoreHome = homeScore;
-        this._finalScoreAway = awayScore;
+    public finishMatch(): void {
         this._status = 'FT';
     }
 
     public startMatch(): void {
         this._status = 'LIVE';
     }
+
 
     
     public hasStarted(): boolean {
@@ -39,14 +37,38 @@ export class Match {
         return this._status === 'FT';
     }
 
-    public updateMatch(match: Partial<Match>): void {
-        Object.assign(this, match);
+    // public updateMatch(match: Partial<Match>): void {
+    //     Object.assign(this, match);
+    // }
+    public updateHomeScore(score:number):void{
+        this._finalScoreHome = score;
     }
+
+    public updateAwayScore(score:number):void{
+        this._finalScoreAway = score;
+    }
+
     public makeMatch(status: string,time:Date): void {
         this._status = status;
         this._startTime = time;
         this._finalScoreHome = null;
         this._finalScoreAway = null;
+    }
+    public updateStart(): void {
+        this._status = 'LIVE';
+        this._events=[];
+        this._finalScoreHome=0;
+        this._finalScoreAway=0;
+    }
+    public updateGoalscorer(playerId:number,minute:number): void {
+        this._events.push({ playerId, minute, type: 'GOAL' });
+    }
+    public updateAssistant(playerId:number,minute:number): void {
+        this._events.push({ playerId, minute, type: 'ASSIST' });
+    }
+
+    public computed(): void {
+        this._isComputed = true;
     }
     
     get id() { return this._id; }
@@ -61,6 +83,6 @@ export class Match {
     get finalScoreAway() { return this._finalScoreAway; }
     get homeTeamLogo() { return this._homeTeamLogo; }
     get awayTeamLogo() { return this._awayTeamLogo; }
-    get actualScorersIds() { return this._actualScorersIds; }
-    get actualAssistantsIds() { return this._actualAssistantsIds; }
+    get events() { return this._events; }
+    get isComputed() { return this._isComputed; }
 }

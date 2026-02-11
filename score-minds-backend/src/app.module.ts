@@ -19,6 +19,7 @@ import { PersonalPredictionModule } from './modules/personal-predictition.module
 import { PredictionAuditModule } from './modules/prediction-audit.module';
 import { GroupPredictionModule } from './modules/group-prediction.module';
 import { AppGateway } from './gateway/app.gateway';
+import { CalculatingModule } from './modules/calculating.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -59,7 +60,8 @@ import { AppGateway } from './gateway/app.gateway';
     SyncModule,
     PersonalPredictionModule,
     PredictionAuditModule,
-    GroupPredictionModule
+    GroupPredictionModule,
+    CalculatingModule
 
 ],
 controllers: [AppController],

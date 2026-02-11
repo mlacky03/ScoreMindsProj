@@ -10,6 +10,7 @@ export class BaseMatchDto {
     homeTeamLogo:string;
     startTime:Date;
     status:string;
+    isComputed:boolean;
     
     constructor(m: Match | FullMatchDto) {
        this.id=m.id!;
@@ -20,5 +21,6 @@ export class BaseMatchDto {
        this.status=m.status;
        this.awayTeamLogo=m.awayTeamLogo;
        this.homeTeamLogo=m.homeTeamLogo;
+       this.isComputed=m.isComputed;
     }
 }

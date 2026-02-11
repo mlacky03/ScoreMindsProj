@@ -27,7 +27,8 @@ export class PersonalPredictionMapper extends BaseMapper<PersonalPrediction, Per
             entity.updatedAt,
             events ,
             match,
-            entity.userId
+            entity.userId,
+            entity.status
         );
     }
 
@@ -50,6 +51,7 @@ export class PersonalPredictionMapper extends BaseMapper<PersonalPrediction, Per
                 this.eventMapper.toPersistence(e)
             );
         }
+        entity.status = domain.status;
 
         return entity;
     }

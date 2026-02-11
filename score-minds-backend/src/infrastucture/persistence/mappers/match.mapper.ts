@@ -17,8 +17,8 @@ export class MatchMapper extends BaseMapper<Match, MatchEntity> {
             entity.finalScoreAway,
             entity.homeTeamLogo,
             entity.awayTeamLogo,
-            entity.actualScorersIds || [],
-            entity.actualAssistantsIds || []
+            entity.events || [],
+            entity.isComputed
         );
     }
 
@@ -36,8 +36,8 @@ export class MatchMapper extends BaseMapper<Match, MatchEntity> {
         entity.finalScoreAway = domain.finalScoreAway;
         entity.homeTeamLogo = domain.homeTeamLogo;
         entity.awayTeamLogo = domain.awayTeamLogo;
-        entity.actualScorersIds = domain.actualScorersIds;
-        entity.actualAssistantsIds = domain.actualAssistantsIds;
+        entity.events = domain.events;
+        entity.isComputed = domain.isComputed;
         return entity;
     }
 }

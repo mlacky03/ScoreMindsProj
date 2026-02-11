@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan, SelectQueryBuilder, In } from 'typeorm';
+import { Repository, MoreThan, SelectQueryBuilder, In, LessThanOrEqual } from 'typeorm';
 import { BaseRepository, PagginationOptions } from './base.repository';
 import { Match } from 'src/domain/models/match.model';
 import { Match as MatchEntity } from '../entities/matches.entity';
@@ -15,23 +15,33 @@ export class MatchRepository extends BaseRepository<Match, MatchEntity> {
         super(typeOrmRepo, new MatchMapper());
     }
 
-    async findMatchesByIds(ids:number[]): Promise<Match[]> {
+    async findMatchToStart(): Promise<Match[]> {
+        const now = new Date();
         const entities = await this.typeOrmRepo.find({
-            where: { id: In(ids)}
+            where: { status: 'NS', startTime: LessThanOrEqual(now) },
+
         });
         return this.mapper.toDomainList(entities);
     }
-    
+
+    async findMatchesByIds(ids: number[]): Promise<Match[]> {
+        const entities = await this.typeOrmRepo.find({
+            where: { id: In(ids) }
+        });
+        return this.mapper.toDomainList(entities);
+    }
+
     async findAll(): Promise<Match[]> {
-        const entities = await this.typeOrmRepo.find({order:{startTime: 'DESC'}});
+        const entities = await this.typeOrmRepo.find({ order: { startTime: 'DESC' } });
         return this.mapper.toDomainList(entities);
     }
 
     async findUpcoming(): Promise<Match[]> {
         const entities = await this.typeOrmRepo.find({
-            where: { status: 'NS',
-                    startTime: MoreThan(new Date())
-             },
+            where: {
+                status: 'NS',
+                startTime: MoreThan(new Date())
+            },
             order: { startTime: 'ASC' }
         });
         return this.mapper.toDomainList(entities);
@@ -44,7 +54,7 @@ export class MatchRepository extends BaseRepository<Match, MatchEntity> {
         return this.mapper.toDomainList(entities);
     }
 
-    async playerSync(team:number): Promise<Match[]> {
+    async playerSync(team: number): Promise<Match[]> {
         const match = await this.typeOrmRepo.find({
             take: team,
             select: {
@@ -61,6 +71,13 @@ export class MatchRepository extends BaseRepository<Match, MatchEntity> {
 
     async upsert(matches: Match[]): Promise<void> {
         await this.typeOrmRepo.upsert(this.mapper.toPersistenceList(matches), ['externalId']);
+    }
+
+    async findFinishedMatches(): Promise<Match[]> {
+        const entities = await this.typeOrmRepo.find({
+            where: { status: 'FT' }
+        });
+        return this.mapper.toDomainList(entities);
     }
 
 

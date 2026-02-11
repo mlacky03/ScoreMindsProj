@@ -1,3 +1,4 @@
+import { EventRecord } from "src/application/interfaces/event-record";
 import { Match } from "src/domain/models/match.model";
 
 export class FullMatchDto{
@@ -15,6 +16,8 @@ export class FullMatchDto{
     actualAssistantsIds: number[];
     hometeamId: number;
     awayteamId: number;
+    isComputed:boolean;
+    events:EventRecord[]
 
     constructor(m:Match){
         this.id=m.id!;
@@ -27,9 +30,9 @@ export class FullMatchDto{
         this.status=m.status;
         this.finalScoreHome=m.finalScoreHome;
         this.finalScoreAway=m.finalScoreAway;
-        this.actualScorersIds=m.actualScorersIds;
-        this.actualAssistantsIds=m.actualAssistantsIds;
+        this.events=m.events;
         this.hometeamId=m.homeTeamId;
         this.awayteamId=m.awayTeamId;
+        this.isComputed=m.isComputed;
     }
 }

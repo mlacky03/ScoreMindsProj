@@ -31,6 +31,14 @@ export class PersonalPredictionRepository extends BaseRepository<PersonalPredict
         });
         return entity ? this.mapper.toDomain(entity) : null;
     }
+
+    async findByMatchId(matchId: number): Promise<PersonalPrediction[]> {
+        const entities = await this.typeOrmRepo.find({
+            where: { matchId },
+            relations: ['predictedEvents']
+        });
+        return entities.map(entity => this.mapper.toDomain(entity));
+    }
     
     async findByUserId(userId: number): Promise<PersonalPrediction[]> {
         const entities = await this.typeOrmRepo.find({

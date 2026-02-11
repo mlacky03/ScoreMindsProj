@@ -8,7 +8,7 @@
 
                 <div class="team-body">
                     <div class="team-logo-wrapper" [class.winner-glow]="prediction()?.winner === 'HOME'">
-                        <img [src]="match()?.homeTeamLogo || 'assets/shield-placeholder.png'" alt="Home Team"
+                        <img [src]="match()?.homeTeamLogo || 'assets/shield-placeholder.png'" [alt]="match()?.hometeamId"
                             class="team-logo" (error)="onImgError($event)">
                         <div *ngIf="prediction()?.winner === 'HOME'" class="winner-badge">🏆</div>
                     </div>
@@ -28,6 +28,26 @@
                         title="Edit Prediction">
                         Edit ✏️
                     </button>
+                    <div class="prediction-info">
+
+                        <div class="status-side">
+                            <span *ngIf="prediction()?.status === 'PROCESSED'; else pendingBadge"
+                                class="badge status-processed">
+                                Završeno
+                            </span>
+
+                            <ng-template #pendingBadge>
+                                <span class="badge status-pending">U toku</span>
+                            </ng-template>
+                        </div>
+
+                        <div class="points-container" *ngIf="prediction()?.status === 'PROCESSED'">
+                            <span class="label">Osvojeno</span>
+                            <span class="value">{{ prediction()?.totalPoints || 0 }}</span>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -38,7 +58,7 @@
                     <span class="prediction-score">{{ prediction()?.predictedAwayScore ?? '-' }}</span>
 
                     <div class="team-logo-wrapper" [class.winner-glow]="prediction()?.winner === 'AWAY'">
-                        <img [src]="match()?.awayTeamLogo || 'assets/shield-placeholder.png'" alt="Away Team"
+                        <img [src]="match()?.awayTeamLogo || 'assets/shield-placeholder.png'" [alt]="match()?.awayteamId"
                             class="team-logo" (error)="onImgError($event)">
                         <div *ngIf="prediction()?.winner === 'AWAY'" class="winner-badge">🏆</div>
                     </div>
