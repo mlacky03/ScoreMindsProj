@@ -32,8 +32,13 @@ export class PersonalPredictionService {
     async createPrediction(userId: number, prediction: CreatePredictionDto): Promise<FullPredictionDto> {
 
         const match = await this.matchService.findOne(prediction.matchId);
+        const matchTime = new Date(match.startTime).getTime(); // Sigurno pretvara string ili Date u broj
+        const now = new Date().getTime();
         if (!match) {
             throw new NotFoundException(`Meč sa ID-jem ${prediction.matchId} nije pronađen.`);
+        }
+        if(matchTime < now) {
+            throw new BadRequestException(`Meč sa ID-jem ${prediction.matchId} je već počeo.`);
         }
         if (prediction.events && prediction.events.length > 0) {
             for (const eventDto of prediction.events) {
@@ -91,7 +96,11 @@ export class PersonalPredictionService {
     async updatePrediction(predictionId: number, userId: number, predictionDto: UpdatePredictionDto): Promise<FullPredictionDto> {
         const prediction = await this.repo.findPredictionByUserWithRelations(userId, predictionId);
         if (!prediction) throw new NotFoundException('Prediction not found');
-
+        const matchTime = new Date(prediction.match!.startTime).getTime(); 
+        const now = new Date().getTime();
+        if(matchTime < now) {
+            throw new BadRequestException('Mec je vec poceo ne mozes uraditi update');
+        }
         const cleanData = Object.fromEntries(
             Object.entries(predictionDto).filter(([_, value]) => value !== null && value !== undefined)
         );

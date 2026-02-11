@@ -23,7 +23,7 @@ export class MatchRepository extends BaseRepository<Match, MatchEntity> {
     }
     
     async findAll(): Promise<Match[]> {
-        const entities = await this.typeOrmRepo.find({order:{startTime: 'ASC'}});
+        const entities = await this.typeOrmRepo.find({order:{startTime: 'DESC'}});
         return this.mapper.toDomainList(entities);
     }
 

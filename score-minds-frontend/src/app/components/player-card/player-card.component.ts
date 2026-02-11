@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';
-import { NgClass, NgIf } from '@angular/common';
+import { CommonModule, NgClass, NgIf } from '@angular/common';
 import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/data/prediction-event/prediction-event-create.dto';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-player-card',
     standalone: true,
-    imports: [NgIf, NgClass, FormsModule],
+    imports: [NgIf, NgClass, FormsModule,ReactiveFormsModule,CommonModule],
     templateUrl: './player-card.component.html',
     styleUrl: './player-card.component.scss',
 })
@@ -17,13 +17,30 @@ export class PlayerCardComponent {
 
     @Output() eventCreated = new EventEmitter<PredictionEventCreateDto>();
 
-    isModalOpen = false;
-    activeEventType: 'GOAL' | 'ASSIST' | null = null;
-    inputMinute: number | null = null;
+    editingStates: boolean[] = [];
+    isEditing = false;
+    form!: FormGroup;
+    constructor(private fb: FormBuilder) {}
     get playerName(): string {
         return this.player?.name ?? '';
     }
 
+    startEdit(type: 'GOAL' | 'ASSIST') {
+        this.isEditing = true;
+
+        // Kreiramo formu lokalno
+        this.form = this.fb.group({
+            type: [type, Validators.required],
+            minute: [null, [Validators.required, Validators.min(1)]]
+        });
+    }
+    toggleEdit(index: number) {
+        this.editingStates[index] = !this.editingStates[index];
+    }
+
+    cancelEdit() {
+    this.isEditing = false;
+  }
 
     get playerPosition(): string {
         return this.player?.position ?? '';
@@ -39,39 +56,28 @@ export class PlayerCardComponent {
 
     goalMinute: number | null = null;
     assistMinute: number | null = null;
-    openModal(type: 'GOAL' | 'ASSIST') {
-        this.activeEventType = type;
-        this.inputMinute = null; 
-        this.isModalOpen = true; 
-    }
 
-   
-    confirmWithMinute() {
-        if (this.activeEventType) {
-            this.emitEvent(this.inputMinute); 
-        }
-        this.closeModal();
-    }
+    save() {
+    if (this.form.valid) {
+      const payload = {
+        playerId: this.player.id,
+        ...this.form.value
+      };
 
-    
-    confirmWithoutMinute() {
-        if (this.activeEventType) {
-            this.emitEvent(null); // Šaljemo null
-        }
-        this.closeModal();
+      this.emitEvent(payload.minute,payload.type);
+      
+      this.isEditing = false;
+      this.cancelEdit();
     }
+  }
 
-   
-    closeModal() {
-        this.isModalOpen = false;
-        this.activeEventType = null;
-        this.inputMinute = null;
-    }
 
-    private emitEvent(minute: number | null) {
+
+
+    private emitEvent(minute: number | null,type: 'GOAL' | 'ASSIST') {
         this.eventCreated.emit({
             playerId: this.player.id,
-            type: this.activeEventType!,
+            type: type,
             minute: minute,
             predictionId: 0
         });

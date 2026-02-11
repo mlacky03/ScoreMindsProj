@@ -1,54 +1,49 @@
 <div class="player" tabindex="0" role="button">
 
-  <div class="player-container">
-    <div class="player-info">
-      <div class="player-logo">
-        <img *ngIf="player.photo; else playerFallback" [src]="player.photo" alt="{{ player.name }}"
-          (error)="onImgError($event)" />
-        <ng-template #playerFallback>
-          <div class="fallback-icon">👤</div>
-        </ng-template>
-      </div>
-      <span class="player-name">{{ player.name }}</span>
-      <span class="player-position">{{ player.position }}</span>
-    </div>
-
-    <div class="player-actions">
-      <div class="action-icon" (click)="openModal('GOAL')" title="Add Goal">
-        ⚽
+  <div class="player-card-container">
+    <ng-container *ngIf="!isEditing">
+      <div class="player-view">
+        <div class="player-info">
+          <img *ngIf="player.photo; else playerFallback" [src]="player.photo" alt="{{ player.name }}"
+            (error)="onImgError($event)" />
+          <ng-template #playerFallback>
+            <div class="fallback-icon">👤</div>
+          </ng-template>
+        </div>
+        <span class="player-name">{{ player.name }}</span>
+        <span class="player-position">{{ player.position }}</span>
       </div>
 
-      <div class="action-icon" (click)="openModal('ASSIST')" title="Add Assist">
-        👟
-      </div>
-    </div>
-    <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
-
-      <div class="modal-content" (click)="$event.stopPropagation()">
-
-        <h3 class="modal-title">
-          Add {{ activeEventType === 'GOAL' ? 'Goal' : 'Assist' }}
-        </h3>
-
-        <p class="modal-subtitle">Do you want to add the minute?</p>
-
-        <input type="number" class="modal-input" placeholder="min'" [(ngModel)]="inputMinute"
-          (keydown.enter)="confirmWithMinute()" autofocus>
-
-        <div class="modal-buttons">
-          <button class="btn-confirm" [disabled]="!inputMinute" (click)="confirmWithMinute()">
-            ✅ Yes, Add {{ inputMinute ? '(' + inputMinute + '\')' : '' }}
-          </button>
-
-          <button class="btn-skip" (click)="confirmWithoutMinute()">
-            ❌ No, just add event
-          </button>
+      <div class="player-actions">
+        <div class="action-icon" (click)="startEdit('GOAL')" title="Add Goal">
+          ⚽
         </div>
 
-        <button class="btn-close" (click)="closeModal()">✕</button>
+        <div class="action-icon" (click)="startEdit('ASSIST')" title="Add Assist">
+          👟
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="isEditing">
 
+      <div class="edit-wrapper" [formGroup]="form">
+        <div class="edit-header">Adding for {{ player.name }}</div>
+
+        <div class="controls">
+          <select formControlName="type">
+            <option value="GOAL">⚽ Goal</option>
+            <option value="ASSIST">👟 Assist</option>
+          </select>
+          <input type="number" formControlName="minute" placeholder="Min">
+        </div>
+
+        <div class="edit-actions">
+          <button (click)="cancelEdit()">❌</button>
+          <button (click)="save()" >✅</button>
+        </div>
       </div>
 
-    </div>
+    </ng-container>
   </div>
+
 </div>

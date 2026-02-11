@@ -1,12 +1,13 @@
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PlayerCardComponent } from '../player-card/player-card.component';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';
 import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/data/prediction-event/prediction-event-create.dto';
+import { FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-players-list',
-    imports: [PlayerCardComponent, NgFor],
+    imports: [PlayerCardComponent, NgFor,NgIf],
     templateUrl: './player-list.component.html',
     styleUrl: './player-list.component.scss',
 })
@@ -15,15 +16,14 @@ export class PlayerListComponent {
 
     @Output() playerEvent = new EventEmitter<PredictionEventCreateDto>();
 
-    ngOnChanges(): void {
-        const map = new Map<string, PlayerFullDto>();
-    }
-
     onEvent(event: PredictionEventCreateDto): void {
         this.playerEvent.emit(event);
+        console.log(event);
     }
 
     trackByPlayer(index: number, player: PlayerFullDto): number {
-        return player.id;
+        return player.externalId;
     }
+
+    
 }

@@ -1,5 +1,5 @@
 <div class="player-list">
-  <ng-container *ngFor="let player of players">
+  <ng-container >
     <div class="player-item" *ngFor="let player of players; trackBy: trackByPlayer">
 
       <app-player-card [player]="player" (eventCreated)="onEvent($event)">

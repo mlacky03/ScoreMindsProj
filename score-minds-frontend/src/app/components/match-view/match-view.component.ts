@@ -82,7 +82,8 @@ export class MatchViewComponent {
           this.match.set(result.matchData);
           this.homeTeamPlayers.set(result.homePlayers);
           this.awayTeamPlayers.set(result.awayPlayers);
-
+          console.log("Home players", this.homeTeamPlayers().length);
+          console.log("Away players", this.awayTeamPlayers().length);
         },
         error: (err) => {
           console.error('Greška pri učitavanju:', err);
