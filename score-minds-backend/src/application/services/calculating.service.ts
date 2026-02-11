@@ -14,7 +14,7 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 export class CalculatingService {
     private readonly logger = new Logger(CalculatingService.name);
 
-    // Bodovni sistem (Konstante)
+    
     private readonly POINTS_EXACT_SCORE = 10;
 
     private readonly POINTS_EXACT_MINUTE_ASSIST = 15;
@@ -83,7 +83,7 @@ export class CalculatingService {
 
             prediction.addPoints(totalPoints);
             prediction.updateStatus(PredictionStatus.PROCESSED);
-
+            
             await this.predictionRepo.save(prediction);
 
             this.appGateway.sendNotificationToUser(prediction.userId, {
