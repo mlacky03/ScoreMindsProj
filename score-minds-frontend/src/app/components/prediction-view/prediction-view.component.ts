@@ -11,7 +11,7 @@ import {
 } from 'rxjs/operators';
 import { PersonalPredictionService } from '../../feature/predictions/personal-predictions/personal-predictions.service';
 import { MatDialog } from '@angular/material/dialog';
-import { FullUserPredictionDto } from '../../feature/predictions/personal-predictions/data/full-p-prediction.dto';
+import { FullUserPredictionDto } from '../../feature/predictions/personal-predictions/models/full-p-prediction.dto';
 import { MatchFullDto } from '../../feature/match/data/match-full.dto';
 import { MatchService } from '../../feature/match/match.service';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';

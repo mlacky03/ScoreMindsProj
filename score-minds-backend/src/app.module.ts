@@ -20,6 +20,7 @@ import { PredictionAuditModule } from './modules/prediction-audit.module';
 import { GroupPredictionModule } from './modules/group-prediction.module';
 import { AppGateway } from './gateway/app.gateway';
 import { CalculatingModule } from './modules/calculating.module';
+import { GatewayModule } from './modules/app-gateway.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -61,10 +62,11 @@ import { CalculatingModule } from './modules/calculating.module';
     PersonalPredictionModule,
     PredictionAuditModule,
     GroupPredictionModule,
-    CalculatingModule
+    CalculatingModule,
+    GatewayModule
 
 ],
 controllers: [AppController],
-  providers: [AppService, {provide: 'APP_GUARD', useClass: ThrottlerGuard}, StorageService,AppGateway],
+  providers: [AppService, {provide: 'APP_GUARD', useClass: ThrottlerGuard}, StorageService],
 })
 export class AppModule {}

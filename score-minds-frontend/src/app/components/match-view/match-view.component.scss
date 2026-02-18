@@ -1,13 +1,12 @@
-// --- GLAVNI KONTEJNER (ŠIRENJE) ---
 .match-grid {
   display: grid;
   // Srednja kolona je fiksna (350px), strane se šire (1fr)
-  grid-template-columns: 1fr 350px 1fr; 
+  grid-template-columns: 1fr 350px 1fr;
   gap: 2rem;
   align-items: start;
-  
+
   // 🔥 PROMENA 1: Povećana širina da popuni ekran
-  width: 95%; 
+  width: 95%;
   max-width: 1800px; // Ranije je bilo 1200px
   margin: 0 auto;
   padding: 2rem 1rem;
@@ -25,11 +24,23 @@
   gap: 30px; // Veći razmak između elemenata
 
   // Poravnanje ostaje isto
-  &.home { text-align: right; align-items: flex-end; }
-  &.away { text-align: left; align-items: flex-start; }
+  &.home {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  &.away {
+    text-align: left;
+    align-items: flex-start;
+  }
 
   @media (max-width: 1024px) {
-    &.home, &.away { text-align: center; align-items: center; }
+
+    &.home,
+    &.away {
+      text-align: center;
+      align-items: center;
+    }
   }
 
   .team-header {
@@ -41,11 +52,11 @@
 
   .team-name {
     // 🔥 PROMENA 2: Veći font za imena timova
-    font-size: 2.2rem; 
+    font-size: 2.2rem;
     font-weight: 800;
     margin-top: 15px;
     letter-spacing: 1px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -57,7 +68,7 @@
   height: 160px;
   padding: 15px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
   cursor: pointer;
   border: 5px solid transparent; // Deblji border
@@ -66,11 +77,11 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
   }
 
-  &:hover {
-    background: rgba(255,255,255,0.1);
+  &:not(.locked):hover {
+    background: rgba(255, 255, 255, 0.1);
     transform: scale(1.1); // Jače uvećanje na hover
   }
 
@@ -92,23 +103,30 @@
       justify-content: center;
       font-weight: bold;
       font-size: 1.5rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     }
+
+   
   }
+   &.locked {
+      cursor: default;
+      opacity: 0.8;
+      pointer-events: none;
+    }
 }
 
 // --- BELI KARTON ZA IGRAČE (NOVO) ---
 .players-list-wrapper {
   // 🔥 PROMENA 4: Beli "kontejner"
-  background-color: #ffffff; 
+  background-color: #ffffff;
   color: #1a1a1a; // Tamna slova jer je pozadina bela
-  
+
   width: 100%;
   max-width: 500px; // Ograničimo širinu da ne bude preširoko na ogromnim ekranima
-  
+
   border-radius: 20px; // Lepo zaobljeno
   padding: 2rem; // Unutrašnji razmak
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5); // Senka da "lebdi" iznad tamne pozadine
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); // Senka da "lebdi" iznad tamne pozadine
 
   .list-title {
     font-size: 1.2rem;
@@ -118,7 +136,7 @@
     margin-bottom: 1.5rem;
     border-bottom: 2px solid #eee;
     padding-bottom: 0.5rem;
-    
+
     // Centriramo naslov liste uvek
     text-align: center;
   }
@@ -140,15 +158,15 @@
   margin-bottom: 30px;
 }
 
-// --- INPUTI (VEĆI) ---
+
 .score-box {
-  // 🔥 PROMENA 5: Povećani inputi
-  width: 100px;  // Bilo 80
-  height: 100px; // Bilo 80
-  font-size: 4rem; // Ogromni brojevi
+
+  width: 100px;
+  height: 100px;
+  font-size: 4rem;
   font-weight: 900;
   text-align: center;
-  
+
   background: #1e1e1e;
   border: 3px solid #444;
   color: #fff;
@@ -156,7 +174,7 @@
   outline: none;
   transition: border-color 0.2s;
 
-  &:focus {
+  &:not(.read-only):focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.2);
     background: #000;
@@ -172,6 +190,18 @@
     -webkit-appearance: none;
     margin: 0;
   }
+
+  &.read-only {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border-color: transparent;
+    color: #fff;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    cursor: default;
+  }
+
   appearance: textfield;
 }
 
@@ -189,11 +219,11 @@
   gap: 15px;
   align-items: center;
   margin-bottom: 30px;
-  
+
   // Veći font za detalje
-  font-size: 1.1rem; 
+  font-size: 1.1rem;
   color: #bbb;
-  
+
   .status {
     font-size: 1.3rem;
     font-weight: bold;

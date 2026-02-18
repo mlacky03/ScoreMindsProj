@@ -11,6 +11,7 @@ import { Match } from "src/domain/models/match.model";
 @Injectable()
 export class SyncService {
   private readonly logger = new Logger(SyncService.name);
+  private b=0;
   constructor(
     private footballApi: FootballApiService,
     @Inject(MatchRepository)
@@ -51,7 +52,7 @@ export class SyncService {
       
       const minutesPlayed = Math.floor((now.getTime() - match.startTime.getTime()) / 60000);
 
-      const MATCH_DURATION = 1; 
+      const MATCH_DURATION = 2; 
       
       if (minutesPlayed >= MATCH_DURATION) {
         match.finishMatch();
@@ -63,12 +64,13 @@ export class SyncService {
       }
 
       //Math.random() < 0.1
-      let b=0;
-      if (b===0) { 
+      
+     
+      if (this.b===0) { 
         this.scoreGoal(match,minutesPlayed);
         await this.matchRepo.save(match);
         this.notifySystem(match);
-        b++;
+        this.b++;
       }
     }
   }
@@ -196,10 +198,11 @@ export class SyncService {
       events: match.events
     };
 
-    if(match.status === 'FINISHED') {
+    if(match.status === 'FT') {
       this.rabbitClient.emit('match_finished', payload);
     }
     this.rabbitClient.emit('update_match', payload);
+    this.rabbitClient.emit('update_match_list', { id: match.id, status: match.status });
 
   }
 

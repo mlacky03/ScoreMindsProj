@@ -12,6 +12,7 @@ import { PersonalPredictionModule } from './personal-predictition.module';
 import { UserValidationService } from 'src/common/services/user-validation.service';
 import { UserModule } from './user.module';
 import { AuthModule } from './auth.module';
+import { GatewayModule } from './app-gateway.module';
 
 
 @Module({
@@ -20,13 +21,13 @@ import { AuthModule } from './auth.module';
     forwardRef(() => PersonalPredictionModule),
     UserModule,
     AuthModule,
+    GatewayModule
   ],
   controllers: [
     CalculatingWorker 
   ],
   providers: [
     CalculatingService, 
-    AppGateway,
     UserValidationService,
 
   ],

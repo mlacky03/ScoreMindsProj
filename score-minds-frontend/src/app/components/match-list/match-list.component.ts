@@ -1,7 +1,9 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { MatchCardComponent } from '../match-card/match-card.components';
 import { MatchBaseDto } from '../../feature/match/data/match-base.dto';
+import { Subscription } from 'rxjs';
+import { SocketService } from '../../core/services/socket.service';
 
 @Component({
     selector: 'app-match-list',
@@ -9,11 +11,16 @@ import { MatchBaseDto } from '../../feature/match/data/match-base.dto';
     templateUrl: './match-list.component.html',
     styleUrl: './match-list.component.scss',
 })
-export class MatchListComponent {
+export class MatchListComponent  {
     @Input({required:true}) matches: MatchBaseDto[] = [];
 
     @Output() matchSelected = new EventEmitter<number>();
     
+    
+   
+
+    
+
     ngOnChanges():void{
         const map=new Map<string,MatchBaseDto>();
     }
@@ -21,4 +28,6 @@ export class MatchListComponent {
     onOpen(matchId:number):void{
         this.matchSelected.emit(matchId);
     }
+
+    
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, inject, signal } from '@angular/core';
 import { NgIf, NgFor, NgOptimizedImage, NgClass, CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -13,13 +13,14 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatchService } from '../../feature/match/match.service';
 import { MatchFullDto } from '../../feature/match/data/match-full.dto';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, Subscription } from 'rxjs';
 import { PlayerService } from '../../feature/players/player.service';
 import { PlayerListComponent } from '../player-list/player-list.component';
 import { FormsModule } from '@angular/forms';
 import { PersonalPredictionService } from '../../feature/predictions/personal-predictions/personal-predictions.service';
-import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/data/prediction-event/prediction-event-create.dto';
-import { CreateUserPredictionDto } from '../../feature/predictions/personal-predictions/data/create-p-prediction.dto';
+import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/models/prediction-event/prediction-event-create.dto';
+import { CreateUserPredictionDto } from '../../feature/predictions/personal-predictions/models/create-p-prediction.dto';
+import { SocketService } from '../../core/services/socket.service';
 
 @Component({
   selector: 'app-match-view',
@@ -28,19 +29,23 @@ import { CreateUserPredictionDto } from '../../feature/predictions/personal-pred
   templateUrl: './match-view.component.html',
   styleUrl: './match-view.component.scss',
 })
-export class MatchViewComponent {
+export class MatchViewComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private matches = inject(MatchService);
   private dialog = inject(MatDialog);
   private players = inject(PlayerService)
   private predictions = inject(PersonalPredictionService)
+  private socketService = inject(SocketService);
+
+  private socketSub?: Subscription;
+  private currentMatchId?: number;
+
 
   predictionEvents = signal<PredictionEventCreateDto[]>([]);
   match = signal<MatchFullDto | null>(null);
   homeTeamPlayers = signal<PlayerFullDto[]>([]);
   awayTeamPlayers = signal<PlayerFullDto[]>([]);
   loading = signal(false);
-
   predictionHomeScore = signal<number | null>(null);
   predictionAwayScore = signal<number | null>(null);
   selectedWinner = signal<'HOME' | 'AWAY' | 'DRAW' | null>(null);
@@ -61,7 +66,12 @@ export class MatchViewComponent {
         map((id) => (id ? Number(id) : NaN)),
         filter((id) => Number.isFinite(id) && id > 0),
         distinctUntilChanged(),
-        tap(() => this.loading.set(true)),
+        tap((id) => {
+          this.loading.set(true);
+          
+          this.currentMatchId = id;
+          this.socketService.joinRoom(`match_${id}`);
+        }),
         switchMap((id) => {
 
           return this.matches.getOneMatch(id).pipe(
@@ -90,6 +100,22 @@ export class MatchViewComponent {
           this.loading.set(false);
         },
       });
+      this.socketSub = this.socketService.onMatchUpdate().subscribe((updateData) => {
+      console.log('Stigli live podaci:', updateData);
+      
+      this.match.update((currentMatch) => {
+        if (!currentMatch) return null;
+        return { ...currentMatch, ...updateData };
+      });
+    });
+  }
+  ngOnDestroy() {
+    if (this.currentMatchId) {
+      this.socketService.leaveRoom(`match_${this.currentMatchId}`);
+    }
+    if (this.socketSub) {
+      this.socketSub.unsubscribe();
+    }
   }
 
   onImgError(e: Event) {

@@ -2,7 +2,7 @@
   <ng-container >
     <div class="player-item" *ngFor="let player of players; trackBy: trackByPlayer">
 
-      <app-player-card [player]="player" (eventCreated)="onEvent($event)">
+      <app-player-card [player]="player"  [matchStatus]="matchStatus" (eventCreated)="onEvent($event)">
       </app-player-card>
 
     </div>

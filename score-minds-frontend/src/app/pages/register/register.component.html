@@ -21,7 +21,7 @@
                 [form]="form" 
                 [submitLabel]="loading ? 'Creating Account...' : 'Create Account'" 
                 [loading]="loading"
-                [cancelLabel]="'Reset'" 
+                [cancelLabel]="'Reset'"
                 (formSubmit)="onSubmit($event, form.controls.confirmPassword.value)">
         
         <app-input-field 

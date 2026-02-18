@@ -10,6 +10,7 @@ import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [
     RouterOutlet, NavBarComponent
   ],
@@ -21,24 +22,37 @@ export class AppComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private routerSubscription: Subscription | undefined;
 
+  private authSubscription: Subscription | undefined;
+
+
   ngOnInit() {
-    // Logika ostaje ista: Čekamo da se uloguje
-    this.store.select(selectAuth).pipe(
-      map(a => a?.status === 'authenticated'),
-      distinctUntilChanged(),
-      filter(Boolean),
-      take(1)
-    ).subscribe(() => {
-        // 2. Umesto reviewListener.init(), zovemo socket connect
+    
+    this.authSubscription = this.store.select(selectAuth).pipe(
+      
+      map(authState => authState?.status === 'authenticated'),
+      
+      distinctUntilChanged()
+    ).subscribe((isAuthenticated) => {
+      
+      if (isAuthenticated) {
+        console.log('🔐 Korisnik je ulogovan -> Povezujem Socket...');
         this.socketService.connect();
+      } else {
+        console.log('👋 Korisnik nije ulogovan -> Gasim Socket...');
+        this.socketService.disconnect();
+      }
+      
     });
 
-    // ... router logika ostaje ista
+    
   }
 
   ngOnDestroy() {
-    // 3. Gasimo konekciju kad se aplikacija uništi (npr. refresh)
     this.socketService.disconnect();
+
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }

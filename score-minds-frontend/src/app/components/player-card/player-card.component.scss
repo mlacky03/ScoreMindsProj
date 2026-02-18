@@ -128,6 +128,27 @@ $transition-speed: 0.2s;
       }
     }
   }
+  .player-stats-display {
+  display: flex;
+  align-items: center;
+  gap: 10px; // Razmak između lopte i kopačke
+  margin-left: auto; // Gura ih skroz desno
+  padding-right: 10px;
+
+  .stat-badge {
+    font-size: 1.4rem; // Veličina emotikona
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    cursor: default; // Nema ruke, ne može da se klikne
+
+    small {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #aaa;
+    }
+  }
+}
 
   // ==========================================
   // 4. EDIT MODE (Forma)

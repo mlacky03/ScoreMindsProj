@@ -3,32 +3,42 @@ import { EventPattern, Payload } from "@nestjs/microservices";
 import { SyncService } from "src/application/services/sync.service";
 import { MatchRepository } from "src/infrastucture/persistence/repositories/match.repository";
 import { PlayerRepository } from "src/infrastucture/persistence/repositories/player.repository";
+import { AppGateway } from "src/gateway/app.gateway";
 
 @Controller()
 export class SyncWorker {
     constructor(
         private matchRepo: MatchRepository,
-        private playerRepo: PlayerRepository
+        private playerRepo: PlayerRepository,
+        private appGateway: AppGateway
     ) { }
 
     @EventPattern('sync_league_matches')
     async syncLeagueMatches(@Payload() data: any[]) {
-        if(!data || data.length === 0) return;
+        if (!data || data.length === 0) return;
         await this.matchRepo.upsert(data);
     }
 
     @EventPattern('sync_players_for_team')
     async syncPlayersForTeam(@Payload() data: any[]) {
-        if(!data || data.length === 0) return;
+        if (!data || data.length === 0) return;
         await this.playerRepo.upsert(data);
     }
 
-    // @EventPattern('update_match')
-    // async updateMatch(@Payload() data: any) {
-    //     const match = await this.matchRepo.findById(data.id);
-    //     if(!match) return;
-    //     match.updateMatch(data);
-    //     await this.matchRepo.save(match);
-    // }
+    @EventPattern('update_match')
+    handleMatchUpdate(@Payload() data: any) {
+        console.log(`📡 RabbitMQ -> WebSocket: Update za meč ${data.id}`);
+
+
+        this.appGateway.broadcastMatchUpdate(data.id, data);
+        this.appGateway.broadcastMatchStatusChange(data.id, data.status);
+    }
+
+    @EventPattern('update_match_list')
+    handleMatchListUpdate(@Payload() data: any) {
+        console.log(`📡 RabbitMQ -> WebSocket: Update liste mečeva`);
+
+        this.appGateway.broadcastMatchStatusChange(data.id, data.status);
+    }
 }
 

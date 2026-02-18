@@ -6,25 +6,34 @@ import { AuthService } from '../auth/auth.service'; // Tvoj auth servis
 @Injectable({ providedIn: 'root' })
 export class SocketService {
   private socket: Socket | undefined;
-  private readonly URL = 'http://localhost:3000'; // Tvoj backend
+  private readonly URL = 'http://localhost:3000';
 
-  constructor(private authService: AuthService) {}
 
-  // Ovu metodu zoveš u AppComponent
+
+  private readonly instanceId = Math.floor(Math.random() * 10000);
+
+  constructor(private authService: AuthService) {
+    console.log(`🛠️ KREIRAN SocketService [ID: ${this.instanceId}]`);
+  }
+
   connect() {
-    // Ako smo već konektovani, ne radi ništa
-    if (this.socket?.connected) return;
+    console.group(`🔌 Pokušaj konekcije na servisu [ID: ${this.instanceId}]`);
+    console.trace('Ko me je pozvao?');
+    console.groupEnd();
+    //if (this.socket?.connected) return;
+    if (this.socket) {
+      console.log('⚠️ Socket već postoji, preskačem kreiranje nove konekcije.');
+      return;
+    }
+    const token = this.authService.getToken();
 
-    const token = this.authService.getToken(); // Tvoja metoda za dohvatanje tokena
-
-    // 1. Konekcija sa Auth Tokenom
     this.socket = io(this.URL, {
-      auth: { token }, // Ovo šaljemo backendu u 'handleConnection'
+      auth: { token },
       reconnection: true,
       autoConnect: true
     });
 
-    // Debugging
+
     this.socket.on('connect', () => console.log('Socket povezan! ID:', this.socket?.id));
     this.socket.on('connect_error', (err) => console.error('Socket greška:', err));
   }
@@ -35,12 +44,43 @@ export class SocketService {
     }
   }
 
-  // Slušalac za notifikacije (zamenjuje SSE stream)
+
   onNotification(): Observable<any> {
     return new Observable(observer => {
       this.socket?.on('notification', (data) => {
         observer.next(data);
       });
     });
+  }
+
+
+  onMatchUpdate(): Observable<any> {
+    return new Observable(observer => {
+
+      if (!this.socket) return;
+
+      this.socket.on('live_match_update', (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  onMatchListUpdate():Observable<any>
+  {
+    return new Observable(observer => {
+      if (!this.socket) return;
+      this.socket.on('match_status_changed', (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+
+  joinRoom(roomName: string) {
+    this.socket?.emit('join_room', roomName);
+  }
+
+  leaveRoom(roomName: string) {
+    this.socket?.emit('leave_room', roomName);
   }
 }

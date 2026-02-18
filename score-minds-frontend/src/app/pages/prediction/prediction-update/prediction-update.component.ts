@@ -3,10 +3,10 @@ import { Component, inject } from "@angular/core";
 import { FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators } from "@angular/forms";
 import { PersonalPredictionService } from "../../../feature/predictions/personal-predictions/personal-predictions.service";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { BaseUserPredictionDto } from "../../../feature/predictions/personal-predictions/data/base-p-prediction.dto";
-import { FullUserPredictionDto } from "../../../feature/predictions/personal-predictions/data/full-p-prediction.dto";
-import { UpdateUserPredictionDto } from "../../../feature/predictions/personal-predictions/data/update-p-prediction";
-import { PredictionEventUpdateDto } from "../../../feature/predictions/personal-predictions/data/prediction-event/prediction-event-update.dto";
+import { BaseUserPredictionDto } from "../../../feature/predictions/personal-predictions/models/base-p-prediction.dto";
+import { FullUserPredictionDto } from "../../../feature/predictions/personal-predictions/models/full-p-prediction.dto";
+import { UpdateUserPredictionDto } from "../../../feature/predictions/personal-predictions/models/update-p-prediction";
+import { PredictionEventUpdateDto } from "../../../feature/predictions/personal-predictions/models/prediction-event/prediction-event-update.dto";
 import { PlayerFullDto } from "../../../feature/players/data/player-full.dto";
 import { MatchFullDto } from "../../../feature/match/data/match-full.dto";
 

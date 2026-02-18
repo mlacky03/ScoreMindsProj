@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NgIf,NgClass } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, distinctUntilChanged, switchMap} from 'rxjs/operators';
@@ -8,6 +8,7 @@ import { MatchBaseDto } from '../../feature/match/data/match-base.dto';
 import { interval, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { MatchViewComponent } from '../../components/match-view/match-view.component';
+import { SocketService } from '../../core/services/socket.service';
 
 
 
@@ -18,10 +19,14 @@ import { MatchViewComponent } from '../../components/match-view/match-view.compo
     templateUrl: './match.component.html',
     styleUrl: './match.component.scss'
 })
-export class MatchComponent {
+export class MatchComponent implements OnInit, OnDestroy    {
     private matchService = inject(MatchService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
+    
+
+    private socketService = inject(SocketService); 
+    private socketSub?: Subscription;
     
     private pollingSubscription?: Subscription;
     allMatches = signal<MatchBaseDto[]>([]);
@@ -47,30 +52,34 @@ export class MatchComponent {
     });
     
     ngOnInit() {
+        
         this.matchService.getAllMatches().subscribe({
             next: (ms) => this.allMatches.set(ms),
             error: (err) => {
+                console.error('Greška pri učitavanju mečeva:', err);
             }
         });
+        this.socketService.joinRoom('all_matches_list');
 
-        this.pollingSubscription = interval(180000) 
-            .pipe(
-                switchMap(() => this.matchService.getAllMatches())
-            )
-            .subscribe({
-                next: (data) => {
-                    this.allMatches.set(data); 
-                },
-                error: (err) => console.error('Greška pri osvežavanju', err)
+        this.socketSub = this.socketService.onMatchListUpdate().subscribe(data => {
+            this.allMatches.update(currentMatches => {
+                const index = currentMatches.findIndex(m => m.id === data.id);
+                if (index === -1) return currentMatches;
+
+                
+                const newMatches = [...currentMatches];
+                newMatches[index] = { ...newMatches[index], status: data.status };
+                return newMatches;
             });
+        });
 
         this.route.paramMap.pipe(
-      map(pm => pm.get('id') ?? pm.get('matchId')),
-      map(id => id ? Number(id) : null),
-      distinctUntilChanged(),
-    ).subscribe(id => {
-      this.selectedMatchId.set(id);
-    });
+            map(pm => pm.get('id') ?? pm.get('matchId')),
+            map(id => id ? Number(id) : null),
+            distinctUntilChanged(),
+        ).subscribe(id => {
+            this.selectedMatchId.set(id);
+        });
     }
     
 
@@ -81,5 +90,10 @@ export class MatchComponent {
     onSelect(matchId: number) {
       if (!matchId || this.selectedMatchId() === matchId) return;
       this.router.navigate(['/matches', matchId]);
+    }
+
+    ngOnDestroy() {
+        this.socketService.leaveRoom('all_matches_list');
+        this.socketSub?.unsubscribe();
     }
 }

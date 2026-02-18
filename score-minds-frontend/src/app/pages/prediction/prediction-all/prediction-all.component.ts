@@ -4,7 +4,7 @@ import { PredictionViewComponent } from "../../../components/prediction-view/pre
 import { CommonModule, NgIf } from "@angular/common";
 import { PersonalPredictionService } from "../../../feature/predictions/personal-predictions/personal-predictions.service";
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from "@angular/router";
-import { BaseUserPredictionDto } from "../../../feature/predictions/personal-predictions/data/base-p-prediction.dto";
+import { BaseUserPredictionDto } from "../../../feature/predictions/personal-predictions/models/base-p-prediction.dto";
 import { MatchBaseDto } from "../../../feature/match/data/match-base.dto";
 import { filter, finalize, forkJoin, of, Subscription, switchMap, tap } from "rxjs";
 import { MatchService } from "../../../feature/match/match.service";
