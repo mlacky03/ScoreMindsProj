@@ -37,6 +37,7 @@ export class SyncService {
       
       await this.matchRepo.save(match);
       this.notifySystem(match);
+      //this.rabbitClient.emit("match_started", {matchId: match.id,status:match.status});
       this.logger.log(`Match STARTED: ${match.homeTeamName} vs ${match.awayTeamName}`);
     }
   }

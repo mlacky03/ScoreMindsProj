@@ -13,6 +13,7 @@ import { UserValidationService } from 'src/common/services/user-validation.servi
 import { UserModule } from './user.module';
 import { AuthModule } from './auth.module';
 import { GatewayModule } from './app-gateway.module';
+import { RabbitMQModule } from 'src/infrastucture/messaging/rabbitmq.module';
 
 
 @Module({
@@ -21,7 +22,7 @@ import { GatewayModule } from './app-gateway.module';
     forwardRef(() => PersonalPredictionModule),
     UserModule,
     AuthModule,
-    GatewayModule
+    RabbitMQModule
   ],
   controllers: [
     CalculatingWorker 

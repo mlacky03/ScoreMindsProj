@@ -8,6 +8,7 @@ import { BaseUserPredictionDto } from "../../../feature/predictions/personal-pre
 import { MatchBaseDto } from "../../../feature/match/data/match-base.dto";
 import { filter, finalize, forkJoin, of, Subscription, switchMap, tap } from "rxjs";
 import { MatchService } from "../../../feature/match/match.service";
+import { SocketService } from "../../../core/services/socket.service";
 
 
 @Component({
@@ -23,6 +24,7 @@ export class PredictionAllComponent {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private updateSub!: Subscription;
+    private socketService = inject(SocketService);
 
     predictions = signal<BaseUserPredictionDto[]>([]);
     matches = signal<MatchBaseDto[]>([]);
@@ -76,6 +78,11 @@ export class PredictionAllComponent {
                     console.error('Error loading data:', error);
                 }
             });
+            //this.socketService.joinRoom('all_matches_list');
+
+            
+        
+
     }
 
     onActivate() {
@@ -97,6 +104,7 @@ export class PredictionAllComponent {
         if (this.updateSub) {
             this.updateSub.unsubscribe();
         }
+       // this.socketService.leaveRoom('all_matches_list');
     }
 
 }

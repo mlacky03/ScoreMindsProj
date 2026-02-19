@@ -8,7 +8,7 @@ import { AppGateway } from 'src/gateway/app.gateway';
 import { MatchRepository } from 'src/infrastucture/persistence/repositories/match.repository';
 import { PersonalPredictionRepository } from 'src/infrastucture/persistence/repositories/personal-prediction.repository';
 import { PredictionStatus } from 'src/infrastucture/persistence/entities/personal-prediction.entity';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 
 @Injectable()
 export class CalculatingService {
@@ -28,7 +28,8 @@ export class CalculatingService {
         private matchRepo: MatchRepository,
         @Inject(PersonalPredictionRepository)
         private predictionRepo: PersonalPredictionRepository,
-        private appGateway: AppGateway, 
+        @Inject('RABBITMQ_SERVICE')
+            private readonly rabbitClient: ClientProxy,
     ) { }
 
     
@@ -49,6 +50,38 @@ export class CalculatingService {
         await this.processMatch(match);
         
     }
+
+    // async statusChange(data:any)
+    // {
+    //     const match=await this.matchRepo.findById(data.id);
+    //     if(!match) {
+    //         this.logger.log(`Match not found: ${data.id}`);
+    //         return;
+    //     }
+    //     if(match.isComputed)
+    //     {
+    //         this.logger.log(`Match already computed: ${data.id}`);
+    //         return;
+    //     }
+        
+    //     await this.processPredictionStatus(match);
+    // }
+
+    // private async processPredictionStatus(match: Match)
+    // {
+    //     const personalPredictions=await this.predictionRepo.findByMatchId(match.id!);
+    //     if(personalPredictions.length === 0) {
+    //         this.logger.log(`No predictions found for match: ${match.id}`);
+    //         match.computed();
+    //         await this.matchRepo.save(match);
+    //         return;
+    //     }
+
+    //     const updatePromises=personalPredictions.map(async(p)=>{
+    //         p.status=PredictionStatus.;
+    //         await this.predictionRepo.save(p);
+    //     })
+    // }
 
     private async processMatch(match: Match) {
         this.logger.log(`Calculating scores for match: ${match.homeTeamName} vs ${match.awayTeamName}`);
@@ -85,13 +118,21 @@ export class CalculatingService {
             prediction.updateStatus(PredictionStatus.PROCESSED);
             
             await this.predictionRepo.save(prediction);
+            this.rabbitClient.emit('prediction-computed', {
+                userId: prediction.userId,
+                predictionId: prediction.id,
+                points: totalPoints,
+                status: PredictionStatus.PROCESSED
 
-            this.appGateway.sendNotificationToUser(prediction.userId, {
-                title: 'Rezultati su stigli!',
-                message: `Osvojio si ${totalPoints} poena na utakmici ${match.homeTeamName} - ${match.awayTeamName}`,
-                matchId: match.id,
-                points: totalPoints
             });
+
+            this.rabbitClient.emit('prediction-list-changed', {predictionId: prediction.id,status: PredictionStatus.PROCESSED});
+            // this.appGateway.sendNotificationToUser(prediction.userId, {
+            //     title: 'Rezultati su stigli!',
+            //     message: `Osvojio si ${totalPoints} poena na utakmici ${match.homeTeamName} - ${match.awayTeamName}`,
+            //     matchId: match.id,
+            //     points: totalPoints
+            // });
         });
 
         await Promise.all(updatePromises);

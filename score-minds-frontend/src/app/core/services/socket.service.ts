@@ -74,7 +74,15 @@ export class SocketService {
       });
     });
   }
-
+  onPredictionUpdate():Observable<any>
+  {
+    return new Observable(observer => {
+      if (!this.socket) return;
+      this.socket.on('prediction_computed', (data) => {
+        observer.next(data);
+      });
+    });
+  }
 
   joinRoom(roomName: string) {
     this.socket?.emit('join_room', roomName);

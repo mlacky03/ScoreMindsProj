@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, inject, signal } from '@angular/core';
 import { NgIf, NgFor, NgOptimizedImage, NgClass, DatePipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -15,10 +15,11 @@ import { FullUserPredictionDto } from '../../feature/predictions/personal-predic
 import { MatchFullDto } from '../../feature/match/data/match-full.dto';
 import { MatchService } from '../../feature/match/match.service';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, Subscription } from 'rxjs';
 import { PlayerService } from '../../feature/players/player.service';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PredictionUpdateComponent } from '../../pages/prediction/prediction-update/prediction-update.component';
+import { SocketService } from '../../core/services/socket.service';
 
 @Component({
   selector: 'app-prediction-view',
@@ -27,18 +28,23 @@ import { PredictionUpdateComponent } from '../../pages/prediction/prediction-upd
   templateUrl: './prediction-view.component.html',
   styleUrl: './prediction-view.component.scss',
 })
-export class PredictionViewComponent {
+export class PredictionViewComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private predictions = inject(PersonalPredictionService);
   private matches = inject(MatchService)
   private playersS = inject(PlayerService)
   private dialog = inject(MatDialog);
+  private socketService = inject(SocketService);
 
 
   players = signal<PlayerFullDto[] | null>(null);
   prediction = signal<FullUserPredictionDto | null>(null);
   match = signal<MatchFullDto | null>(null);
   loading = signal(false);
+
+  private subs = new Subscription();
+  private currentPredictionId?: number;
+  private currentMatchId?:number;
 
   ngOnInit() {
     this.route.paramMap
@@ -53,6 +59,12 @@ export class PredictionViewComponent {
 
             tap((pred) => {
               this.prediction.set(pred);
+
+              this.currentPredictionId = id;
+              this.socketService.joinRoom(`prediction_${id}`);
+
+              this.currentMatchId = pred.matchId;
+              this.socketService.joinRoom(`match_${pred.matchId}`);
             }),
 
             switchMap((pred) => {
@@ -86,10 +98,39 @@ export class PredictionViewComponent {
           this.players.set(g.players)
         },
         error: (err) => {
-          // Error handling is done by ErrorService
+          
         },
       });
 
+      this.subs.add(
+      this.socketService.onPredictionUpdate().subscribe((data: any) => {
+        console.log('Stigao update za predikciju:', data);
+        if (this.currentPredictionId && data.predictionId === this.currentPredictionId) {
+          this.prediction.update((current) => {
+            if (!current) return null;
+            return {
+              ...current,
+              totalPoints: data.points, 
+              status: data.status 
+            };
+          });
+        }
+      })
+    );
+
+   
+    this.subs.add(
+      this.socketService.onMatchUpdate().subscribe((matchData: any) => {
+        console.log('Stigao update za meč:', matchData);
+        
+       
+        this.match.update((currentMatch) => {
+          if (!currentMatch) return null;
+         
+          return { ...currentMatch, ...matchData };
+        });
+      })
+    );
   }
 
   onImgError(e: Event) {
@@ -145,5 +186,15 @@ export class PredictionViewComponent {
           // Error handling is done by ErrorService
         },
       });
+  }
+
+  ngOnDestroy(): void {
+      this.subs.unsubscribe();
+      if (this.currentPredictionId) {
+        this.socketService.leaveRoom(`prediction_${this.currentPredictionId}`);
+      }
+      if (this.currentMatchId) {
+        this.socketService.leaveRoom(`match_${this.currentMatchId}`);
+      }
   }
 }

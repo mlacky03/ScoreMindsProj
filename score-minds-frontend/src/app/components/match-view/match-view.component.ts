@@ -108,6 +108,8 @@ export class MatchViewComponent implements OnInit, OnDestroy {
         return { ...currentMatch, ...updateData };
       });
     });
+
+  
   }
   ngOnDestroy() {
     if (this.currentMatchId) {

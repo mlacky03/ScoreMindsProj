@@ -64,6 +64,14 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to('all_matches_list').emit('match_status_changed', { id: matchId, status });
   }
 
+  brodcastPredictionComputedChange(predictionId: number, data: any) {
+    this.server.to(`prediction_${predictionId}`).emit('prediction_computed', data);
+  }
+
+  brodcastPredictionListChagne(predictionId: number, data: any) {
+    this.server.to(`all_predictions_list`).emit('prediction_list_changed', {predictionId,data});
+  }
+
   @SubscribeMessage('join_room')
   handleJoinRoom(client: Socket, room: string) {
     client.join(room);

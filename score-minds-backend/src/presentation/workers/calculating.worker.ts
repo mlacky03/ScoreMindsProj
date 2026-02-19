@@ -7,7 +7,7 @@ import { AppGateway } from 'src/gateway/app.gateway';
 @Controller()
 export class CalculatingWorker {
     constructor(private calculatingService: CalculatingService,
-                private appGateway:AppGateway
+               // private appGateway:AppGateway
     ) {}
 
     
@@ -21,4 +21,11 @@ export class CalculatingWorker {
             //this.appGateway.broadcastMatchStatusChange(data.id, data.status);
         
     }
+
+    // @EventPattern('match_started')
+    // handleMatchStarted(@Payload() data: any) {
+    //     console.log(`📡 RabbitMQ -> WebSocket: Match started ${data.matchId}`);
+
+    //     this.calculatingService.statusChange(data);
+    // }
 }
