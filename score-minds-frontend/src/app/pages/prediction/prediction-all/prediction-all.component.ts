@@ -23,7 +23,7 @@ export class PredictionAllComponent {
     private matchService = inject(MatchService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    private updateSub!: Subscription;
+    private updateSub = new Subscription();
     private socketService = inject(SocketService);
 
     predictions = signal<BaseUserPredictionDto[]>([]);
@@ -43,16 +43,39 @@ export class PredictionAllComponent {
     }
 
     ngOnInit() {
-        this.updateSub = this.predictionService.predictionUpdated$.subscribe((updatedPrediction) => {
-            this.predictions.update((currentList) => {
-                return currentList.map((item) => {
-                    if (item.id === updatedPrediction.id) {
-                        return { ...item, ...updatedPrediction };
-                    }
-                    return item;
+       this.updateSub.add(
+            this.socketService.onMatchListUpdate().subscribe((data: { id: number, status: string }) => {
+                console.log('Stigao update statusa meča u listu predikcija:', data);
+                
+                this.matches.update((currentMatches) => {
+                    return currentMatches.map(match => {
+                        if (match.id === data.id) {
+                            return { ...match, status: data.status };
+                        }
+                        return match;
+                    });
                 });
-            });
-        });
+            })
+        );
+        
+        this.socketService.joinRoom('all_matches_list');
+
+
+
+
+        this.updateSub.add(
+            this.predictionService.predictionUpdated$.subscribe((updatedPrediction) => {
+                this.predictions.update((currentList) => {
+                    return currentList.map((item) => {
+                        if (item.id === updatedPrediction.id) {
+                            return { ...item, ...updatedPrediction };
+                        }
+                        return item;
+                    });
+                });
+            })
+        );
+
         this.predictionService.getAllPredictions()
             .pipe(
                 tap((predictions) => {
@@ -78,10 +101,6 @@ export class PredictionAllComponent {
                     console.error('Error loading data:', error);
                 }
             });
-            //this.socketService.joinRoom('all_matches_list');
-
-            
-        
 
     }
 
@@ -104,7 +123,7 @@ export class PredictionAllComponent {
         if (this.updateSub) {
             this.updateSub.unsubscribe();
         }
-       // this.socketService.leaveRoom('all_matches_list');
+        this.socketService.leaveRoom('all_matches_list');
     }
 
 }

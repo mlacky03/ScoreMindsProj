@@ -34,7 +34,7 @@ $transition-speed: 0.2s;
   // Hover efekat na celu karticu (samo kad nismo u edit modu)
   &:hover {
     background: #333333;
-    border-color: #007F9F;
+    border-color: #ffffff;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 127, 159, 0.2);
     transform: translateX(4px);
@@ -43,8 +43,16 @@ $transition-speed: 0.2s;
     // Kad pređemo mišem preko kartice, prikaži akcije u View Modu
     .player-view .player-actions {
     }
+    
+  }
+  &:focus {
+    outline: none;
   }
 
+  /* Ponekad browser to dodeli i na sam trenutak klika (:active) */
+  &:active {
+    outline: none;
+  }
   // ==========================================
   // 3. VIEW MODE (Prikaz info i akcija)
   // ==========================================

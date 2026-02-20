@@ -1,7 +1,9 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { TokenState } from '../core/auth/token.state';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../core/auth/state/auth.selectors';
 
 @Component({
   selector: 'app-nav-bar',
@@ -12,9 +14,11 @@ import { TokenState } from '../core/auth/token.state';
 export class NavBarComponent {
   private authState = inject(TokenState);
   private router = inject(Router);
+  private store = inject(Store);
 
+  user = this.store.selectSignal(selectUser);
   menuOpen = signal(false);
-  isAuth = signal<boolean>(this.authState.isAuthenticated);
+  isAuth = computed(() => !!this.user());
 
   links = [
     { path: '/',          label: 'Home',      authOnly: false },

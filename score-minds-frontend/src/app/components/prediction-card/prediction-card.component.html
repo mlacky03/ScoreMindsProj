@@ -16,7 +16,7 @@
     </div>
     <div class="score-badge" [class.winner-bg]="prediction?.winner === 'HOME'"
       *ngIf="prediction?.predictedHomeScore !== undefined">
-      {{ prediction?.predictedHomeScore||'X' }}
+      {{ prediction?.predictedHomeScore===null ?'X': prediction?.predictedHomeScore }}
     </div>
     
   </div>
@@ -37,7 +37,7 @@
   <div class="team-container away">
     <div class="score-badge" [class.winner-bg]="prediction?.winner === 'AWAY'"
       *ngIf="prediction?.predictedAwayScore !== undefined">
-      {{ prediction?.predictedAwayScore||'X' }}
+      {{ prediction?.predictedAwayScore===null ? 'X': prediction?.predictedAwayScore }}
     </div>
     <div class="team-details">
       <span class="team-name" [class.winner-text]="prediction?.winner === 'AWAY'"
