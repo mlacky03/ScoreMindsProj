@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, input, Output } from "@angular/core";
-import { FullUserPredictionDto } from "../../feature/predictions/personal-predictions/models/full-p-prediction.dto";
-import { BaseUserPredictionDto } from "../../feature/predictions/personal-predictions/models/base-p-prediction.dto";
+import { FullUserPredictionDto } from "../../feature/predictions/personal-predictions/data/full-p-prediction.dto";
+import { BaseUserPredictionDto } from "../../feature/predictions/personal-predictions/data/base-p-prediction.dto";
 import { DatePipe, NgClass, NgIf } from "@angular/common";
 import { MatchBaseDto } from "../../feature/match/data/match-base.dto";
 

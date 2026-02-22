@@ -1,0 +1,36 @@
+<div class="layout-container" [class.is-split-view]="isDetailsOpen()">
+
+    <div class="list-panel" >
+        
+        <div class="group-selector-header" *ngIf="groups().length > 0">
+            <div class="header-content">
+                <h2>Moje Grupe</h2>
+                <select 
+                    class="group-dropdown" 
+                    [value]="selectedGroupId()" 
+                    (change)="onGroupChange($any($event.target).value)"
+                    >
+                    <option *ngFor="let group of groups()" [value]="group.id">
+                        {{ group.name }}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="loading-state" *ngIf="loading(); else listContent">
+            <div class="spinner"></div>
+        </div>
+        <ng-template #listContent>
+            <app-prediction-list [predictions]="predictions()" [matches]="matches()"
+                [mode]="isDetailsOpen() ? 'sidebar' : 'grid'"
+                (predictionSelected)="onSelect($event.predictionId, $event.matchId)">
+            </app-prediction-list>
+        </ng-template>
+    </div>
+
+    <div class="detail-panel">
+        <router-outlet (activate)="onActivate()" (deactivate)="onDeactivate()">
+        </router-outlet>
+    </div>
+
+</div>

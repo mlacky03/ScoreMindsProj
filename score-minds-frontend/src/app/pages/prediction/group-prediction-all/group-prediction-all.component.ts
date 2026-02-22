@@ -2,25 +2,29 @@ import { Component, inject, signal } from "@angular/core";
 import { PredictionListComponent } from "../../../components/prediction-list/predicton-list.component";
 import { PredictionViewComponent } from "../../../components/prediction-view/prediction-view.component";
 import { CommonModule, NgIf } from "@angular/common";
-import { PersonalPredictionService } from "../../../feature/predictions/personal-predictions/personal-predictions.service";
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from "@angular/router";
 import { BaseUserPredictionDto } from "../../../feature/predictions/personal-predictions/data/base-p-prediction.dto";
 import { MatchBaseDto } from "../../../feature/match/data/match-base.dto";
 import { filter, finalize, forkJoin, of, Subscription, switchMap, tap } from "rxjs";
 import { MatchService } from "../../../feature/match/match.service";
 import { SocketService } from "../../../core/services/socket.service";
+import { GroupPredictionService } from "../../../feature/predictions/group-predictions/group-prediction.service";
+import { BaseGroupPredictionDto } from "../../../feature/predictions/group-predictions/data/base-g-predicton.dto";
+import { GroupBaseDto } from "../../../feature/groups/data/group-base.dto";
+import { GroupService } from "../../../feature/groups/group.service";
 
 
 @Component({
-    selector: 'app-prediction-all',
+    selector: 'app-group-prediction-all',
     standalone: true,
     imports: [PredictionListComponent, PredictionViewComponent, NgIf, RouterOutlet, CommonModule],
-    templateUrl: './prediction-all.component.html',
-    styleUrls: ['./prediction-all.component.scss']
+    templateUrl: './group-prediction-all.component.html',
+    styleUrls: ['./group-prediction-all.component.scss']
 })
 export class PredictionAllComponent {
-    private predictionService = inject(PersonalPredictionService);
+    private predictionService = inject(GroupPredictionService);
     private matchService = inject(MatchService);
+    private groupService = inject(GroupService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private updateSub = new Subscription();
@@ -29,6 +33,8 @@ export class PredictionAllComponent {
     predictions = signal<BaseUserPredictionDto[]>([]);
     matches = signal<MatchBaseDto[]>([]);
     selectedPredictionId = signal<number | null>(null);
+    groups = signal<GroupBaseDto[]>([])
+    selectedGroupId = signal<number | null>(null);
 
     loading = signal(true);
     isDetailsOpen = signal(false);
@@ -43,10 +49,10 @@ export class PredictionAllComponent {
     }
 
     ngOnInit() {
-       this.updateSub.add(
+        this.updateSub.add(
             this.socketService.onMatchListUpdate().subscribe((data: { id: number, status: string }) => {
                 console.log('Stigao update statusa meča u listu predikcija:', data);
-                
+
                 this.matches.update((currentMatches) => {
                     return currentMatches.map(match => {
                         if (match.id === data.id) {
@@ -57,7 +63,7 @@ export class PredictionAllComponent {
                 });
             })
         );
-        
+
         this.socketService.joinRoom('all_matches_list');
 
 
@@ -76,18 +82,63 @@ export class PredictionAllComponent {
             })
         );
         this.loading.set(true);
-        this.predictionService.getAllPredictions()
+        this.groupService.searchGroups().subscribe({
+            next: (groups) => {
+                this.groups.set(groups);
+
+                if (groups.length > 0) {
+
+                    const defaultGroupId = groups[0].id;
+                    this.selectedGroupId.set(defaultGroupId);
+                    this.loadDataForGroup(defaultGroupId);
+                } else {
+
+                    this.loading.set(false);
+                }
+            },
+            error: (err) => {
+                console.error('Greška pri učitavanju grupa', err);
+                this.loading.set(false);
+            }
+        });
+
+    }
+    onGroupChange(newGroupIdStr: string | number) {
+    const newGroupId = Number(newGroupIdStr);
+
+    
+    if (this.selectedGroupId() === newGroupId) {
+        return;
+    }
+
+    
+    this.selectedGroupId.set(newGroupId);
+
+   
+    this.predictions.set([]);
+    this.matches.set([]);
+
+    
+    this.loadDataForGroup(newGroupId);
+}
+
+
+    loadDataForGroup(groupId: number) {
+        this.loading.set(true);
+
+
+        this.predictionService.getAllPrediction(groupId)
             .pipe(
                 tap((predictions) => {
                     this.predictions.set(predictions);
                 }),
-
                 switchMap((predictions) => {
                     const allMatchIds = predictions.map(p => p.matchId);
 
                     if (allMatchIds.length === 0) {
                         return of([]);
                     }
+
 
                     return this.matchService.getMatchesByIds(allMatchIds);
                 }),
@@ -98,10 +149,9 @@ export class PredictionAllComponent {
                     this.matches.set(matches as MatchBaseDto[]);
                 },
                 error: (error) => {
-                    console.error('Error loading data:', error);
+                    console.error('Error loading group data:', error);
                 }
             });
-
     }
 
     onActivate() {
@@ -116,7 +166,11 @@ export class PredictionAllComponent {
         if (!predictionId || this.selectedPredictionId() === predictionId) {
             return;
         }
-        this.router.navigate([predictionId], { relativeTo: this.route });
+
+        this.router.navigate([predictionId], { 
+        relativeTo: this.route,
+        queryParams: { groupId: this.selectedGroupId() } 
+    });
     }
 
     ngOnDestroy() {

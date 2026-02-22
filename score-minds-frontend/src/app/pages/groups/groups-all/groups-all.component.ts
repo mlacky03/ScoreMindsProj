@@ -26,7 +26,7 @@ export class GroupsAllComponent {
   creatingGroup = signal<boolean>(true);
 
   ngOnInit() {
-    this.groupsService.getAllGroups().subscribe({
+    this.groupsService.searchGroups().subscribe({
       next: (gs) => this.groups.set(gs),
       error: (err) => {
       }

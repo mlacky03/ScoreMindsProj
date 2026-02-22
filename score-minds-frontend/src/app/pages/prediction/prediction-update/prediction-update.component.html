@@ -48,7 +48,7 @@
                 </span>
                 
             </div>
-            <div class="player-search-container" *ngIf="isEventsOpen">
+            <div class="player-search-container" *ngIf="isEventsOpen && hasLock">
                     <div class="search-input-wrapper">
                         <span class="search-icon">🔍</span>
                         <input type="text" [formControl]="playerSearchControl"
@@ -94,13 +94,13 @@
                                 </div>
                             </div>
 
-                            <button type="button" class="btn-icon edit" (click)="toggleEdit(i)" title="Edit">
+                            <button type="button" class="btn-icon edit" (click)="toggleEdit(i)" title="Edit" *ngIf="hasLock">
                                 ✏️
                             </button>
                         </ng-container>
 
                         <ng-container *ngIf="editingStates[i]">
-                            <div class="edit-controls">
+                            <div class="edit-controls" *ngIf="hasLock">
                                 <select formControlName="type" class="mini-input">
                                     <option value="GOAL">⚽ Goal</option>
                                     <option value="ASSIST">👟 Assist</option>
@@ -137,7 +137,7 @@
                     Cancel
                 </button>
 
-                <button type="submit" class="btn-submit" [disabled]="form.invalid || loading|| editingStatesChack()">
+                <button type="submit" class="btn-submit" [disabled]="form.invalid || loading|| editingStatesChack() || !hasLock">
                     <span *ngIf="!loading">Update</span>
                     <span *ngIf="loading" class="spinner"></span>
                 </button>

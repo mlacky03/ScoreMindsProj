@@ -52,6 +52,33 @@ export class SocketService {
       });
     });
   }
+  emit(eventName: string, data: any) {
+    if (!this.socket) {
+      console.warn(`Pokusaj emitovanja '${eventName}' ali socket nije povezan!`);
+      return;
+    }
+    this.socket.emit(eventName, data);
+  }
+  on(eventName: string): Observable<any> {
+    return new Observable(observer => {
+      if (!this.socket) {
+        console.warn(`Pokusaj slusanja '${eventName}' ali socket nije povezan!`);
+        return;
+      }
+
+      
+      const handler = (data: any) => {
+        observer.next(data);
+      };
+
+      
+      this.socket.on(eventName, handler);
+
+      return () => {
+        this.socket?.off(eventName, handler);
+      };
+    });
+  }
 
 
   onMatchUpdate(): Observable<any> {

@@ -1,0 +1,52 @@
+<div class="group-search-page">
+    <div class="group-search-wrapper">
+
+        <h2 mat-dialog-title class="group-search-title">Search groups</h2>
+
+        <div class="content" mat-dialog-content>
+            <mat-form-field appearance="outline" class="w-full outline-purple">
+                <mat-label>Search groups</mat-label>
+                <input matInput [formControl]="searchCtrl" placeholder="Type a group name…" autocomplete="off" />
+                <button *ngIf="searchCtrl.value" matSuffix mat-icon-button aria-label="Clear"
+                    (click)="searchCtrl.setValue('', {emitEvent: true})">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </mat-form-field>
+
+            <div class="spinner" *ngIf="loading">
+                <mat-progress-spinner mode="indeterminate" diameter="24"></mat-progress-spinner>
+            </div>
+
+            <mat-nav-list *ngIf="(results$ | async) as results">
+                <ng-container *ngIf="results.length; else noResults">
+                    <a mat-list-item 
+                       *ngFor="let g of results; trackBy: trackById" 
+                       (click)="onGroupSelected(g)"
+                       [class.selected-group]="selectedGroup?.id === g.id"
+                       [attr.aria-selected]="selectedGroup?.id === g.id">
+                        <mat-icon matListItemIcon>groups</mat-icon> <div matListItemTitle>{{ displayGroup(g) }}</div> <div matListItemLine *ngIf="g.name">{{ g.name }}</div>
+                        <mat-icon matListItemMeta *ngIf="selectedGroup?.id === g.id" class="check-icon">check</mat-icon>
+                    </a>
+                </ng-container>
+                
+                <ng-template #noResults>
+                    <div class="muted" *ngIf="!loading && (searchCtrl.value?.trim()?.length ?? 0) >= 2">
+                        No groups found.
+                    </div>
+                </ng-template>
+            </mat-nav-list>
+
+            <div class="error" *ngIf="error">{{ error }}</div>
+        </div>
+
+        <div mat-dialog-actions align="end" class="actions">
+            <button mat-stroked-button class="action-button cancel-button" (click)="onCancel()">
+                Cancel
+            </button>
+            <button mat-flat-button class="action-button submit-button" (click)="onSubmit()" [disabled]="!selectedGroup || loading">
+                Join Group
+            </button>
+        </div>
+
+    </div>
+</div>

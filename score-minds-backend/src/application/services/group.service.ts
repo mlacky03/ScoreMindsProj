@@ -12,9 +12,9 @@ import { UpdateGroupDto } from "../dtos/group-dto/update-group.dto";
 import { GroupRepository } from "src/infrastucture/persistence/repositories/group.repository";
 import { ClientProxy } from "@nestjs/microservices";
 import { BaseGroupUserDto } from "../dtos/group-user-dto/BaseGroupMember.dto";
-
+import { FilterGroupDto } from "../dtos/group-dto/filter-group.dto";
 @Injectable()
-export class GroupService  {
+export class GroupService {
     constructor(
         @Inject(GroupRepository)
         private readonly repo: GroupRepository,
@@ -25,14 +25,20 @@ export class GroupService  {
         private readonly rabbitClient: ClientProxy,
 
     ) {
-        
+
     }
 
-    async findAll(memberId: number): Promise<BaseGroupDto[]> {
-        const groups= await this.repo.findByOwner(memberId);
-
+    async findAll(memberId: number, filter?: FilterGroupDto): Promise<BaseGroupDto[]> {
+        // if(filter){
+        //     const groups = await this.repo.findAllWithFilters(filter);
+        //     const filteredGroups = groups.filter(p => this.chackMembership(memberId, p.id!));
+        //     return filteredGroups.map(g => new BaseGroupDto(g));
+        // }
+        const groups=await this.repo.findAllForMember(memberId,filter?.query!);
         return groups.map(g => new BaseGroupDto(g));
     }
+
+
 
     async findOne(userId: number, groupId: number): Promise<FullGroupDto> {
         if (!(await this.chackMembership(userId, groupId))) {
@@ -64,26 +70,26 @@ export class GroupService  {
 
 
     async create(data: CreateGroupDto, userId: number): Promise<FullGroupDto> {
-        const owner= await this.userService.findOne(userId);
+        const owner = await this.userService.findOne(userId);
         if (!owner) {
             throw new UserNotFoundException(userId);
         }
-        
-        const group=new Group(
+
+        const group = new Group(
             null,
             data.name,
             userId,
             new Date(),
             data.profileImageUrl
         )
-       const createGroup=await this.repo.save(group);
-       const groupUser=await this.groupUserService.addMemberToGroup( userId,createGroup.id!);
-       
+        const createGroup = await this.repo.save(group);
+        const groupUser = await this.groupUserService.addMemberToGroup(userId, createGroup.id!);
+
 
         return new FullGroupDto(createGroup, [groupUser]);
     }
 
-    async addMemberToGroup(groupId: number, userId: number,adminId:number): Promise<BaseGroupUserDto> {
+    async addMemberToGroup(groupId: number, userId: number, adminId: number): Promise<BaseGroupUserDto> {
         const group = await this.repo.findById(groupId);
         if (!group) {
             throw new GroupNotFoundException(groupId);
@@ -109,12 +115,12 @@ export class GroupService  {
         }
 
         group.updateProfileImage(imagePath);
-        const updatedGroup=await this.repo.save(group);
+        const updatedGroup = await this.repo.save(group);
 
         return new BaseGroupDto(updatedGroup);
     }
 
-    async update(id: number, data: UpdateGroupDto,userId:number): Promise<BaseGroupDto> {
+    async update(id: number, data: UpdateGroupDto, userId: number): Promise<BaseGroupDto> {
         const group = await this.repo.findById(id);
 
         if (!group) {
@@ -126,17 +132,17 @@ export class GroupService  {
         }
 
         group.updateGroup(data.name!, data.profileImageUrl!);
-        const updatedGroup=await this.repo.save(group);
+        const updatedGroup = await this.repo.save(group);
 
         return new BaseGroupDto(updatedGroup);
     }
 
-    async kickMemberFromGroup(memberId:number,groupId:number,adminId:number): Promise<{message:string}> {
+    async kickMemberFromGroup(memberId: number, groupId: number, adminId: number): Promise<{ message: string }> {
         const group = await this.repo.findById(groupId);
         if (!group) {
             throw new GroupNotFoundException(groupId);
         }
-        if(group.ownerId!==adminId){
+        if (group.ownerId !== adminId) {
             throw new ForbiddenException("You do not have permission to kick this member");
         }
         const gs = await this.groupUserService.getMemberById(memberId, groupId);
@@ -146,19 +152,19 @@ export class GroupService  {
 
         return this.groupUserService.deleteGroupMember(gs.id!);
     }
-    async delete(id: number,adminId:number): Promise<{message:string}> {
+    async delete(id: number, adminId: number): Promise<{ message: string }> {
         const group = await this.repo.findById(id);
 
         if (!group) {
             throw new GroupNotFoundException(id);
         }
 
-        if(group.ownerId!==adminId){
+        if (group.ownerId !== adminId) {
             throw new ForbiddenException("You do not have permission to delete this group");
         }
 
         await this.repo.delete(id);
-        return {message:"Group deleted successfully"};
+        return { message: "Group deleted successfully" };
     }
 
 }

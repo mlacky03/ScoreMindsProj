@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';
 import { CommonModule, NgClass, NgIf } from '@angular/common';
-import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/models/prediction-event/prediction-event-create.dto';
+import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/data/prediction-event/prediction-event-create.dto';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({

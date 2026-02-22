@@ -24,8 +24,10 @@ export class NavBarComponent {
     { path: '/',          label: 'Home',      authOnly: false },
     { path: '/me',  label: 'My Profile',  authOnly: true },
     { path: '/groups',  label: 'My Groups',  authOnly: true },
-    { path: 'predictions', label: 'My Predictions', authOnly: true },
+    { path: '/predictions', label: 'My Predictions', authOnly: true },
     { path: '/matches', label: 'Matches', authOnly: true },
+    { path: '/groupPredictions', label: 'Group Predictions', authOnly: true },
+
   ];
 
   toggle() { this.menuOpen.update(v => !v); }

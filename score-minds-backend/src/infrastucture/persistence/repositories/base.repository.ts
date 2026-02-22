@@ -38,7 +38,8 @@ export abstract class BaseRepository<TDomain, TEntity extends ObjectLiteral> {
     }
 
     async findAll(): Promise<TDomain[]> {
-        const entities = await this.typeOrmRepo.find();
+        const entities = await this.typeOrmRepo.find(
+        );
         return this.mapper.toDomainList(entities);
     }
 

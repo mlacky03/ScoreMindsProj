@@ -12,6 +12,7 @@ import {
     ParseFilePipe,
     Patch,
     Post,
+    Query,
     UploadedFile,
     UseGuards,
     UseInterceptors,
@@ -33,6 +34,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PAGINATION } from '../../common/constants/pagination.constants';
 import { ApiTags } from '@nestjs/swagger';
 import { FullGroupDto } from 'src/application/dtos/group-dto/full-group.dto';
+import { FilterGroupDto } from 'src/application/dtos/group-dto/filter-group.dto';
 
 @ApiTags('Groups')
 @Controller('groups')
@@ -45,8 +47,9 @@ export class GroupController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    async findAll(@CurrentUser() id: number): Promise<BaseGroupDto[]> {
-        const groups = await this.groupService.findAll(id);
+    async findAll(@CurrentUser() id: number, @Query('query') query:string): Promise<BaseGroupDto[]> {
+        const filters:FilterGroupDto= {query};
+        const groups = await this.groupService.findAll(id,filters);
 
         return groups.map(g => ({
             ...g,

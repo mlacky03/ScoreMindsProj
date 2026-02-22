@@ -8,6 +8,7 @@ import {
   redirectLoggedInToApp,
 } from './core/guards/auth.guard';
 import { PredictionAllComponent } from './pages/prediction/prediction-all/prediction-all.component';
+import { PredictionAllComponent as GroupPredictionAllComponent } from './pages/prediction/group-prediction-all/group-prediction-all.component';
 
 export const routes: Routes = [
   // public
@@ -82,13 +83,28 @@ export const routes: Routes = [
     path: 'predictions',
     component: PredictionAllComponent, 
     canActivate: [authGuard],
+
     children: [
       {
         path: ':id', 
+        data: { mode: 'personal' },
         loadComponent: () => import('./components/prediction-view/prediction-view.component').then(m => m.PredictionViewComponent)
       }
     ]
   },
+  {
+    path: 'groupPredictions',
+    component: GroupPredictionAllComponent, 
+    canActivate: [authGuard],
+    children: [
+      {
+        path: ':id', 
+        data: { mode: 'group' },
+        loadComponent: () => import('./components/prediction-view/prediction-view.component').then(m => m.PredictionViewComponent)
+      }
+    ]
+  },
+  
   {
     path: 'predictions/:id',
     canActivate: [authGuard],

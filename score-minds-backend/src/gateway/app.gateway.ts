@@ -17,6 +17,7 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() server: Server;
+  private activeLocks = new Map<number, { socketId: string, userId: number, userName: string }[]>();
 
   constructor(private jwtService: JwtService) { }
 
@@ -32,6 +33,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const payload = this.jwtService.verify(token);
       const userId = payload.sub;
 
+      client['user'] = payload;
 
       const personalRoom = `user_${userId}`;
       client.join(personalRoom);
@@ -48,6 +50,9 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     console.log('Korisnik diskonektovan');
+    for (const predictionId of this.activeLocks.keys()) {
+      this.removeUserFromQueue(predictionId, client.id);
+    }
 
   }
   broadcastMatchUpdate(matchId: number, data: any) {
@@ -69,7 +74,98 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   brodcastPredictionListChagne(predictionId: number, data: any) {
-    this.server.to(`all_predictions_list`).emit('prediction_list_changed', {predictionId,data});
+    this.server.to(`all_predictions_list`).emit('prediction_list_changed', { predictionId, data });
+  }
+  @SubscribeMessage('request_edit_lock')
+  handleRequestLock(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { predictionId: number }
+  ) {
+    const predictionId = data.predictionId;
+    const queue = this.activeLocks.get(predictionId) || [];
+
+    const userId = client['user']?.sub;
+    const userName = client['user']?.username || `Korisnik ID: ${userId}`;
+
+
+    if (!queue.find(req => req.socketId === client.id)) {
+      queue.push({ socketId: client.id, userId, userName });
+      this.activeLocks.set(predictionId, queue);
+    }
+
+
+    if (queue[0].socketId === client.id) {
+      client.emit('edit_lock_status', { locked: true, isMe: true });
+
+
+      client.to(`prediction_${predictionId}`).emit('edit_lock_status', {
+        locked: true,
+        isMe: false,
+        editorName: userName
+      });
+    } else {
+      // Ako nije prvi, javljamo mu da sačeka i ko trenutno edituje
+      client.emit('edit_lock_status', {
+        locked: true,
+        isMe: false,
+        editorName: queue[0].userName,
+        queuePosition: queue.findIndex(req => req.socketId === client.id)
+      });
+    }
+  }
+
+  @SubscribeMessage('form_value_changed')
+  handleFormValueChanged(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { predictionId: number, data: any }
+  ) {
+    const queue = this.activeLocks.get(payload.predictionId);
+
+    
+    if (queue && queue.length > 0 && queue[0].socketId === client.id) {
+      client.to(`prediction_${payload.predictionId}`).emit('live_form_update', payload.data);
+    }
+  }
+
+  @SubscribeMessage('release_edit_lock')
+  handleReleaseLock(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { predictionId: number }
+  ) {
+    this.removeUserFromQueue(data.predictionId, client.id);
+  }
+
+  private removeUserFromQueue(predictionId: number, socketId: string) {
+    const queue = this.activeLocks.get(predictionId);
+    if (!queue) return;
+
+    const wasFirst = queue[0]?.socketId === socketId;
+    const updatedQueue = queue.filter(req => req.socketId !== socketId);
+
+    if (updatedQueue.length === 0) {
+      
+      this.activeLocks.delete(predictionId);
+      if (wasFirst) {
+        this.server.to(`prediction_${predictionId}`).emit('edit_lock_status', { locked: false, isMe: false });
+      }
+    } else {
+      this.activeLocks.set(predictionId, updatedQueue);
+      
+      if (wasFirst) {
+        
+        const nextUser = updatedQueue[0];
+        
+       
+        this.server.to(nextUser.socketId).emit('edit_lock_status', { locked: true, isMe: true });
+        
+      
+        this.server.to(`prediction_${predictionId}`).except(nextUser.socketId).emit('edit_lock_status', {
+          locked: true,
+          isMe: false,
+          editorName: nextUser.userName
+        });
+      }
+    }
   }
 
   @SubscribeMessage('join_room')

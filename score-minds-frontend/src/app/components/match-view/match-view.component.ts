@@ -18,9 +18,12 @@ import { PlayerService } from '../../feature/players/player.service';
 import { PlayerListComponent } from '../player-list/player-list.component';
 import { FormsModule } from '@angular/forms';
 import { PersonalPredictionService } from '../../feature/predictions/personal-predictions/personal-predictions.service';
-import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/models/prediction-event/prediction-event-create.dto';
-import { CreateUserPredictionDto } from '../../feature/predictions/personal-predictions/models/create-p-prediction.dto';
+import { PredictionEventCreateDto } from '../../feature/predictions/personal-predictions/data/prediction-event/prediction-event-create.dto';
+import { CreateUserPredictionDto } from '../../feature/predictions/personal-predictions/data/create-p-prediction.dto';
 import { SocketService } from '../../core/services/socket.service';
+import { GroupPredictionService } from '../../feature/predictions/group-predictions/group-prediction.service';
+import { CreateGroupPredictionDto } from '../../feature/predictions/group-predictions/data/create-g-predicton.dto';
+import { GroupSearchComponent } from '../group-search/group-search.component';
 
 @Component({
   selector: 'app-match-view',
@@ -34,12 +37,13 @@ export class MatchViewComponent implements OnInit, OnDestroy {
   private matches = inject(MatchService);
   private dialog = inject(MatDialog);
   private players = inject(PlayerService)
-  private predictions = inject(PersonalPredictionService)
+  private personalPredictions = inject(PersonalPredictionService)
+  private groupPredictions = inject(GroupPredictionService)
   private socketService = inject(SocketService);
 
   private socketSub?: Subscription;
   private currentMatchId?: number;
-
+  private groupId?: number;
 
   predictionEvents = signal<PredictionEventCreateDto[]>([]);
   match = signal<MatchFullDto | null>(null);
@@ -50,7 +54,7 @@ export class MatchViewComponent implements OnInit, OnDestroy {
   predictionAwayScore = signal<number | null>(null);
   selectedWinner = signal<'HOME' | 'AWAY' | 'DRAW' | null>(null);
   selectWinner(side: 'HOME' | 'AWAY' | 'DRAW') {
-    // Ako je već selektovan taj tim, deselekruj ga (opciono)
+
     if (this.selectedWinner() === side) {
       this.selectedWinner.set(null);
     } else {
@@ -68,7 +72,7 @@ export class MatchViewComponent implements OnInit, OnDestroy {
         distinctUntilChanged(),
         tap((id) => {
           this.loading.set(true);
-          
+
           this.currentMatchId = id;
           this.socketService.joinRoom(`match_${id}`);
         }),
@@ -100,16 +104,16 @@ export class MatchViewComponent implements OnInit, OnDestroy {
           this.loading.set(false);
         },
       });
-      this.socketSub = this.socketService.onMatchUpdate().subscribe((updateData) => {
+    this.socketSub = this.socketService.onMatchUpdate().subscribe((updateData) => {
       console.log('Stigli live podaci:', updateData);
-      
+
       this.match.update((currentMatch) => {
         if (!currentMatch) return null;
         return { ...currentMatch, ...updateData };
       });
     });
 
-  
+
   }
   ngOnDestroy() {
     if (this.currentMatchId) {
@@ -145,7 +149,7 @@ export class MatchViewComponent implements OnInit, OnDestroy {
       events: this.predictionEvents()
     };
 
-    this.predictions.createPrediction(prediction).subscribe({
+    this.personalPredictions.createPrediction(prediction).subscribe({
       next: (prediction) => {
         console.log('Prediction created:', prediction);
       },
@@ -154,7 +158,47 @@ export class MatchViewComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+  onCreateGroupPrediction() {
+    this.onOpenSearchDialog();
+    if (!this.groupId) return;
+    const prediction: CreateGroupPredictionDto = {
+      matchId: this.match()!.id,
+      predictedHomeScore: this.predictionHomeScore() || null,
+      predictedAwayScore: this.predictionAwayScore() || null,
+      winner: this.selectedWinner() || "DRAW",
+      events: this.predictionEvents()
+    };
+
+    this.groupPredictions.createPredicton(prediction, this.groupId).subscribe({
+      next: (prediction) => {
+        console.log('Prediction created:', prediction);
+      },
+      error: (err) => {
+        console.error('Greška pri kreiranju predikcije:', err);
+      }
+    });
+  }
+  onOpenSearchDialog() {
+    const ref = this.dialog.open(GroupSearchComponent, {
+      disableClose: false,
+      width: '720px',
+      panelClass: 'app-modal-panel',
+      backdropClass: 'app-modal-backdrop',
+    });
+
+    ref.afterClosed().subscribe((result) => {
+      if (result && result !== 'cancel') {
+
+
+
+        this.groupId = result as number;
+
+      }
+
+    });
+  }
+
+
 
   get homePlayersCount(): number {
     return this.homeTeamPlayers().length;

@@ -7,6 +7,7 @@ import { catchError } from 'rxjs';
 import { GroupFullDto } from "./data/group-full.dto";
 import { GroupCreateDto } from "./data/group-create.dto";
 import { GroupUpdateDto } from "./data/group-update.dto";
+import { GroupFilterDto } from "./data/group-filter.dto";
 
 
 @Injectable({
@@ -17,12 +18,7 @@ export class GroupService{
     private errorService=inject(ErrorService);
     private base=environment.apiUrl;
 
-    getAllGroups()
-    {
-       return this.http.get<GroupBaseDto[]>(`${this.base}/groups`).pipe(
-            catchError((err) => this.errorService.handleHttpError(err))
-        );
-    }
+    
 
     getGroupById(id:number)
     {
@@ -61,6 +57,17 @@ export class GroupService{
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
+    
+    searchGroups(filters?:GroupFilterDto) {
+        const url = `${this.base}/groups`;
+        return this.http.get<GroupBaseDto[]>(url, {
+            params: {
+                query: filters?.name || ''
+            }
+        }).pipe(
+            catchError((err) => this.errorService.handleHttpError(err))
+        );
+    }
 
 
 
@@ -73,4 +80,5 @@ export class GroupService{
         fd.append('image', image);
         return fd;
       }
+
 }

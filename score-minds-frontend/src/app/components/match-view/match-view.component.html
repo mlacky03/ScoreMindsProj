@@ -46,8 +46,11 @@
         </div>
       </div>
 
-      <button class="action-button primary" (click)="onCreatePrediction()" [disabled]="!selectedWinner() ">
+      <button class="action-button primary" *ngIf="match()?.status !== 'FT'" (click)="onCreatePrediction()" [disabled]="!selectedWinner() ">
         Create Prediction
+      </button>
+      <button class="action-button primary"  *ngIf="match()?.status !== 'FT'"(click)="onCreateGroupPrediction()" [disabled]="!selectedWinner() ">
+        Create Group Prediction
       </button>
 
     </div> <div class="team-column away">

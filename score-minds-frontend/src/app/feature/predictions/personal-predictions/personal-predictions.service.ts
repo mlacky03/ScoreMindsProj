@@ -3,10 +3,10 @@ import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../../environment/environment";
 import { ErrorService } from "../../../core/services/error.service";
 import { catchError, Subject } from 'rxjs';
-import { BaseUserPredictionDto } from "./models/base-p-prediction.dto";
-import { CreateUserPredictionDto } from "./models/create-p-prediction.dto";
-import { UpdateUserPredictionDto } from "./models/update-p-prediction";
-import { FullUserPredictionDto } from "./models/full-p-prediction.dto";
+import { BaseUserPredictionDto } from "./data/base-p-prediction.dto";
+import { CreateUserPredictionDto } from "./data/create-p-prediction.dto";
+import { UpdateUserPredictionDto } from "./data/update-p-prediction";
+import { FullUserPredictionDto } from "./data/full-p-prediction.dto";
 
 @Injectable({
     providedIn: 'root'
@@ -32,7 +32,7 @@ export class PersonalPredictionService {
         );
     }
 
-    getOnePrediction(predictionId:number)
+    getOnePrediction(predictionId:number,)
     {
         return this.http.get<FullUserPredictionDto>(`${this.base}/personal-predictions/find/${predictionId}`).pipe(
             catchError((err) => this.errorService.handleHttpError(err))

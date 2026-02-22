@@ -22,8 +22,8 @@ export class GroupUserService {
 
     }
 
-    async findAll(): Promise<GroupUser[]> {
-        return this.repo.findAll();
+    async findAll(memberId: number): Promise<GroupUser[]> {
+        return this.repo.findByUserId(memberId);
     }
 
     async findOne(id: number): Promise<GroupUser | null> {

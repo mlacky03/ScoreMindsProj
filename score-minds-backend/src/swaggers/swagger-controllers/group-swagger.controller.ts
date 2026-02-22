@@ -11,6 +11,7 @@ import {
   ParseFilePipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -41,6 +42,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { PAGINATION } from '../../common/constants/pagination.constants';
 import { FullGroupDto } from 'src/application/dtos/group-dto/full-group.dto';
+import { FilterGroupDto } from 'src/application/dtos/group-dto/filter-group.dto';
 
 @ApiTags('Groups')
 @Controller('groups')
@@ -67,8 +69,9 @@ export class GroupSwaggerController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll(@CurrentUser() userId: number): Promise<BaseGroupDto[]> {
-    const groups = await this.groupService.findAll(userId);
+  async findAll(@CurrentUser() userId: number, @Query('query') query: string): Promise<BaseGroupDto[]> {
+    const filters: FilterGroupDto = { query };
+    const groups = await this.groupService.findAll(userId, filters);
 
     return groups.map((group) => ({
       ...group,
@@ -265,7 +268,7 @@ export class GroupSwaggerController {
     }
 
 
-    return this.groupService.addMemberToGroup(+groupId, +memberId,userId);
+    return this.groupService.addMemberToGroup(+groupId, +memberId, userId);
   }
 
   @ApiOperation({
