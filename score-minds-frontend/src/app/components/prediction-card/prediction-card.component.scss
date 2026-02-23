@@ -1,13 +1,13 @@
 .prediction-card {
+  position: relative; // OVO JE BITNO ZA OVERLAY
+  overflow: hidden;   // OVO JE BITNO ZA OVERLAY
   background: #1e1e1e;
   border-radius: 12px;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all 0.2s ease;
-  overflow: hidden;
 
   // --- 1. DEFAULT STATE (GRID / KOCKA) ---
-  // Vertikalni raspored: Timovi su gore i dole (ili levo/desno ali veliki)
   display: flex;
   flex-direction: column; // Slažemo elemente vertikalno
   align-items: center;
@@ -16,11 +16,82 @@
   min-height: 220px; // Visina kocke
   gap: 15px;
 
+  // Osnovni hover efekat cele kartice
   &:hover {
     background: #252525;
     border-color: rgba(255, 255, 255, 0.1);
     transform: translateY(-4px);
   }
+
+  // ==========================================
+  // HOVER OVERLAY (BLUR I DUGMIĆI)
+  // ==========================================
+  .hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    // Polu-providna tamna pozadina sa zamućenjem
+    background-color: rgba(18, 18, 18, 0.75); 
+    backdrop-filter: blur(6px); // Glavni Blur efekat
+    
+    display: flex;
+    flex-direction: column; // Dugmad idu jedno ispod drugog
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    
+    // Početno stanje - skriveno
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); // Glatka tranzicija
+    z-index: 10; // Da bude iznad svih grbova i tekstova
+
+    .overlay-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      width: 170px; // Ista širina za oba dugmeta
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      
+      &.view-btn {
+        background-color: #3b82f6; // Plava boja
+        color: white;
+        
+        &:hover { background-color: #2563eb; }
+      }
+
+      &.audit-btn {
+        background-color: #374151; // Tamno siva boja
+        color: white;
+        border: 1px solid #4b5563;
+        
+        &:hover { background-color: #4b5563; }
+      }
+
+      &:active {
+        transform: scale(0.95); // Suptilan efekat na klik
+      }
+    }
+  }
+
+  // Aktivacija overlay-a na hover kartice (Samo kada NIJE u compact modu)
+  &:not(.compact-mode):hover {
+    .hover-overlay {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+  // ==========================================
 
   // Zajednički stilovi za timove
   .team-container {
@@ -38,6 +109,7 @@
       object-fit: contain;
       img { width: 100%; height: 100%; object-fit: contain; }
     }
+    
     .score-badge {
       font-size: 1.2rem;
       font-weight: 800;
@@ -107,6 +179,12 @@
     padding: 10px 15px;
     min-height: auto; // Reset visine
     gap: 10px;
+
+    // Kad je u compact modu gasimo hover transformaciju da se ne diže previse
+    &:hover {
+      transform: none;
+      background: #2a2a2a;
+    }
 
     // Resetujemo timove da budu horizontalni
     .team-container {

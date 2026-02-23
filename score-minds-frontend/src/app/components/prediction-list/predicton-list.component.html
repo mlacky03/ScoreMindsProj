@@ -7,7 +7,9 @@
           [prediction]="prediction" 
           [match]="getMatch(prediction.matchId)!"
           [compact]="mode === 'sidebar'"
-          (predictionUpdated)="onPredictionSelected(prediction.id, prediction.matchId)"> 
+          (predictionUpdated)="onPredictionSelected(prediction.id, prediction.matchId)"
+          [personal]="personal"
+          [currentGroupId]="currentGroupId"> 
       </app-prediction-card>
 
     </div>

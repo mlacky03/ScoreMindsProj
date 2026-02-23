@@ -4,7 +4,7 @@
         
         <div class="group-selector-header" *ngIf="groups().length > 0">
             <div class="header-content">
-                <h2>Moje Grupe</h2>
+                <h2>Predikcije grupe</h2>
                 <select 
                     class="group-dropdown" 
                     [value]="selectedGroupId()" 
@@ -23,7 +23,8 @@
         <ng-template #listContent>
             <app-prediction-list [predictions]="predictions()" [matches]="matches()"
                 [mode]="isDetailsOpen() ? 'sidebar' : 'grid'"
-                (predictionSelected)="onSelect($event.predictionId, $event.matchId)">
+                (predictionSelected)="onSelect($event.predictionId, $event.matchId)"
+                [currentGroupId]="getSelectedGroupId()">
             </app-prediction-list>
         </ng-template>
     </div>

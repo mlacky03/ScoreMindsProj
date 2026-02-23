@@ -1,0 +1,20 @@
+<div class="layout-container">
+    <div calss="audit-header">
+        <h1>Prediction Audit</h1>
+    </div>
+    <div class="list-panel">
+        
+        <div class="loading-state" *ngIf="loading(); else listContent">
+            <div class="spinner"></div>
+        </div>
+
+        <ng-template #listContent>
+            
+            <app-prediction-audit-list 
+                [predictionAuditList]="predictionAuditList()">
+            </app-prediction-audit-list>
+            
+        </ng-template>
+
+    </div>
+</div>

@@ -13,6 +13,7 @@ import { FullMatchDto } from "../dtos/matches-dto/full-match.dto";
 import { GroupPrediction } from "src/domain/models/group-prediction.model";
 import { PredictionStatus } from "src/infrastucture/persistence/entities/group-prediction.entity";
 import { GroupService } from "./group.service";
+import { UserService } from "./user.service";
 
 
 @Injectable()
@@ -24,7 +25,8 @@ export class GroupPredictionService {
         private readonly matchService: MatchService,
         private readonly predictionAuditService: PredictionAuditService,
         private readonly playerService: PlayerService,
-        private readonly groupService: GroupService
+        private readonly groupService: GroupService,
+        private readonly userService:UserService
     ) { }
 
     async findAll(id: number, userId: number): Promise<BasePredictionDto[]> {
@@ -99,11 +101,11 @@ export class GroupPredictionService {
     async findOne(id: number, groupId: number, userId: number): Promise<FullPredictionDto> {
         await this.groupService.chackMembership(userId, groupId);
         const prediction = await this.repo.findPredictionByGroupIdWithRelations(groupId, id);
-
+        const user=await this.userService.findOne(userId);
         if (!prediction) {
             throw new NotFoundException('Prediction not found');
         }
-        return new FullPredictionDto(prediction);
+        return new FullPredictionDto(prediction,user.username);
     }
 
 
@@ -178,7 +180,7 @@ export class GroupPredictionService {
 
         const freshPrediction = await this.repo.findPredictionByGroupIdWithRelations(groupId, predictionId);
 
-        return new FullPredictionDto(freshPrediction!);
+        return new FullPredictionDto(freshPrediction!,"");
 
     }
     async deletePrediction(predictionId: number, groupId: number, userId: number): Promise<{ message: string }> {

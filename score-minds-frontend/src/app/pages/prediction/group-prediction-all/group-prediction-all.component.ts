@@ -48,8 +48,8 @@ export class PredictionAllComponent {
         });
         const routerState = this.router.getCurrentNavigation()?.extras.state;
         if (routerState && routerState['passedGroupId']) {
-        this.selectedGroupId.set(routerState['passedGroupId']);
-    }
+            this.selectedGroupId.set(routerState['passedGroupId']);
+        }
     }
 
     ngOnInit() {
@@ -85,6 +85,13 @@ export class PredictionAllComponent {
                 });
             })
         );
+        this.updateSub.add(
+            this.predictionService.predictionDeleted$.subscribe((deletedId) => {
+                this.predictions.update((currentList) =>
+                    currentList.filter(item => item.id !== deletedId)
+                );
+            })
+        );
         this.loading.set(true);
         this.groupService.searchGroups().subscribe({
             next: (groups) => {
@@ -93,10 +100,10 @@ export class PredictionAllComponent {
                 if (groups.length > 0) {
 
                     const defaultGroupId = groups[0].id;
-                    if(this.selectedGroupId() === null){
+                    if (this.selectedGroupId() === null) {
                         this.selectedGroupId.set(defaultGroupId);
                     }
-                  
+
 
                     this.loadDataForGroup(this.selectedGroupId()!);
                 } else {
@@ -179,6 +186,10 @@ export class PredictionAllComponent {
             relativeTo: this.route,
             queryParams: { groupId: this.selectedGroupId() }
         });
+    }
+
+    getSelectedGroupId(): number | undefined {
+        return this.selectedGroupId() || undefined;
     }
 
     ngOnDestroy() {

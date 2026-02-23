@@ -1,0 +1,17 @@
+<div class="audit-list">
+    <ng-container>
+        <div class="audit-item" *ngFor="let audit of predictionAuditList; trackBy: trackByAudit">
+
+            <app-prediction-audit-card [predictionAudit]="audit" [currentUserId]="currentUserId">
+            </app-prediction-audit-card>
+
+        </div>
+    </ng-container>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!predictionAuditList || predictionAuditList.length === 0">
+        <div class="empty-icon">❌</div>
+        <h3 class="empty-title">No Audit for this prediction</h3>
+        <p class="empty-description">There are no audits for this prediction yet</p>
+    </div>
+</div>

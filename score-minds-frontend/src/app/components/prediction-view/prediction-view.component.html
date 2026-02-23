@@ -1,6 +1,9 @@
 <div class="prediction-view" *ngIf="match() && prediction(); else loading">
 
     <div class="prediction-header">
+        <div class="info-group" *ngIf="getMode() === 'group'">
+            <h3 class="owner-name">Creator:  {{ prediction()?.createdByName }}</h3>
+        </div>
         <div class="match-container">
 
             <div class="team-section home">
@@ -29,6 +32,7 @@
                         title="Edit Prediction">
                         Edit ✏️
                     </button>
+
                     <div class="prediction-info">
 
                         <div class="status-side">
@@ -67,6 +71,10 @@
             </div>
 
         </div>
+
+        <button class="btn-delete" [disabled]="match()?.status !== 'NS'" (click)="onDelete()" title="Delete Prediction">
+            Delete 🗑️
+        </button>
     </div>
 
     <div class="events-section">

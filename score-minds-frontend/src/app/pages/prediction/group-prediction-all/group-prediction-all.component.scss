@@ -42,7 +42,7 @@
                 h2 {
                     margin: 0;
                     font-size: 1.2rem;
-                    color: var(--text-primary);
+                    color:#007F9F;
                 }
 
                 .group-dropdown {
@@ -54,9 +54,11 @@
                     font-size: 1rem;
                     cursor: pointer;
                     outline: none;
+                    color:#007F9F;
 
                     &:focus {
                         border-color: var(--primary-color);
+                        
                     }
                 }
             }

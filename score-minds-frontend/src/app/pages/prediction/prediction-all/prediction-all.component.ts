@@ -75,6 +75,14 @@ export class PredictionAllComponent {
                 });
             })
         );
+
+        this.updateSub.add(
+        this.predictionService.predictionDeleted$.subscribe((deletedId) => {
+            this.predictions.update((currentList) => 
+                currentList.filter(item => item.id !== deletedId)
+            );
+        })
+    );
         this.loading.set(true);
         this.predictionService.getAllPredictions()
             .pipe(

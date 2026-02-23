@@ -81,12 +81,12 @@ export const routes: Routes = [
 
   {
     path: 'predictions',
-    component: PredictionAllComponent, 
+    component: PredictionAllComponent,
     canActivate: [authGuard],
 
     children: [
       {
-        path: ':id', 
+        path: ':id',
         data: { mode: 'personal' },
         loadComponent: () => import('./components/prediction-view/prediction-view.component').then(m => m.PredictionViewComponent)
       }
@@ -94,17 +94,17 @@ export const routes: Routes = [
   },
   {
     path: 'groupPredictions',
-    component: GroupPredictionAllComponent, 
+    component: GroupPredictionAllComponent,
     canActivate: [authGuard],
     children: [
       {
-        path: ':id', 
+        path: ':id',
         data: { mode: 'group' },
         loadComponent: () => import('./components/prediction-view/prediction-view.component').then(m => m.PredictionViewComponent)
       }
     ]
   },
-  
+
   {
     path: 'predictions/:id',
     canActivate: [authGuard],
@@ -114,24 +114,14 @@ export const routes: Routes = [
       ),
   },
 
-//   {
-//     path: 'groups/:id/expenses',
-//     canActivate: [authGuard],
-//     loadComponent: () =>
-//       import('./pages/groups/group-expenses/group-expenses.component').then(
-//         (m) => m.GroupExpensesComponent
-//       ),
-//   },
-
-//   {
-//     path: 'expenses/:expenseId/group/:groupId',
-//     canActivate: [authGuard],
-//     pathMatch: 'full',
-//     loadComponent: () =>
-//       import('./pages/expenses/expense-details/expense-details.component').then(
-//         (m) => m.ExpenseDetailsComponent
-//       ),
-//   },
+  {
+    path: 'prediction-audit/:predictionId',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/prediction-audit/prediction-audit.component').then(
+        (m) => m.PredictionAuditComponent
+      ),
+  },
   {
     path: 'groups/:id',
     canActivate: [authGuard],
@@ -151,7 +141,7 @@ export const routes: Routes = [
       ),
   },
 
-  
+
   { path: 'offline', component: OfflineComponent },
   { path: '500', component: Error500Component },
   { path: '**', component: Error404Component },

@@ -14,4 +14,5 @@ export interface FullGroupPredictionDto {
     lastUpdatedById:number;
     status:string;
     createdById:number;
+    createdByName:string;
 }

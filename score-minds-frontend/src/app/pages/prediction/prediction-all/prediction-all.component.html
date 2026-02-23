@@ -8,7 +8,8 @@
         <ng-template #listContent>
             <app-prediction-list [predictions]="predictions()" [matches]="matches()"
                 [mode]="isDetailsOpen() ? 'sidebar' : 'grid'"
-                (predictionSelected)="onSelect($event.predictionId, $event.matchId)">
+                (predictionSelected)="onSelect($event.predictionId, $event.matchId)"
+                [personal]="true">
             </app-prediction-list>
         </ng-template>
     </div>

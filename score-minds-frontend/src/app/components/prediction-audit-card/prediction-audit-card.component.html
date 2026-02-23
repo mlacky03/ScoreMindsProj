@@ -1,0 +1,35 @@
+<div class="audit-card" (click)="handleClick()" tabindex="0" role="button" (keydown.enter)="handleClick()">
+  
+  <div class="status-indicator">
+    <span class="status-dot" [ngClass]="predictionAudit.action.toLowerCase()"> 
+      {{ predictionAudit.action }}
+    </span>
+  </div>
+
+  <div class="audit-info">
+    <div class="changes-grid">
+      
+      <ng-container *ngIf="predictionAudit.action !== 'CREATE'">
+        <div class="change-badge" *ngFor="let change of predictionAudit.changes | keyvalue">
+          <span class="change-key">{{ change.key }}:</span>
+          <span class="change-value">{{ $any(change.value).new }}</span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="predictionAudit.action === 'CREATE'">
+        <ng-container *ngIf="predictionAudit.changes?.initialState">
+          <div class="change-badge" *ngFor="let change of predictionAudit.changes.initialState | keyvalue">
+            <span class="change-key">{{ change.key }}:</span>
+            <span class="change-value">{{ change.value }}</span>
+          </div>
+        </ng-container>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <div class="audit-created">
+    <span class="audit-created-date">{{ predictionAudit.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+  </div>
+
+</div>

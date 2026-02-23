@@ -17,8 +17,9 @@ export class FullPredictionDto{
     lastUpdatedById:number;
     status:PredictionStatus;
     createdById:number;
+    createdByName:string;
 
-    constructor(p:GroupPrediction)
+    constructor(p:GroupPrediction,creactedByName:string)
     {
         this.id=p.id!;
         this.predictedAwayScore=p.predictedAwayScore;
@@ -32,5 +33,6 @@ export class FullPredictionDto{
         this.lastUpdatedById=p.lastUpdatedById;
         this.status=p.status;
         this.createdById=p.createdById;
+        this.createdByName=creactedByName;
     }
 }

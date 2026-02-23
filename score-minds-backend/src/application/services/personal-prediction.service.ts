@@ -11,6 +11,7 @@ import { PersonalPredictionRepository } from "src/infrastucture/persistence/repo
 import { PlayerService } from "./player.service";
 import { FullMatchDto } from "../dtos/matches-dto/full-match.dto";
 import { PredictionStatus } from "src/infrastucture/persistence/entities/personal-prediction.entity";
+import { UserService } from "./user.service";
 @Injectable()
 export class PersonalPredictionService {
     constructor(
@@ -19,7 +20,8 @@ export class PersonalPredictionService {
         private readonly predictionEventService: PredictionEventService,
         private readonly matchService: MatchService,
         private readonly predictionAuditService: PredictionAuditService,
-        private readonly playerService: PlayerService
+        private readonly playerService: PlayerService,
+        private readonly userService:UserService
     ) {
 
     }

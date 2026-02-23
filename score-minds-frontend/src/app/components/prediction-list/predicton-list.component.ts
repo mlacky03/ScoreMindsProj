@@ -15,6 +15,8 @@ export class PredictionListComponent {
     //@Input({ required: true }) predictions: BaseUserPredictionDto[] = [];
     @Input({ required: true }) matches: MatchBaseDto[] = [];
     @Input() mode: 'grid' | 'sidebar' = 'grid';
+    @Input() personal:boolean=false
+    @Input() currentGroupId?: number
 
     @Output() predictionSelected = new EventEmitter<{ predictionId: number, matchId: number }>();
 

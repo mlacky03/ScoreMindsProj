@@ -12,4 +12,5 @@ export interface FullUserPredictionDto{
     predictedEvents:PredictionEventBaseDto[];
     winner:string;
     status:string;
+    createdByName:string;
 }

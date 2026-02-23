@@ -13,46 +13,49 @@ import { FullUserPredictionDto } from "./data/full-p-prediction.dto";
 })
 export class PersonalPredictionService {
 
-    private http=inject(HttpClient);
-    private base=environment.apiUrl;
-    private errorService=inject(ErrorService);
+    private http = inject(HttpClient);
+    private base = environment.apiUrl;
+    private errorService = inject(ErrorService);
 
     private predictionUpdatedSource = new Subject<FullUserPredictionDto>();
-  
- 
-    predictionUpdated$ = this.predictionUpdatedSource.asObservable();
-    notifyPredictionUpdate(prediction: FullUserPredictionDto) {
-    this.predictionUpdatedSource.next(prediction);
-  }
+    private predictionDeletedSource = new Subject<number>();
 
-    getAllPredictions()
-    {
+
+    predictionUpdated$ = this.predictionUpdatedSource.asObservable();
+    predictionDeleted$ = this.predictionDeletedSource.asObservable();
+    notifyPredictionUpdate(prediction: FullUserPredictionDto) {
+        this.predictionUpdatedSource.next(prediction);
+    }
+    notifyPredictionDelete(predictionId: number) {
+        this.predictionDeletedSource.next(predictionId);
+    }
+
+    getAllPredictions() {
         return this.http.get<BaseUserPredictionDto[]>(`${this.base}/personal-predictions/all`).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
 
-    getOnePrediction(predictionId:number,)
-    {
+    getOnePrediction(predictionId: number,) {
         return this.http.get<FullUserPredictionDto>(`${this.base}/personal-predictions/find/${predictionId}`).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
 
-    createPrediction(dto:CreateUserPredictionDto){
-        return this.http.post<CreateUserPredictionDto>(`${this.base}/personal-predictions/create`,dto).pipe(
+    createPrediction(dto: CreateUserPredictionDto) {
+        return this.http.post<CreateUserPredictionDto>(`${this.base}/personal-predictions/create`, dto).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
 
-    updatePrediction(predictionId:number,dto:UpdateUserPredictionDto){
-        return this.http.put<UpdateUserPredictionDto>(`${this.base}/personal-predictions/update/${predictionId}`,dto).pipe(
+    updatePrediction(predictionId: number, dto: UpdateUserPredictionDto) {
+        return this.http.put<UpdateUserPredictionDto>(`${this.base}/personal-predictions/update/${predictionId}`, dto).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
 
-    deletePrediction(predictionId:number){
-        return this.http.delete<FullUserPredictionDto>(`${this.base}/personal-predictions/delete/${predictionId}`).pipe(
+    deletePrediction(predictionId: number) {
+        return this.http.delete<{ message: string }>(`${this.base}/personal-predictions/delete/${predictionId}`).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }

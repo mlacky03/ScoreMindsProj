@@ -9,7 +9,7 @@ $color-draw: #f1c40f;
 $color-accent: #3b82f6;
 
 $color-processed: #2ecc71; // Zelena za bodove
-$color-pending: #f39c12;   // Narandžasta za čekanje
+$color-pending: #f39c12; // Narandžasta za čekanje
 $color-bg-card: #ffffff;
 $color-text-main: #2c3e50;
 $color-text-muted: #95a5a6;
@@ -25,11 +25,18 @@ $color-text-muted: #95a5a6;
 
 // --- HEADER (Match Score & Logos) ---
 .prediction-header {
+  display: flex;
+  flex-direction: column;
   background: $bg-card;
   border-radius: 16px;
   padding: 30px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-
+  .info-group{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+  }
   .match-container {
     display: flex;
     justify-content: center; // Centriramo sve
@@ -39,6 +46,47 @@ $color-text-muted: #95a5a6;
     @media (max-width: 650px) {
       flex-direction: column; // Na mobilnom jedan ispod drugog
       gap: 30px;
+    }
+  }
+
+  .btn-delete {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 25px;
+    font-weight: 600;
+    color: #ef4444;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+
+    transition: all 0.2s ease-in-out;
+
+    svg {
+      transition: transform 0.2s ease-in-out;
+    }
+
+    &:hover {
+      background-color: #fef2f2;
+      /* Jako svetla, pastelno crvena pozadina */
+      border-color: #fca5a5;
+      /* Bleda crvena ivica */
+      color: #dc2626;
+      /* Zatamnjen tekst */
+
+      svg {
+        transform: scale(1.1) rotate(5deg);
+      }
+    }
+
+    &:active {
+      transform: scale(0.95);
+      background-color: #fee2e2;
     }
   }
 }
@@ -241,6 +289,7 @@ $color-text-muted: #95a5a6;
       .points-container {
         text-align: right;
         margin-left: 2px;
+
         .label {
           display: block;
           font-size: 0.75rem;
