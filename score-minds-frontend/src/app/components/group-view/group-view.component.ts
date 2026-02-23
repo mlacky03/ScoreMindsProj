@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { NgIf, NgFor, NgOptimizedImage, NgClass } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   finalize,
   map,
@@ -27,6 +27,7 @@ export class GroupViewComponent {
   private route = inject(ActivatedRoute);
   private groups = inject(GroupService);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   group = signal<GroupFullDto | null>(null);
   loading = signal(false);
@@ -53,14 +54,15 @@ export class GroupViewComponent {
 
 
         next: (g) => {
-       // g?.members?.map(m=>console.log(m.user.profileImageUrl));
-        this.group.set(g);},
+          // g?.members?.map(m=>console.log(m.user.profileImageUrl));
+          this.group.set(g);
+        },
         error: (err) => {
           // Error handling is done by ErrorService
         },
       });
 
-      
+
   }
 
   onImgError(e: Event) {
@@ -110,6 +112,15 @@ export class GroupViewComponent {
     });
   }
 
+  onSeeGroupPredictions() {
+    const g = this.group();
+    if (!g) return;
+    this.router.navigate(['/groupPredictions'],
+    {
+      state: { passedGroupId: g.id }
+    });
+  }
+
 
   private refreshCurrent() {
     const g = this.group();
@@ -126,5 +137,5 @@ export class GroupViewComponent {
       });
   }
 
- 
+
 }

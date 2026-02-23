@@ -30,7 +30,7 @@ $transition-speed: 0.2s;
   gap: 1rem;
   padding: 1rem;
   border: 1px solid #404040;
-  
+
   // Hover efekat na celu karticu (samo kad nismo u edit modu)
   &:hover {
     background: #333333;
@@ -39,12 +39,12 @@ $transition-speed: 0.2s;
     box-shadow: 0 4px 12px rgba(0, 127, 159, 0.2);
     transform: translateX(4px);
     color: white;
-    
+
     // Kad pređemo mišem preko kartice, prikaži akcije u View Modu
-    .player-view .player-actions {
-    }
-    
+    .player-view .player-actions {}
+
   }
+
   &:focus {
     outline: none;
   }
@@ -53,13 +53,22 @@ $transition-speed: 0.2s;
   &:active {
     outline: none;
   }
+  &.has-stats {
+          background: #16a34a;
+           border: 2px solid #ffffff; 
+       &:hover{
+        background: #00471a;
+           
+    }
+  }
+
   // ==========================================
   // 3. VIEW MODE (Prikaz info i akcija)
   // ==========================================
   .player-view {
     display: flex;
     align-items: center;
-    justify-content:space-evenly;
+    justify-content: space-evenly;
     padding: 10px 15px;
     cursor: pointer;
 
@@ -136,34 +145,35 @@ $transition-speed: 0.2s;
       }
     }
   }
-  .player-stats-display {
-  display: flex;
-  align-items: center;
-  gap: 10px; // Razmak između lopte i kopačke
-  margin-left: auto; // Gura ih skroz desno
-  padding-right: 10px;
 
-  .stat-badge {
-    font-size: 1.4rem; // Veličina emotikona
+  .player-stats-display {
     display: flex;
     align-items: center;
-    gap: 3px;
-    cursor: default; // Nema ruke, ne može da se klikne
+    gap: 10px; // Razmak između lopte i kopačke
+    margin-left: auto; // Gura ih skroz desno
+    padding-right: 10px;
 
-    small {
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: #aaa;
+    .stat-badge {
+      font-size: 1.4rem; // Veličina emotikona
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      cursor: default; // Nema ruke, ne može da se klikne
+
+      small {
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: #aaa;
+      }
     }
   }
-}
 
   // ==========================================
   // 4. EDIT MODE (Forma)
   // ==========================================
   .edit-wrapper {
     display: flex;
-    flex-direction: column;
+    //flex-direction: column;
     background-color: #383838;
     padding: 10px 15px;
     border-radius: $border-radius;
@@ -175,9 +185,11 @@ $transition-speed: 0.2s;
       font-size: 0.75rem;
       color: $text-muted;
       margin-bottom: 8px;
+      margin-right: 5px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-weight: 600;
+      text-align: start;
     }
 
     .controls {
@@ -239,6 +251,7 @@ $transition-speed: 0.2s;
           background: transparent;
           color: #888;
           border: 1px solid $border-color;
+          margin-left: 5px;
 
           &:hover {
             color: #fff;
@@ -277,6 +290,7 @@ $transition-speed: 0.2s;
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

@@ -4,12 +4,12 @@ import { UserValidationService } from "src/common/services/user-validation.servi
 import { AuthModule } from "./auth.module";
 import { RabbitMQModule } from "src/infrastucture/messaging/rabbitmq.module";
 import { UserModule } from "./user.module";
-
+import { forwardRef } from "@nestjs/common";
 
 @Module({
-  imports: [AuthModule,
+  imports: [forwardRef(() => AuthModule),
       RabbitMQModule,
-      UserModule
+      forwardRef(() => UserModule)
     ],
   providers: [AppGateway,   UserValidationService],
   exports: [AppGateway], 

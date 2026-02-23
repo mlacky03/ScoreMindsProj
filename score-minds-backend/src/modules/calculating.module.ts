@@ -22,6 +22,7 @@ import { RabbitMQModule } from 'src/infrastucture/messaging/rabbitmq.module';
     forwardRef(() => PersonalPredictionModule),
     UserModule,
     AuthModule,
+    forwardRef(() => GatewayModule),
     RabbitMQModule
   ],
   controllers: [

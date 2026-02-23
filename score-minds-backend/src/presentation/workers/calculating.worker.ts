@@ -7,7 +7,7 @@ import { AppGateway } from 'src/gateway/app.gateway';
 @Controller()
 export class CalculatingWorker {
     constructor(private calculatingService: CalculatingService,
-               // private appGateway:AppGateway
+               private appGateway:AppGateway
     ) {}
 
     
@@ -21,6 +21,13 @@ export class CalculatingWorker {
             //this.appGateway.broadcastMatchStatusChange(data.id, data.status);
         
     }
+    @EventPattern('prediction-computed')
+    handlePredictionComputed(@Payload() data: any) {
+        console.log(`📡 RabbitMQ -> WebSocket: Prediction computed for user ${data.userId}`);
+
+        this.appGateway.brodcastPredictionComputedChange(data.predictionId, data);
+    }
+    
 
     // @EventPattern('match_started')
     // handleMatchStarted(@Payload() data: any) {

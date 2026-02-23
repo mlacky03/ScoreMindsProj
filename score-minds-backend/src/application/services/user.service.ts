@@ -31,7 +31,8 @@ export class UserService {
     };
 
     async findAll(filter?: FilterUserDto): Promise<BaseUserDto[]> {
-        const users = await this.repo.findAllWithFilters(filter);
+        console.log(filter);
+        const users = await this.repo.findAllWithFilters(filter?.query!);
 
         return users.map((u) => new BaseUserDto(u));
     }

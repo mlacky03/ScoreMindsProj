@@ -33,7 +33,8 @@ export class GroupUserService {
 
     async addMemberToGroup(
         userId: number,
-        groupId: number
+        groupId: number,
+       
     ): Promise<BaseGroupUserDto> {
 
         const groupUser = new GroupUser(
@@ -44,6 +45,11 @@ export class GroupUserService {
         );
         const savedGroupUser = await this.repo.save(groupUser)
         const user= await this.userService.findOne(userId);
+        const payload={
+            userId:userId,
+            groupId:groupId
+        }
+        this.rabbitClient.emit("add_member_to_group",payload)   
         return new BaseGroupUserDto(savedGroupUser, new BaseUserDto(user));
     }
 

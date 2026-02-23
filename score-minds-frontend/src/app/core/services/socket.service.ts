@@ -66,12 +66,12 @@ export class SocketService {
         return;
       }
 
-      
+
       const handler = (data: any) => {
         observer.next(data);
       };
 
-      
+
       this.socket.on(eventName, handler);
 
       return () => {
@@ -92,8 +92,7 @@ export class SocketService {
     });
   }
 
-  onMatchListUpdate():Observable<any>
-  {
+  onMatchListUpdate(): Observable<any> {
     return new Observable(observer => {
       if (!this.socket) return;
       this.socket.on('match_status_changed', (data) => {
@@ -101,14 +100,17 @@ export class SocketService {
       });
     });
   }
-  onPredictionUpdate():Observable<any>
-  {
+  onPredictionUpdate(): Observable<any> {
     return new Observable(observer => {
       if (!this.socket) return;
       this.socket.on('prediction_computed', (data) => {
         observer.next(data);
       });
     });
+  }
+
+  onAddedToGroup(): Observable<any> {
+    return this.on('added_to_group'); 
   }
 
   joinRoom(roomName: string) {

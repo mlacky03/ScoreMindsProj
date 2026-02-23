@@ -41,20 +41,10 @@ export class SyncWorker {
         this.appGateway.broadcastMatchStatusChange(data.id, data.status);
     }
 
-    @EventPattern('prediction-computed')
-    handlePredictionComputed(@Payload() data: any) {
-        console.log(`📡 RabbitMQ -> WebSocket: Prediction computed for user ${data.userId}`);
-
-        this.appGateway.brodcastPredictionComputedChange(data.predictionId, data);
-    }
+    
 
     
 
-    @EventPattern('prediction-list-changed')
-    handlePredictionListChanged(@Payload() data: any) {
-        console.log(`📡 RabbitMQ -> WebSocket: Prediction list changed for user ${data.userId}`);
-
-        this.appGateway.brodcastPredictionListChagne(data.predictionId, data);
-    }
+    
 }
 

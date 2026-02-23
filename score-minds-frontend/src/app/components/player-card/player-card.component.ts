@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 @Component({
     selector: 'app-player-card',
     standalone: true,
-    imports: [NgIf, NgClass, FormsModule,ReactiveFormsModule,CommonModule],
+    imports: [NgIf, NgClass, FormsModule, ReactiveFormsModule, CommonModule],
     templateUrl: './player-card.component.html',
     styleUrl: './player-card.component.scss',
 })
@@ -17,10 +17,13 @@ export class PlayerCardComponent {
     @Input() matchStatus?: string;
     @Output() eventCreated = new EventEmitter<PredictionEventCreateDto>();
 
+
+    addedGoals: number = 0;
+    addedAssists: number = 0;
     editingStates: boolean[] = [];
     isEditing = false;
     form!: FormGroup;
-    constructor(private fb: FormBuilder) {}
+    constructor(private fb: FormBuilder) { }
     get playerName(): string {
         return this.player?.name ?? '';
     }
@@ -28,10 +31,10 @@ export class PlayerCardComponent {
     startEdit(type: 'GOAL' | 'ASSIST') {
         this.isEditing = true;
 
-        
+
         this.form = this.fb.group({
             type: [type, Validators.required],
-            minute: [null, [Validators.required, Validators.min(1)]]
+            minute: [null, [Validators.min(1)]]
         });
     }
     toggleEdit(index: number) {
@@ -39,8 +42,8 @@ export class PlayerCardComponent {
     }
 
     cancelEdit() {
-    this.isEditing = false;
-  }
+        this.isEditing = false;
+    }
 
     get playerPosition(): string {
         return this.player?.position ?? '';
@@ -58,23 +61,28 @@ export class PlayerCardComponent {
     assistMinute: number | null = null;
 
     save() {
-    if (this.form.valid) {
-      const payload = {
-        playerId: this.player.id,
-        ...this.form.value
-      };
+        if (this.form.valid) {
+            const payload = {
+                playerId: this.player.id,
+                ...this.form.value
+            };
+            if (this.form.value.type === 'GOAL') {
+                this.addedGoals++;
+            } else if (this.form.value.type === 'ASSIST') {
+                this.addedAssists++;
+            }
 
-      this.emitEvent(payload.minute,payload.type);
-      
-      this.isEditing = false;
-      this.cancelEdit();
+            this.emitEvent(payload.minute, payload.type);
+
+            this.isEditing = false;
+            this.cancelEdit();
+        }
     }
-  }
 
 
 
 
-    private emitEvent(minute: number | null,type: 'GOAL' | 'ASSIST') {
+    private emitEvent(minute: number | null, type: 'GOAL' | 'ASSIST') {
         this.eventCreated.emit({
             playerId: this.player.id,
             type: type,

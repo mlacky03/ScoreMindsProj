@@ -13,7 +13,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatchService } from '../../feature/match/match.service';
 import { MatchFullDto } from '../../feature/match/data/match-full.dto';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';
-import { forkJoin, of, Subscription } from 'rxjs';
+import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { PlayerService } from '../../feature/players/player.service';
 import { PlayerListComponent } from '../player-list/player-list.component';
 import { FormsModule } from '@angular/forms';
@@ -43,7 +43,7 @@ export class MatchViewComponent implements OnInit, OnDestroy {
 
   private socketSub?: Subscription;
   private currentMatchId?: number;
-  private groupId?: number;
+  private groupId?: number
 
   predictionEvents = signal<PredictionEventCreateDto[]>([]);
   match = signal<MatchFullDto | null>(null);
@@ -53,6 +53,8 @@ export class MatchViewComponent implements OnInit, OnDestroy {
   predictionHomeScore = signal<number | null>(null);
   predictionAwayScore = signal<number | null>(null);
   selectedWinner = signal<'HOME' | 'AWAY' | 'DRAW' | null>(null);
+  hasPersonalPrediction =signal<boolean>(false);
+  
   selectWinner(side: 'HOME' | 'AWAY' | 'DRAW') {
 
     if (this.selectedWinner() === side) {
@@ -152,33 +154,49 @@ export class MatchViewComponent implements OnInit, OnDestroy {
     this.personalPredictions.createPrediction(prediction).subscribe({
       next: (prediction) => {
         console.log('Prediction created:', prediction);
+        this.hasPersonalPrediction.set(true);
+
       },
       error: (err) => {
         console.error('Greška pri kreiranju predikcije:', err);
+        if (err.status === 409 || err?.error?.statusCode === 409) {
+          this.hasPersonalPrediction.set(true);
+        }
       }
     });
+
   }
   onCreateGroupPrediction() {
-    this.onOpenSearchDialog();
-    if (!this.groupId) return;
-    const prediction: CreateGroupPredictionDto = {
-      matchId: this.match()!.id,
-      predictedHomeScore: this.predictionHomeScore() || null,
-      predictedAwayScore: this.predictionAwayScore() || null,
-      winner: this.selectedWinner() || "DRAW",
-      events: this.predictionEvents()
-    };
+    
+    this.onOpenSearchDialog().subscribe((selectedGroupId:number|undefined) => {
+        
+       
+        if (selectedGroupId==undefined) {
+            return; 
+        }
 
-    this.groupPredictions.createPredicton(prediction, this.groupId).subscribe({
-      next: (prediction) => {
-        console.log('Prediction created:', prediction);
-      },
-      error: (err) => {
-        console.error('Greška pri kreiranju predikcije:', err);
-      }
+        
+        const prediction: CreateGroupPredictionDto = {
+            matchId: this.match()!.id,
+            predictedHomeScore: this.predictionHomeScore() || null,
+            predictedAwayScore: this.predictionAwayScore() || null,
+            winner: this.selectedWinner() || "DRAW",
+            events: this.predictionEvents()
+        };
+
+        this.groupPredictions.createPredicton(prediction, selectedGroupId).subscribe({
+            next: (prediction) => {
+                console.log('Prediction created:', prediction);
+                
+            },
+            error: (err) => {
+                console.error('Greška pri kreiranju predikcije:', err);
+                
+            }
+        });
     });
-  }
-  onOpenSearchDialog() {
+}
+  onOpenSearchDialog() :Observable<number|undefined> {
     const ref = this.dialog.open(GroupSearchComponent, {
       disableClose: false,
       width: '720px',
@@ -186,16 +204,17 @@ export class MatchViewComponent implements OnInit, OnDestroy {
       backdropClass: 'app-modal-backdrop',
     });
 
-    ref.afterClosed().subscribe((result) => {
-      if (result && result !== 'cancel') {
-
-
-
-        this.groupId = result as number;
-
-      }
-
-    });
+    return ref.afterClosed().pipe(
+      map((result) => {
+        if (result && result !== 'cancel') {
+          this.groupId = result as number; 
+          return result as number;         
+        }
+        
+        return undefined; 
+      })
+    );
+   
   }
 
 

@@ -38,9 +38,9 @@ export class UserController {
     async findAll
         (
             @CurrentUser() id: number,
-            @Query() query: string,
+            @Query('query') searchQuery: string,
         ): Promise<BaseUserDto[]> {
-        const filter: FilterUserDto = { query };
+       const filter: FilterUserDto = { query: searchQuery };
 
         const users = await this.userService.findAll(filter);
 

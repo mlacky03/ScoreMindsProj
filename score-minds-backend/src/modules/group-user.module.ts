@@ -9,12 +9,14 @@ import { GroupUserWorker } from "src/presentation/workers/group-user.worker";
 import { UserService } from "src/application/services/user.service";
 import { UserModule } from "./user.module";
 import { StorageService } from "src/application/services/storage.service";
+import { GatewayModule } from "./app-gateway.module";
+
 
 @Module({
     imports:[
         TypeOrmModule.forFeature([GroupUser]),
         forwardRef(() => UserModule),
-        
+        forwardRef(() => GatewayModule),
         RabbitMQModule
     ],
     providers:[GroupUserService,GroupUserRepository,StorageService],

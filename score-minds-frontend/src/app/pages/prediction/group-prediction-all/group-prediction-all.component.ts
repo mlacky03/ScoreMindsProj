@@ -46,6 +46,10 @@ export class PredictionAllComponent {
             const hasChild = this.route.children.length > 0;
             this.isDetailsOpen.set(hasChild);
         });
+        const routerState = this.router.getCurrentNavigation()?.extras.state;
+        if (routerState && routerState['passedGroupId']) {
+        this.selectedGroupId.set(routerState['passedGroupId']);
+    }
     }
 
     ngOnInit() {
@@ -89,8 +93,12 @@ export class PredictionAllComponent {
                 if (groups.length > 0) {
 
                     const defaultGroupId = groups[0].id;
-                    this.selectedGroupId.set(defaultGroupId);
-                    this.loadDataForGroup(defaultGroupId);
+                    if(this.selectedGroupId() === null){
+                        this.selectedGroupId.set(defaultGroupId);
+                    }
+                  
+
+                    this.loadDataForGroup(this.selectedGroupId()!);
                 } else {
 
                     this.loading.set(false);
@@ -104,23 +112,23 @@ export class PredictionAllComponent {
 
     }
     onGroupChange(newGroupIdStr: string | number) {
-    const newGroupId = Number(newGroupIdStr);
+        const newGroupId = Number(newGroupIdStr);
 
-    
-    if (this.selectedGroupId() === newGroupId) {
-        return;
+
+        if (this.selectedGroupId() === newGroupId) {
+            return;
+        }
+
+
+        this.selectedGroupId.set(newGroupId);
+
+
+        this.predictions.set([]);
+        this.matches.set([]);
+
+
+        this.loadDataForGroup(newGroupId);
     }
-
-    
-    this.selectedGroupId.set(newGroupId);
-
-   
-    this.predictions.set([]);
-    this.matches.set([]);
-
-    
-    this.loadDataForGroup(newGroupId);
-}
 
 
     loadDataForGroup(groupId: number) {
@@ -167,10 +175,10 @@ export class PredictionAllComponent {
             return;
         }
 
-        this.router.navigate([predictionId], { 
-        relativeTo: this.route,
-        queryParams: { groupId: this.selectedGroupId() } 
-    });
+        this.router.navigate([predictionId], {
+            relativeTo: this.route,
+            queryParams: { groupId: this.selectedGroupId() }
+        });
     }
 
     ngOnDestroy() {

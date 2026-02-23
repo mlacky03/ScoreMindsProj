@@ -10,7 +10,7 @@
                     [value]="selectedGroupId()" 
                     (change)="onGroupChange($any($event.target).value)"
                     >
-                    <option *ngFor="let group of groups()" [value]="group.id">
+                    <option *ngFor="let group of groups()" [value]="group.id" [selected]="group.id === selectedGroupId()">
                         {{ group.name }}
                     </option>
                 </select>

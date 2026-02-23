@@ -16,7 +16,7 @@ export class GroupPredictionController {
         private readonly groupPredictionService: GroupPredictionService
     ) { }
     
-    @Post(':groupId')
+    @Post('create/:groupId')
     @UseGuards(JwtAuthGuard)
     async createPrediction(@Body() createPredictionDto: CreatePredictionDto,  @CurrentUser() id: number, @Param('groupId') groupId: number):Promise<FullPredictionDto> {
         return await this.groupPredictionService.createPrediction(groupId, createPredictionDto, id);;

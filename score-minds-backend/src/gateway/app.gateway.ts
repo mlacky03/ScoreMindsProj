@@ -76,6 +76,12 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   brodcastPredictionListChagne(predictionId: number, data: any) {
     this.server.to(`all_predictions_list`).emit('prediction_list_changed', { predictionId, data });
   }
+
+  brodcastUserAddedToGroup(userId:number,groupId:number)
+  { 
+    this.server.to(`user_${userId}`).emit('added_to_group', { groupId });
+  }
+
   @SubscribeMessage('request_edit_lock')
   handleRequestLock(
     @ConnectedSocket() client: Socket,
@@ -104,7 +110,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
         editorName: userName
       });
     } else {
-      // Ako nije prvi, javljamo mu da sačeka i ko trenutno edituje
       client.emit('edit_lock_status', {
         locked: true,
         isMe: false,
