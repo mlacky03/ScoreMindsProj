@@ -60,4 +60,13 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
     async deleteMany(predictionIds: number[]): Promise<void> {
         await this.typeOrmRepo.delete(predictionIds);
     }
+
+    async findByMatchId(matchId: number):Promise<GroupPrediction[]>
+    {
+        const entities = await this.typeOrmRepo.find({
+            where: { matchId },
+            relations: ['predictedEvents']
+        });
+        return entities.map(entity => this.mapper.toDomain(entity));
+    }
 }

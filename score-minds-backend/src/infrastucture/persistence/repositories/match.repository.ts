@@ -31,18 +31,29 @@ export class MatchRepository extends BaseRepository<Match, MatchEntity> {
         return this.mapper.toDomainList(entities);
     }
 
-    async findAll(): Promise<Match[]> {
-        const entities = await this.typeOrmRepo.find({ order: { startTime: 'DESC' } });
+    async findAllPagginated(skip: number, take: number): Promise<Match[]> {
+        const entities = await this.typeOrmRepo.find({ where: { status: 'FT' }, skip, take, order: { startTime: 'DESC' } });
         return this.mapper.toDomainList(entities);
     }
 
-    async findUpcoming(): Promise<Match[]> {
+    async findUpcomingPagginated(skip: number, take: number): Promise<Match[]> {
         const entities = await this.typeOrmRepo.find({
             where: {
                 status: 'NS',
                 startTime: MoreThan(new Date())
             },
+            skip,
+            take,
             order: { startTime: 'ASC' }
+        });
+        return this.mapper.toDomainList(entities);
+    }
+
+    async findLiveMatchesPagginated(skip: number, take: number): Promise<Match[]> {
+        const entities = await this.typeOrmRepo.find({
+            skip,
+            take,
+            where: { status: 'LIVE' }
         });
         return this.mapper.toDomainList(entities);
     }

@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatchBaseDto } from '../../feature/match/data/match-base.dto';
-import { NgClass, NgIf } from '@angular/common';
+import { DatePipe, NgClass, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-match-card',
   standalone: true,
-  imports: [NgIf,NgClass],
+  imports: [NgIf,NgClass,DatePipe],
   templateUrl: './match-card.component.html',
   styleUrl: './match-card.component.scss',
 })

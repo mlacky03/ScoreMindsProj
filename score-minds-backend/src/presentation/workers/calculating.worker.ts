@@ -27,6 +27,12 @@ export class CalculatingWorker {
 
         this.appGateway.brodcastPredictionComputedChange(data.predictionId, data);
     }
+     @EventPattern('prediction-computed-group')
+    handleGroupPredictionComputed(@Payload() data: any) {
+        console.log(`📡 RabbitMQ -> WebSocket: Group prediction computed for group ${data.groupId}`);
+
+        this.appGateway.brodcastPredictionComputedChange(data.predictionId, data);
+    }
     
 
     // @EventPattern('match_started')

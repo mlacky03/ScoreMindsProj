@@ -9,6 +9,7 @@ import { MatchRepository } from 'src/infrastucture/persistence/repositories/matc
 import { PersonalPredictionRepository } from 'src/infrastucture/persistence/repositories/personal-prediction.repository';
 import { PredictionStatus } from 'src/infrastucture/persistence/entities/personal-prediction.entity';
 import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
+import { GroupPredictionRepository } from 'src/infrastucture/persistence/repositories/group-prediction.repository';
 
 @Injectable()
 export class CalculatingService {
@@ -27,9 +28,11 @@ export class CalculatingService {
         @Inject(MatchRepository)
         private matchRepo: MatchRepository,
         @Inject(PersonalPredictionRepository)
-        private predictionRepo: PersonalPredictionRepository,
+        private personalPredictionRepo: PersonalPredictionRepository,
+        @Inject(GroupPredictionRepository)
+        private groupPredictionRepo: GroupPredictionRepository,
         @Inject('RABBITMQ_SERVICE')
-            private readonly rabbitClient: ClientProxy,
+        private readonly rabbitClient: ClientProxy,
     ) { }
 
     
@@ -84,15 +87,31 @@ export class CalculatingService {
     // }
 
     private async processMatch(match: Match) {
-        this.logger.log(`Calculating scores for match: ${match.homeTeamName} vs ${match.awayTeamName}`);
+        this.logger.log(`Starting processing for match: ${match.homeTeamName} vs ${match.awayTeamName}`);
 
         const actualWinner = this.getWinner(match.finalScoreHome!, match.finalScoreAway!);
 
-        const personalPredictions=await this.predictionRepo.findByMatchId(match.id!);
-        if(personalPredictions.length === 0) {
-            this.logger.log(`No predictions found for match: ${match.id}`);
+        try {
+            await this.processPersonalPredictions(match, actualWinner);
+
+            await this.processGroupPredictions(match, actualWinner);
+
             match.computed();
             await this.matchRepo.save(match);
+
+            this.logger.log(`Match ${match.id} calculation DONE.`);
+        } catch (error) {
+            this.logger.error(`Failed to process match ${match.id}:`, error);
+            
+        }
+    }
+
+    private async processPersonalPredictions(match: Match, actualWinner: string) {
+        
+
+        const personalPredictions=await this.personalPredictionRepo.findByMatchId(match.id!);
+        if(personalPredictions.length === 0) {
+            this.logger.log(`No personal predictions found for match: ${match.id}`)
             return;
         }
         const updatePromises = personalPredictions.map(async (prediction) => {
@@ -117,9 +136,64 @@ export class CalculatingService {
             prediction.addPoints(totalPoints);
             prediction.updateStatus(PredictionStatus.PROCESSED);
             
-            await this.predictionRepo.save(prediction);
+            await this.personalPredictionRepo.save(prediction);
             this.rabbitClient.emit('prediction-computed', {
                 userId: prediction.userId,
+                predictionId: prediction.id,
+                points: totalPoints,
+                status: PredictionStatus.PROCESSED
+
+            });
+
+            this.rabbitClient.emit('prediction-list-changed', {predictionId: prediction.id,status: PredictionStatus.PROCESSED});
+            // this.appGateway.sendNotificationToUser(prediction.userId, {
+            //     title: 'Rezultati su stigli!',
+            //     message: `Osvojio si ${totalPoints} poena na utakmici ${match.homeTeamName} - ${match.awayTeamName}`,
+            //     matchId: match.id,
+            //     points: totalPoints
+            // });
+        });
+
+        await Promise.all(updatePromises);
+
+       
+        match.computed();
+        await this.matchRepo.save(match);
+
+        this.logger.log(`Match ${match.id} calculation DONE.`);
+    }
+
+    private async processGroupPredictions(match:Match,actualWinner:string){
+        const groupPredictions=await this.groupPredictionRepo.findByMatchId(match.id!);
+        if(groupPredictions.length === 0) {
+            this.logger.log(`No group predictions found for match: ${match.id}`)
+            return;
+        }
+        const updatePromises = groupPredictions.map(async (prediction) => {
+            let totalPoints = 0;
+
+            if (prediction.winner === actualWinner) {
+                totalPoints += this.POINTS_WINNER;
+            }
+
+            if (
+                prediction.predictedHomeScore === match.finalScoreHome &&
+                prediction.predictedAwayScore === match.finalScoreAway
+            ) {
+                totalPoints += this.POINTS_EXACT_SCORE;
+            }
+
+            if (prediction.predictedEvents && prediction.predictedEvents.length > 0) {
+                const eventPoints = this.calculateEventPoints(prediction.predictedEvents, match);
+                totalPoints += eventPoints;
+            }
+
+            prediction.addPoints(totalPoints);
+            prediction.updateStatus(PredictionStatus.PROCESSED);
+            
+            await this.groupPredictionRepo.save(prediction);
+            this.rabbitClient.emit('prediction-computed-group', {
+                groupId: prediction.groupId,
                 predictionId: prediction.id,
                 points: totalPoints,
                 status: PredictionStatus.PROCESSED

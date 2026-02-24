@@ -14,8 +14,13 @@ export class MatchController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAllMatches() {
-    return await this.matchService.findAll();
+  async getAllMatches(
+    @Query('page') page: string,
+    @Query('size') size: string
+  ) {
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const sizeNumber = size ? parseInt(size, 10) : 10;
+    return await this.matchService.findAll(pageNumber, sizeNumber);
   }
 
   @Get('ids')
@@ -28,10 +33,24 @@ export class MatchController {
 
   @UseGuards(JwtAuthGuard)
   @Get('upcoming')
-  async getUpcomingMatches() {
-    return await this.matchService.findUpcoming();
+  async getUpcomingMatches(
+    @Query('page') page: string,
+    @Query('size') size: string
+  ) {
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const sizeNumber = size ? parseInt(size, 10) : 10;
+    return await this.matchService.findUpcoming(pageNumber, sizeNumber);
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Get('live')
+  async getLiveMatches(
+    @Query('page') page: string,
+    @Query('size') size: string
+  ) {
+    const pageNumber = page ? parseInt(page, 10) : 1;
+    const sizeNumber = size ? parseInt(size, 10) : 10;
+    return await this.matchService.findLiveMatches(pageNumber, sizeNumber);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
@@ -39,9 +58,5 @@ export class MatchController {
     return await this.matchService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('live')
-  async getLiveMatches() {
-    return await this.matchService.findLiveMatches();
-  }
+
 }

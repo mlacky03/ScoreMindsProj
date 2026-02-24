@@ -41,13 +41,52 @@
     }
   }
 
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 10px;
+
+    .page-btn {
+      background-color: #374151;
+      /* Tamno siva pozadina */
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #3b82f6;
+        /* Plava na hover */
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .page-info {
+      color: #9ca3af;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+  }
+
   // --- EMPTY STATE ---
-  .loading-state, .empty-state {
+  .loading-state,
+  .empty-state {
     text-align: center;
     padding: 40px 0;
     color: #888;
 
-    .spinner, .empty-icon {
+    .spinner,
+    .empty-icon {
       font-size: 2rem;
       margin-bottom: 10px;
       display: block;

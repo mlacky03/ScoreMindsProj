@@ -17,8 +17,9 @@ export class MatchService {
     private base = environment.apiUrl;
 
 
-    getAllMatches() {
-        return this.http.get<MatchBaseDto[]>(`${this.base}/matches`).pipe(
+    getHistoryMatches(page:number, size:number) {
+        let params = new HttpParams().set('page', page).set('size', size);
+        return this.http.get<MatchBaseDto[]>(`${this.base}/matches`, { params }).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
@@ -31,13 +32,15 @@ export class MatchService {
 
     }
 
-    getUpcomingMatches() {
-        return this.http.get<MatchBaseDto[]>(`${this.base}/matches/upcoming`).pipe(
+    getUpcomingMatches(page:number,size:number) {
+        let params = new HttpParams().set('page', page).set('size', size);
+        return this.http.get<MatchBaseDto[]>(`${this.base}/matches/upcoming`, { params }).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
-    getLiveMathes() {
-        return this.http.get<MatchBaseDto[]>(`${this.base}/matches/live`).pipe(
+    getLiveMathes(page:number,size:number) {
+        let params = new HttpParams().set('page', page).set('size', size);
+        return this.http.get<MatchBaseDto[]>(`${this.base}/matches/live`, { params }).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }

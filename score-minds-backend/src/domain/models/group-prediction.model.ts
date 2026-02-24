@@ -26,6 +26,11 @@ export class GroupPrediction extends BasePrediction{
         super(id,matchId,predictedHomeScore,predictedAwayScore,winner,totalPoints,createdAt,updatedAt,predictedEvents,match);
     }
 
+    updateStatus(status: PredictionStatus): void
+    {
+        this._status = status;
+    }
+
 
 
 

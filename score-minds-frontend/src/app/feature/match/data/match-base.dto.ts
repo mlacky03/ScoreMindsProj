@@ -8,4 +8,6 @@ export interface MatchBaseDto
     homeTeamLogo:string;
     startTime:Date;
     status:string;
+    finalScoreHome: number|null;
+    finalScoreAway: number|null;
 }
