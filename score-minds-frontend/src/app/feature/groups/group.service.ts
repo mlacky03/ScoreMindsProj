@@ -27,6 +27,12 @@ export class GroupService{
         );
     }
 
+    getLeaderboard() {
+        return this.http.get(`${this.base}/groups/leaderboard`).pipe(
+            catchError((err) => this.errorService.handleHttpError(err))
+        );
+    }
+
     createGroup(dto:GroupCreateDto,image?:File)
     {
         const url=`${this.base}/groups`;

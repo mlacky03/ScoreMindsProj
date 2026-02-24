@@ -28,7 +28,8 @@ export class PersonalPredictionMapper extends BaseMapper<PersonalPrediction, Per
             events ,
             match,
             entity.userId,
-            entity.status
+            entity.status,
+           
         );
     }
 

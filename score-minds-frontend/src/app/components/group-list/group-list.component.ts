@@ -11,7 +11,7 @@ import { GroupCardComponent } from "../group-card/group-card.component";
 })
 export class GroupListComponent {
   @Input({ required: true }) groups: GroupBaseDto[] = [];
-
+  @Input()
   @Output() selection = new EventEmitter<number>();
 
   ngOnChanges(): void {

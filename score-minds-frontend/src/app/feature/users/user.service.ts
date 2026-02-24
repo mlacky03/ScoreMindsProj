@@ -38,6 +38,12 @@ export class UserService {
         );
     }
 
+    getLeaderboard() {
+        return this.http.get(`${this.base}/users/leaderboard`).pipe(
+            catchError((err) => this.errorService.handleHttpError(err))
+        );
+    }
+
      updateUser(userData: UserUpdateDto, image: File | null) {
         const url = `${this.base}/users`;
         const request$ = image

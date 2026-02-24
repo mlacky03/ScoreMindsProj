@@ -35,6 +35,7 @@ import { PAGINATION } from '../../common/constants/pagination.constants';
 import { ApiTags } from '@nestjs/swagger';
 import { FullGroupDto } from 'src/application/dtos/group-dto/full-group.dto';
 import { FilterGroupDto } from 'src/application/dtos/group-dto/filter-group.dto';
+import { RankGroupDto } from 'src/application/dtos/group-dto/rank-group.dto';
 
 @ApiTags('Groups')
 @Controller('groups')
@@ -57,6 +58,17 @@ export class GroupController {
         }));
     }
 
+
+    @UseGuards(JwtAuthGuard)
+    @Get("leaderboard")
+    async findLeaderboard(): Promise<RankGroupDto[]> {
+         const groups=await this.groupService.getLeaderboard();
+        return groups.map(g => ({
+            ...g,
+            photoUrl: g.photoUrl ? this.storage.getPublicUrl(g.photoUrl) : undefined,
+        }));
+
+    }
     @UseGuards(JwtAuthGuard)
     @Get(':id')
     async findOne(@CurrentUser() userId: number, @Param('id') groupId: string) {

@@ -5,7 +5,8 @@ export class User {
         private _email: string,
         private _passwordHash: string,
         private _createdAt: Date = new Date(),
-        private _profileImageUrl: string
+        private _profileImageUrl: string,
+        private _personalPoints: number = 0
     ) {
         
         
@@ -39,4 +40,5 @@ export class User {
     get passwordHash() { return this._passwordHash; }
     get createdAt() { return this._createdAt; }
     get profileImageUrl() { return this._profileImageUrl; }
+    get personalPoints() { return this._personalPoints; }
 }

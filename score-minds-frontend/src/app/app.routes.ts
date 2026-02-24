@@ -141,6 +141,15 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'rank',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('./pages/rank/rank.component').then(
+        (m) => m.RankComponent
+      ),
+  },
+
 
   { path: 'offline', component: OfflineComponent },
   { path: '500', component: Error500Component },

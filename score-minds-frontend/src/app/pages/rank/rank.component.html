@@ -1,0 +1,41 @@
+<div class="rank-container">
+    
+    <div class="tabs-header">
+        <button 
+            class="tab-btn" 
+            [class.active]="activeTab() === 'users'" 
+            (click)="switchTab('users')">
+            👤 Top Players
+        </button>
+        <button 
+            class="tab-btn" 
+            [class.active]="activeTab() === 'groups'" 
+            (click)="switchTab('groups')">
+            🛡️ Top Groups
+        </button>
+    </div>
+
+    <div class="content-area">
+        
+        <div class="loading-state" *ngIf="loading(); else loadedContent">
+            <div class="spinner"></div>
+        </div>
+
+        <ng-template #loadedContent>
+            
+            <div class="tab-content" *ngIf="activeTab() === 'users'">
+                <app-user-list [users]="users()"></app-user-list>
+            </div>
+
+            <div class="tab-content" *ngIf="activeTab() === 'groups'">
+                <app-user-list [users]="groups()"></app-user-list>
+            </div>
+
+            <!-- <div class="tab-content" *ngIf="activeTab() === 'groups'">
+                <app-group-list [groups]="groups()"></app-group-list>
+            </div> -->
+
+        </ng-template>
+        
+    </div>
+</div>

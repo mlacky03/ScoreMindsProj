@@ -10,7 +10,8 @@ export class UserMapper extends BaseMapper<User, UserEntity> {
             entity.email,
             entity.passwordHash,
             entity.createdAt,
-            entity.profileImageUrl
+            entity.profileImageUrl,
+            entity.personalPoints
         );
     }
 
@@ -21,6 +22,7 @@ export class UserMapper extends BaseMapper<User, UserEntity> {
         entity.email = domain.email;
         entity.passwordHash = domain.passwordHash;
         entity.profileImageUrl = domain.profileImageUrl;
+        entity.personalPoints = domain.personalPoints;
         return entity;
     }
 }

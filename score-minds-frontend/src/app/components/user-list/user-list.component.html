@@ -1,0 +1,20 @@
+<div class="leaderboard-container">
+  
+  <div class="leaderboard-header">
+    <h2 class="title">Top Players</h2>
+    <span class="subtitle">Global Ranking</span>
+  </div>
+
+  <div class="leaderboard-list">
+    
+    <ng-container *ngFor="let user of users">
+      <app-user-card [user]="user"></app-user-card>
+    </ng-container>
+    
+    <div class="empty-state" *ngIf="users.length === 0">
+      <p>No players on the leaderboard yet. Be the first!</p>
+    </div>
+    
+  </div>
+
+</div>

@@ -8,6 +8,7 @@ import { UserMapper } from '../mappers/user.mapper';
 import { FilterUserDto } from 'src/application/dtos/user-dto/fileter-user.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { COMMON_SELECT_FIELDS, getSelectFields, PAGINATION } from 'src/common/constants/pagination.constants';
+import { take } from 'rxjs';
 
 @Injectable()
 export class UserRepository extends BaseRepository<User, UserEntity> {
@@ -22,6 +23,18 @@ export class UserRepository extends BaseRepository<User, UserEntity> {
     async findByEmail(email: string): Promise<User | null> {
         const entity = await this.typeOrmRepo.findOne({ where: { email } });
         return entity ? this.mapper.toDomain(entity) : null;
+    }
+    async findLeaderboard():Promise<User[]>
+    {
+        const e= await this.typeOrmRepo.find({
+            order: {
+                personalPoints: 'DESC'
+            },
+            take: 10
+
+        });
+
+        return this.mapper.toDomainList(e);
     }
 
     async findByUsername(username: string): Promise<User | null> {

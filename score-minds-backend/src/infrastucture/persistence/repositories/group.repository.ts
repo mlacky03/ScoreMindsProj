@@ -55,14 +55,14 @@ export class GroupRepository extends BaseRepository<Group, GroupEntity> {
         return this.mapper.toDomainList(entities);
     }
 
-    async findAllForMember(memberId: number,name:string): Promise<Group[]> {
+    async findAllForMember(memberId: number, name: string): Promise<Group[]> {
         const whereCondition: any = {
             members: { userId: memberId }
         };
 
-        
+
         if (name) {
-            
+
             whereCondition.name = ILike(`%${name}%`);
         }
         const entities = await this.typeOrmRepo.find({
@@ -110,6 +110,17 @@ export class GroupRepository extends BaseRepository<Group, GroupEntity> {
         } finally {
             await queryRunner.release();
         }
+    }
+
+    async findLeaderboard(): Promise<Group[]> {
+        const groups = await this.typeOrmRepo.find({
+            order: {
+                groupPoints: 'DESC'
+            },
+            take: 10
+
+        });
+        return this.mapper.toDomainList(groups);
     }
 
 

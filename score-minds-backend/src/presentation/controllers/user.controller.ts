@@ -24,6 +24,8 @@ import { StorageService } from '../../application/services/storage.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { User } from 'src/domain/models/user.model';
+import { RankUserDto } from 'src/application/dtos/user-dto/rank-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -50,6 +52,16 @@ export class UserController {
         }));
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get("leaderboard")
+    async findLeaderboard(): Promise<RankUserDto[]> {
+        const users = await this.userService.getLeaderboard();
+        return users.map(user => ({
+            ...user,
+            photoUrl: user.photoUrl ? this.storageService.getPublicUrl(user.photoUrl) : undefined,
+        }));
+    }
+    
     @UseGuards(JwtAuthGuard)
     @Get("profile")
     async findOne(

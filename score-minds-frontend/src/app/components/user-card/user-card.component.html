@@ -1,0 +1,39 @@
+<div class="leaderboard-card" [ngClass]="getRankClass()">
+  
+  <div class="card-left">
+    <div class="rank-badge">
+      <span class="rank-number" *ngIf="user.rank > 3">{{ user.rank }}</span>
+      <span class="rank-icon" *ngIf="user.rank === 1">🏆</span>
+      <span class="rank-icon" *ngIf="user.rank === 2">🥈</span>
+      <span class="rank-icon" *ngIf="user.rank === 3">🥉</span>
+    </div>
+
+    <div class="user-avatar">
+      <ng-container *ngIf="user?.photoUrl; else fallback">
+        <img
+          [src]="user.photoUrl"
+          [alt]="user.name"
+          class="user-image"
+          (error)="onImgError($event)"
+        />
+      </ng-container>
+      <ng-template #fallback>
+        <div class="fallback-icon">
+          <span class="icon">👥</span>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="user-info">
+      <span class="name">{{ user.name }}</span>
+    </div>
+  </div>
+
+  <div class="card-right">
+    <div class="points-container">
+      <span class="points-value">{{ user.points }}</span>
+      <span class="points-label">PTS</span>
+    </div>
+  </div>
+
+</div>

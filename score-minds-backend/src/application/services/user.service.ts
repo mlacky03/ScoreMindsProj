@@ -13,6 +13,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { PersonalPredictionRepository } from 'src/infrastucture/persistence/repositories/personal-prediction.repository';
 import { GroupRepository } from 'src/infrastucture/persistence/repositories/group.repository';
 import { GroupUserRepository } from 'src/infrastucture/persistence/repositories/group-user.repository';
+import { RankUserDto } from '../dtos/user-dto/rank-user.dto';
 
 @Injectable()
 export class UserService {
@@ -53,12 +54,12 @@ export class UserService {
     }
 
     async finOneForCheck(id: number): Promise<BaseUserDto> {
-        
-        const u= await this.repo.findById(id);
+
+        const u = await this.repo.findById(id);
         if (!u) {
             throw new UserNotFoundException(id);
         }
-        return  new BaseUserDto(u);
+        return new BaseUserDto(u);
     }
 
     async create(user: CreateUserDto): Promise<BaseUserDto> {
@@ -111,6 +112,14 @@ export class UserService {
 
     async findByEmail(email: string): Promise<User | null> {
         return await this.repo.findByEmail(email);
+    }
+
+    async getLeaderboard(): Promise<RankUserDto[]> {
+        const users = await this.repo.findLeaderboard();
+        return users.map((u, index) => {
+            const dto = new RankUserDto(u, index + 1);
+            return dto;
+        });
     }
 
     async updateAvatar(id: number, url: string): Promise<BaseUserDto> {

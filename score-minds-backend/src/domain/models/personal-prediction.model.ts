@@ -18,7 +18,7 @@ export class PersonalPrediction extends BasePrediction{
         predictedEvents: PredictionEvent[] = [],
         match:Match|null,
         private _userId: number,
-        private _status:PredictionStatus,     
+        private _status:PredictionStatus,    
     ) {
         super(id,matchId,predictedHomeScore,predictedAwayScore,winner,pointsWon,createdAt,updatedAt,predictedEvents,match);
     }

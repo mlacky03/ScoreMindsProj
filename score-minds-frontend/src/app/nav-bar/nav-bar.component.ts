@@ -27,6 +27,7 @@ export class NavBarComponent {
     { path: '/predictions', label: 'My Predictions', authOnly: true },
     { path: '/matches', label: 'Matches', authOnly: true },
     { path: '/groupPredictions', label: 'Group Predictions', authOnly: true },
+    { path: '/rank', label: 'Rank', authOnly: false },
 
   ];
 

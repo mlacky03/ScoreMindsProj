@@ -13,6 +13,7 @@ import { GroupRepository } from "src/infrastucture/persistence/repositories/grou
 import { ClientProxy } from "@nestjs/microservices";
 import { BaseGroupUserDto } from "../dtos/group-user-dto/BaseGroupMember.dto";
 import { FilterGroupDto } from "../dtos/group-dto/filter-group.dto";
+import { RankGroupDto } from "../dtos/group-dto/rank-group.dto";
 @Injectable()
 export class GroupService {
     constructor(
@@ -152,6 +153,17 @@ export class GroupService {
 
         return this.groupUserService.deleteGroupMember(gs.id!);
     }
+
+    async getLeaderboard(): Promise<RankGroupDto[]> {
+        const groups = await this.repo.findLeaderboard();
+       
+       return groups.map((g, index) => {
+        const dto = new RankGroupDto(g, index + 1);       
+        return dto;
+    });   
+        
+    }
+
     async delete(id: number, adminId: number): Promise<{ message: string }> {
         const group = await this.repo.findById(id);
 
