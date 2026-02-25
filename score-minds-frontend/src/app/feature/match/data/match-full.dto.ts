@@ -12,5 +12,6 @@ export interface MatchFullDto{
     actualScorersIds: number[];
     actualAssistantsIds: number[];
     hometeamId: number;
-    awayteamId: number;   
+    awayteamId: number;
+    minutes:number|null;   
 }

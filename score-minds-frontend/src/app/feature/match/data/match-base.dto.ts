@@ -10,4 +10,5 @@ export interface MatchBaseDto
     status:string;
     finalScoreHome: number|null;
     finalScoreAway: number|null;
+    minutes:number|null;
 }

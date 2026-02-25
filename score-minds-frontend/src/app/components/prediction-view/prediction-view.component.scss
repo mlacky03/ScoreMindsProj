@@ -31,12 +31,14 @@ $color-text-muted: #95a5a6;
   border-radius: 16px;
   padding: 30px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  .info-group{
+
+  .info-group {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
   }
+
   .match-container {
     display: flex;
     justify-content: center; // Centriramo sve
@@ -120,11 +122,39 @@ $color-text-muted: #95a5a6;
   .prediction-score {
     font-size: 2.5rem; // Veliki rezultat
     font-weight: 800;
+ 
     color: $text-main;
     line-height: 1;
     min-width: 30px;
     text-align: center;
   }
+
+  .real-score {
+  // Povećao sam font-size na 2rem kao što si tražio, ali uz tanji font izgledaće diskretnije
+  font-size: 2.5rem; 
+  font-weight: 200; // Još tanja slova za "ghost" efekat
+  
+  // Svetlo zelena sa niskim opasitetom (providnošću)
+  color: rgba(40, 167, 69, 0.3); 
+  
+  // Sjaj (glow) koji daje taj "drugi plan" efekat
+  text-shadow: 0 0 8px rgba(40, 167, 69, 0.2); 
+
+  display: block;
+  margin-top: -5px; // Malo ga približavamo glavnom rezultatu
+  letter-spacing: -1px;
+
+  // VAŽNO: Uklonjen grayscale(1) jer on pravi sivu boju
+  filter: opacity(0.8); 
+
+  user-select: none;
+  pointer-events: none;
+  
+  // Da bi izgledalo kao senka iza glavnog rezultata
+  position: relative;
+  z-index: 1;
+}
+
 }
 
 .team-logo-wrapper {

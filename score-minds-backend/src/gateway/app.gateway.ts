@@ -73,8 +73,13 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`prediction_${predictionId}`).emit('prediction_computed', data);
   }
 
-  brodcastPredictionListChagne(predictionId: number, data: any) {
-    this.server.to(`all_predictions_list`).emit('prediction_list_changed', { predictionId, data });
+  brodcastPredictionListChagne(predictionId: number, data: any,groupId:number) {
+    const roomName = `all_predictions_list_${groupId}`;
+    console.log(`🚀 Gateway EMIT: Soba="${roomName}" | Podaci:`, data);
+    const clients = this.server.sockets.adapter.rooms.get(roomName);
+    console.log(`👥 Broj klijenata u sobi ${roomName}:`, clients ? clients.size: 0);
+
+    this.server.to(roomName).emit('prediction-list-changed', data);
   }
 
   brodcastUserAddedToGroup(userId:number,groupId:number)

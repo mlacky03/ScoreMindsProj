@@ -36,7 +36,7 @@ export class SyncService {
       match.updateStart();
       
       await this.matchRepo.save(match);
-      this.notifySystem(match);
+      this.notifySystem(match,0);
       //this.rabbitClient.emit("match_started", {matchId: match.id,status:match.status});
       this.logger.log(`Match STARTED: ${match.homeTeamName} vs ${match.awayTeamName}`);
     }
@@ -59,7 +59,7 @@ export class SyncService {
         match.finishMatch();
         await this.matchRepo.save(match);
 
-        this.notifySystem(match);
+        this.notifySystem(match,minutesPlayed);
         this.logger.log(`Match FINISHED: ${match.homeTeamName} ${match.finalScoreHome}-${match.finalScoreAway} ${match.awayTeamName} 🏁`);
         continue; 
       }
@@ -70,7 +70,7 @@ export class SyncService {
       if (this.b===0) { 
         this.scoreGoal(match,minutesPlayed);
         await this.matchRepo.save(match);
-        this.notifySystem(match);
+        this.notifySystem(match,minutesPlayed);
         this.b++;
       }
     }
@@ -190,20 +190,22 @@ export class SyncService {
     return { message: "Utakmica je uspesno poslata u RabbitMQ." };
   }
 
-  private notifySystem(match: Match) {
+  private notifySystem(match: Match,minutesPlayed) {
     const payload = {
       id: match.id, 
       status: match.status,
       finalScoreHome: match.finalScoreHome,
       finalScoreAway: match.finalScoreAway,
-      events: match.events
+      events: match.events,
+      minutes: minutesPlayed
     };
 
     if(match.status === 'FT') {
       this.rabbitClient.emit('match_finished', payload);
     }
     this.rabbitClient.emit('update_match', payload);
-    this.rabbitClient.emit('update_match_list', { id: match.id, status: match.status });
+    this.rabbitClient.emit('update_match_list', { id: match.id, status: match.status,finalScoreHome: match.finalScoreHome,
+      finalScoreAway: match.finalScoreAway,minutes:minutesPlayed });
 
   }
 

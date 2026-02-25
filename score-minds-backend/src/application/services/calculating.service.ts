@@ -200,7 +200,7 @@ export class CalculatingService {
 
             });
 
-            this.rabbitClient.emit('prediction-list-changed', {predictionId: prediction.id,status: PredictionStatus.PROCESSED});
+            //this.rabbitClient.emit('prediction-list-changed', {predictionId: prediction.id,status: PredictionStatus.PROCESSED});
             // this.appGateway.sendNotificationToUser(prediction.userId, {
             //     title: 'Rezultati su stigli!',
             //     message: `Osvojio si ${totalPoints} poena na utakmici ${match.homeTeamName} - ${match.awayTeamName}`,

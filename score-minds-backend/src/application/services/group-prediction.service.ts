@@ -14,6 +14,7 @@ import { GroupPrediction } from "src/domain/models/group-prediction.model";
 import { PredictionStatus } from "src/infrastucture/persistence/entities/group-prediction.entity";
 import { GroupService } from "./group.service";
 import { UserService } from "./user.service";
+import { ClientProxy } from "@nestjs/microservices";
 
 
 @Injectable()
@@ -26,7 +27,9 @@ export class GroupPredictionService {
         private readonly predictionAuditService: PredictionAuditService,
         private readonly playerService: PlayerService,
         private readonly groupService: GroupService,
-        private readonly userService:UserService
+        private readonly userService: UserService,
+        @Inject('RABBITMQ_SERVICE')
+        private readonly rabbitClient: ClientProxy,
     ) { }
 
     async findAll(id: number, userId: number): Promise<BasePredictionDto[]> {
@@ -83,9 +86,22 @@ export class GroupPredictionService {
                 }
             }
 
+
             const fullPrediction = await this.findOne(savedPrediction.id!, groupId, userId);
             //await this.predictionAuditService.createAudit(fullPrediction);
+            const payload = {
+                id: fullPrediction.id,
+                predictedHomeScore: fullPrediction.predictedHomeScore,
+                predictedAwayScore: fullPrediction.predictedHomeScore,
+                matchId: fullPrediction.matchId,
+                totalPoints: fullPrediction.totalPoints,
+                winner: fullPrediction.winner,
+                status: fullPrediction.status,
+                groupId: groupId,
+                match:match
 
+            }
+            this.rabbitClient.emit("prediction-list-changed", payload);
 
             return fullPrediction;
         }
@@ -101,11 +117,11 @@ export class GroupPredictionService {
     async findOne(id: number, groupId: number, userId: number): Promise<FullPredictionDto> {
         await this.groupService.chackMembership(userId, groupId);
         const prediction = await this.repo.findPredictionByGroupIdWithRelations(groupId, id);
-        const user=await this.userService.findOne(userId);
+        const user = await this.userService.findOne(userId);
         if (!prediction) {
             throw new NotFoundException('Prediction not found');
         }
-        return new FullPredictionDto(prediction,user.username);
+        return new FullPredictionDto(prediction, user.username);
     }
 
 
@@ -180,7 +196,7 @@ export class GroupPredictionService {
 
         const freshPrediction = await this.repo.findPredictionByGroupIdWithRelations(groupId, predictionId);
 
-        return new FullPredictionDto(freshPrediction!,"");
+        return new FullPredictionDto(freshPrediction!, "");
 
     }
     async deletePrediction(predictionId: number, groupId: number, userId: number): Promise<{ message: string }> {

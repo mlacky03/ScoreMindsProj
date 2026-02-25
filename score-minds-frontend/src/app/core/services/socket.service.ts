@@ -108,6 +108,16 @@ export class SocketService {
       });
     });
   }
+  onPredictionListUpdate():Observable<any>{
+    console.log("uso sam u socket");
+    return new Observable(observer => {
+      if (!this.socket) return;
+      this.socket.on('prediction-list-changed', (data) => {
+        console.log("primio sam update za prediction list", data);
+        observer.next(data);
+      });
+    });
+  }
 
   onAddedToGroup(): Observable<any> {
     return this.on('added_to_group'); 

@@ -75,6 +75,20 @@
       align-items: center;
       font-size: 0.75rem;
 
+      .live-minutes {
+        color: #00ff88; // Neon zelena za minute
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .blink {
+          color: #ff4d4d; // Crvena tačkica
+          font-size: 1rem;
+          animation: blinker 1s linear infinite;
+        }
+      }
+
       .status-live {
         color: red;
         font-weight: bold;

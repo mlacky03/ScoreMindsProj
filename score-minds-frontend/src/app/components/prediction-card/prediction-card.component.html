@@ -1,5 +1,5 @@
 <div class="prediction-card" (click)="handleClick()" tabindex="0" role="button" (keydown.enter)="handleClick()"
-  [class.compact-mode]="compact">
+  [class.compact-mode]="compact" [class.points-won]="(prediction?.totalPoints || 0) > 0" [class.points-lost]="(prediction?.totalPoints || 0) === 0 && match?.status === 'FT'">
   <div class="team-details">
     <span class="team-name" [class.winner-text]="prediction?.winner === 'HOME'"
       [class.loser-text]="prediction?.winner === 'AWAY'">

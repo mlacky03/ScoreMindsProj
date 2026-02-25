@@ -12,6 +12,7 @@ import { GroupPredictionService } from "../../../feature/predictions/group-predi
 import { BaseGroupPredictionDto } from "../../../feature/predictions/group-predictions/data/base-g-predicton.dto";
 import { GroupBaseDto } from "../../../feature/groups/data/group-base.dto";
 import { GroupService } from "../../../feature/groups/group.service";
+import { FullGroupPredictionDto } from "../../../feature/predictions/group-predictions/data/full-g-predicton.dto";
 
 
 @Component({
@@ -30,7 +31,7 @@ export class PredictionAllComponent {
     private updateSub = new Subscription();
     private socketService = inject(SocketService);
 
-    predictions = signal<BaseUserPredictionDto[]>([]);
+    predictions = signal<BaseGroupPredictionDto[]>([]);
     matches = signal<MatchBaseDto[]>([]);
     selectedPredictionId = signal<number | null>(null);
     groups = signal<GroupBaseDto[]>([])
@@ -67,6 +68,40 @@ export class PredictionAllComponent {
                 });
             })
         );
+         this.updateSub.add(
+            this.socketService.onPredictionListUpdate().subscribe((data: any) => {
+                console.log('Stigao update statusa meča u listu predikcija:', data);
+
+                this.predictions.update((currentPredictions) => {
+                    const index = currentPredictions.findIndex(p => p.id === data.id);
+                    if (index !== -1) {
+                        return currentPredictions.map(prediction =>
+                            prediction.id === data.id ? { ...prediction, ...data} : prediction
+                        );
+                    } else {
+                        this.matches.update((currentMatches) => {
+                            const index= currentMatches.findIndex(m=>m.id === data.matchId);
+                            if (index !== -1) {
+                                return currentMatches;
+                            }
+                            return [data.match,...currentMatches]
+                        });
+                        const p: BaseGroupPredictionDto = {
+                            id: data.id,
+                            matchId: data.matchId,
+                            predictedHomeScore: data.predictedHomeScore,
+                            predictedAwayScore: data.predictedAwayScore,
+                            totalPoints: data.totalPoints,
+                            winner: data.winner,
+                            predictionEvents: data.predictionEvents,
+                            status: data.status
+                        };
+                        return [p, ...currentPredictions];
+                    }
+                });
+            })
+        );
+       
 
         this.socketService.joinRoom('all_matches_list');
 
@@ -104,7 +139,7 @@ export class PredictionAllComponent {
                         this.selectedGroupId.set(defaultGroupId);
                     }
 
-
+                    this.socketService.joinRoom(`all_predictions_list_${defaultGroupId}`);
                     this.loadDataForGroup(this.selectedGroupId()!);
                 } else {
 
@@ -116,8 +151,10 @@ export class PredictionAllComponent {
                 this.loading.set(false);
             }
         });
+        
 
     }
+    
     onGroupChange(newGroupIdStr: string | number) {
         const newGroupId = Number(newGroupIdStr);
 
@@ -125,10 +162,11 @@ export class PredictionAllComponent {
         if (this.selectedGroupId() === newGroupId) {
             return;
         }
+        this.socketService.leaveRoom(`all_predictions_list_${this.selectedGroupId()}`);
 
 
         this.selectedGroupId.set(newGroupId);
-
+        this.socketService.joinRoom(`all_predictions_list_${this.selectedGroupId()}`);
 
         this.predictions.set([]);
         this.matches.set([]);
@@ -181,7 +219,7 @@ export class PredictionAllComponent {
         if (!predictionId || this.selectedPredictionId() === predictionId) {
             return;
         }
-
+        
         this.router.navigate([predictionId], {
             relativeTo: this.route,
             queryParams: { groupId: this.selectedGroupId() }
@@ -197,6 +235,7 @@ export class PredictionAllComponent {
             this.updateSub.unsubscribe();
         }
         this.socketService.leaveRoom('all_matches_list');
+        this.socketService.leaveRoom(`all_predictions_list_${this.selectedGroupId()}`);
     }
 
 }

@@ -10,8 +10,8 @@ export class PredictionWorker{
     ) {}
     @EventPattern('prediction-list-changed')
     handlePredictionListChanged(@Payload() data: any) {
-        console.log(`📡 RabbitMQ -> WebSocket: Prediction list changed for user ${data.userId}`);
+        console.log(`📡 RabbitMQ -> WebSocket: Prediction list changed for group ${data.groupId}`);
 
-        this.appGateway.brodcastPredictionListChagne(data.predictionId, data);
+        this.appGateway.brodcastPredictionListChagne(data.id, data,data.groupId);
     }
 }

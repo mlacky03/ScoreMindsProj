@@ -15,8 +15,11 @@
                             [alt]="match()?.hometeamId" class="team-logo" (error)="onImgError($event)">
                         <div *ngIf="prediction()?.winner === 'HOME'" class="winner-badge">🏆</div>
                     </div>
-
                     <span class="prediction-score">{{ prediction()?.predictedHomeScore ?? '-' }}</span>
+
+                    <span class="real-score" *ngIf="match()?.status==='FT'">{{ match()?.finalScoreHome }}</span>
+
+
                 </div>
             </div>
 
@@ -60,6 +63,7 @@
                 <h2 class="team-name">{{ match()?.awayTeamName }}</h2>
 
                 <div class="team-body">
+                    <span class="real-score" *ngIf="match()?.status==='FT'">{{ match()?.finalScoreAway }}</span>
                     <span class="prediction-score">{{ prediction()?.predictedAwayScore ?? '-' }}</span>
 
                     <div class="team-logo-wrapper" [class.winner-glow]="prediction()?.winner === 'AWAY'">
