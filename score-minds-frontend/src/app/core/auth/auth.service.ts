@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environment/environment';
 import { LoginDto } from './data/login.dto';
@@ -13,6 +13,7 @@ import { tap } from 'rxjs/operators';
     providedIn: 'root'
 })
 export class AuthService{
+    currentUser = signal<UserDto | null>(null);
     getToken() {
         return localStorage.getItem('access_token');
     }
@@ -35,6 +36,7 @@ export class AuthService{
     me()
     {
         return this.http.get<UserDto>(`${this.base}/users/profile`).pipe(
+          tap(user => this.currentUser.set(user)),
             catchError((err)=>this.errorService.handleHttpError(err))
         );
     }

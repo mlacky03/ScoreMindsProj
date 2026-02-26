@@ -17,7 +17,7 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 0.5rem 0;
-    background: linear-gradient(135deg, #007F9F, #6f42c1);
+    background: linear-gradient(135deg, #2bb907, #6f42c1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -57,7 +57,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #007F9F, #6f42c1);
+    background: linear-gradient(90deg, #2bb907, #6f42c1);
     border-radius: 20px 20px 0 0;
   }
 }
@@ -77,7 +77,7 @@
   height: 100px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #007F9F;
+  border: 3px solid #2bb907;
   box-shadow: 0 4px 20px rgba(0, 127, 159, 0.3);
   
   img {
@@ -91,14 +91,14 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #007F9F, #6f42c1);
+  background: linear-gradient(135deg, #2bb907, #6f42c1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2.5rem;
   font-weight: 700;
   color: #ffffff;
-  border: 3px solid #007F9F;
+  border: 3px solid #2bb907;
   box-shadow: 0 4px 20px rgba(0, 127, 159, 0.3);
 }
 
@@ -142,7 +142,7 @@
       content: '';
       width: 4px;
       height: 20px;
-      background: linear-gradient(135deg, #007F9F, #6f42c1);
+      background: linear-gradient(135deg, #2bb907, #6f42c1);
       border-radius: 2px;
     }
   }
@@ -162,7 +162,7 @@
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: #007F9F;
+    border-color: #2bb907;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 127, 159, 0.2);
   }
@@ -189,7 +189,7 @@
     &.user-id {
       font-family: 'Courier New', monospace;
       font-size: 0.875rem;
-      color: #007F9F;
+      color: #2bb907;
       background: rgba(0, 127, 159, 0.1);
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
@@ -273,11 +273,11 @@
   }
   
   &.primary {
-    background: linear-gradient(135deg, #007F9F, #005a7a);
+    background: linear-gradient(135deg, #2bb907, #005a7a);
     color: #ffffff;
     
     &:hover {
-      background: linear-gradient(135deg, #005a7a, #004466);
+      background: linear-gradient(135deg, #2bb907 #004466);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0, 127, 159, 0.3);
     }

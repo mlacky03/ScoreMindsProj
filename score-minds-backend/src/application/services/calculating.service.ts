@@ -1,10 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Match } from 'src/domain/models/match.model';
-import { PersonalPrediction } from 'src/domain/models/personal-prediction.model';
-import { AppGateway } from 'src/gateway/app.gateway';
 import { MatchRepository } from 'src/infrastucture/persistence/repositories/match.repository';
 import { PersonalPredictionRepository } from 'src/infrastucture/persistence/repositories/personal-prediction.repository';
 import { PredictionStatus } from 'src/infrastucture/persistence/entities/personal-prediction.entity';
@@ -54,37 +49,7 @@ export class CalculatingService {
         
     }
 
-    // async statusChange(data:any)
-    // {
-    //     const match=await this.matchRepo.findById(data.id);
-    //     if(!match) {
-    //         this.logger.log(`Match not found: ${data.id}`);
-    //         return;
-    //     }
-    //     if(match.isComputed)
-    //     {
-    //         this.logger.log(`Match already computed: ${data.id}`);
-    //         return;
-    //     }
-        
-    //     await this.processPredictionStatus(match);
-    // }
 
-    // private async processPredictionStatus(match: Match)
-    // {
-    //     const personalPredictions=await this.predictionRepo.findByMatchId(match.id!);
-    //     if(personalPredictions.length === 0) {
-    //         this.logger.log(`No predictions found for match: ${match.id}`);
-    //         match.computed();
-    //         await this.matchRepo.save(match);
-    //         return;
-    //     }
-
-    //     const updatePromises=personalPredictions.map(async(p)=>{
-    //         p.status=PredictionStatus.;
-    //         await this.predictionRepo.save(p);
-    //     })
-    // }
 
     private async processMatch(match: Match) {
         this.logger.log(`Starting processing for match: ${match.homeTeamName} vs ${match.awayTeamName}`);
@@ -145,7 +110,7 @@ export class CalculatingService {
 
             });
 
-            this.rabbitClient.emit('prediction-list-changed', {predictionId: prediction.id,status: PredictionStatus.PROCESSED});
+            this.rabbitClient.emit('personal-list-changed', {userId: prediction.userId,status: PredictionStatus.PROCESSED,predictionId:prediction.id,points:totalPoints});
             // this.appGateway.sendNotificationToUser(prediction.userId, {
             //     title: 'Rezultati su stigli!',
             //     message: `Osvojio si ${totalPoints} poena na utakmici ${match.homeTeamName} - ${match.awayTeamName}`,
@@ -200,7 +165,7 @@ export class CalculatingService {
 
             });
 
-            //this.rabbitClient.emit('prediction-list-changed', {predictionId: prediction.id,status: PredictionStatus.PROCESSED});
+            this.rabbitClient.emit('prediction-list-changed', {predictionId: prediction.id,status: PredictionStatus.PROCESSED,totalPoints: totalPoints});
             // this.appGateway.sendNotificationToUser(prediction.userId, {
             //     title: 'Rezultati su stigli!',
             //     message: `Osvojio si ${totalPoints} poena na utakmici ${match.homeTeamName} - ${match.awayTeamName}`,

@@ -76,7 +76,7 @@
 
         </div>
 
-        <button class="btn-delete" [disabled]="match()?.status !== 'NS'" (click)="onDelete()" title="Delete Prediction">
+        <button *ngIf="getMode()==='personal' || (getMode()==='group' && getOwnerName()==currentUser()?.username)" class="btn-delete" [disabled]="match()?.status !== 'NS'" (click)="onDelete()" title="Delete Prediction">
             Delete 🗑️
         </button>
     </div>

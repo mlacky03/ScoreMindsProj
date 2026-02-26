@@ -1,14 +1,14 @@
 <div class="prediction-card" (click)="handleClick()" tabindex="0" role="button" (keydown.enter)="handleClick()"
   [class.compact-mode]="compact" [class.points-won]="(prediction?.totalPoints || 0) > 0" [class.points-lost]="(prediction?.totalPoints || 0) === 0 && match?.status === 'FT'">
   <div class="team-details">
-    <span class="team-name" [class.winner-text]="prediction?.winner === 'HOME'"
-      [class.loser-text]="prediction?.winner === 'AWAY'">
-      {{ match?.homeTeamName }}
+    <span class="team-name" [class.winner-text]="prediction.winner === 'HOME'"
+      [class.loser-text]="prediction.winner === 'AWAY'">
+      {{ match.homeTeamName }}
     </span>
   </div>
   <div class="team-container home">
     <div class="team-logo">
-      <img *ngIf="match?.homeTeamLogo; else homeFallback" [src]="match?.homeTeamLogo" alt="{{ match.homeTeamName }}"
+      <img *ngIf="match.homeTeamLogo; else homeFallback" [src]="match.homeTeamLogo" alt="{{ match.homeTeamName }}"
         (error)="onImgError($event)" />
       <ng-template #homeFallback>
         <div class="fallback-icon">🛡️</div>
@@ -42,13 +42,13 @@
     <div class="team-details">
       <span class="team-name" [class.winner-text]="prediction?.winner === 'AWAY'"
         [class.loser-text]="prediction?.winner === 'HOME'">
-        {{ match?.awayTeamName }}
+        {{ match.awayTeamName }}
       </span>
 
     </div>
 
     <div class="team-logo">
-      <img *ngIf="match?.awayTeamLogo; else awayFallback" [src]="match?.awayTeamLogo" alt="{{ match?.awayTeamName }}"
+      <img *ngIf="match.awayTeamLogo; else awayFallback" [src]="match.awayTeamLogo" alt="{{ match?.awayTeamName }}"
         (error)="onImgError($event)" />
       <ng-template #awayFallback>
         <div class="fallback-icon">🛡️</div>

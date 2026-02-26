@@ -13,7 +13,7 @@ import { GroupListComponent } from "../../components/group-list/group-list.compo
 @Component({
     selector: 'app-rank',
     standalone: true,
-    imports: [UserListComponent,CommonModule,NgIf,NgClass,GroupListComponent    ],
+    imports: [UserListComponent,CommonModule,NgIf   ],
     templateUrl: './rank.component.html',
     styleUrl: './rank.component.scss'
 })

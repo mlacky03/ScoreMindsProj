@@ -5,13 +5,14 @@
     overflow: visible;
     transition: all 0.3s ease;
     margin-top: 12px;
+    background-color: #121212;
+   
 
     .list-panel {
         width: 100%;
         height: 100%;
         background-color: #121212;
         
-
         
         &::-webkit-scrollbar {
             width: 8px;
@@ -32,6 +33,7 @@
             border-bottom: 1px solid var(--border-color);
             position: sticky;         
             top: 0;
+            // Sprečava da se header suzi kad lista poraste
             z-index: 10;
 
             .header-content {
@@ -68,6 +70,7 @@
             display: block;
             width: 100%;
             min-height: 100%;
+           
             // Napomena: Grid sistem (4 kolone) je definisan unutar app-prediction-list SCSS-a
         }
     }

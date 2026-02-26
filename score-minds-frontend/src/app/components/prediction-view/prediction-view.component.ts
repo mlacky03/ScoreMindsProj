@@ -24,6 +24,7 @@ import { SocketService } from '../../core/services/socket.service';
 import { GroupPredictionService } from '../../feature/predictions/group-predictions/group-prediction.service';
 import { FullGroupPredictionDto } from '../../feature/predictions/group-predictions/data/full-g-predicton.dto';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
+import { AuthService } from '../../core/auth/auth.service';
 
 
 @Component({
@@ -42,6 +43,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private socketService = inject(SocketService);
   private router = inject(Router);
+  private authService=inject(AuthService);
 
   mode: 'personal' | 'group' = 'personal';
 
@@ -60,7 +62,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
   private currentPredictionId?: number;
   private currentMatchId?: number;
   private currentGroupId?: number;
-
+  currentUser = this.authService.currentUser;
   isLockedByOther = signal<boolean>(false);
   activeEditorName = signal<string | null>(null);
 
@@ -224,6 +226,10 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
   getOwnerName(): string | null {
     return this.prediction()?.createdByName || null;
+  }
+
+  getUsername():string{
+    return this.currentUser()?.username || '';
   }
 
 

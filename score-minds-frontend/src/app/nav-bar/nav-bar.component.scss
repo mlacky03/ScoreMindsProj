@@ -1,15 +1,36 @@
 @use 'variables' as *;
 
+// .nav {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   z-index: 1000;
+//   background: rgba(45, 45, 45, 0.95);
+//   backdrop-filter: blur(10px);
+//   border-bottom: 1px solid #404040;
+//   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+// }
 .nav {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(45, 45, 45, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid #404040;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  
+  // --- MAGIJA ZA STAKLO ---
+  // Smanjili smo neprovidnost (alfa) sa 0.95 na 0.3 da bi se teren lepo video
+  background: rgba(18, 18, 18, 0.3); 
+  
+  // Zamućenje ostaje, dodajemo i webkit zbog Safari pregledača
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); 
+  
+  // Pravimo ivicu mnogo suptilnijom (bela boja sa samo 5% vidljivosti)
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  
+  // Nežnija senka koja odgovara staklu
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); 
 }
 
 .nav__inner {

@@ -1,14 +1,13 @@
 import { Component, Input } from "@angular/core";
-import { UserBaseDto } from "../../feature/users/data/user-base.dto";
 import { UserLeaderboardDto } from "../../feature/users/data/user-leaderboard.dto";
-import { NgIf, NgClass, DatePipe, UpperCasePipe } from "@angular/common";
+import { NgIf, NgClass, DatePipe} from "@angular/common";
 import { GroupLeaderboardDto } from "../../feature/groups/data/group-leaderboard.dto";
 
 
 @Component({
     selector: 'app-user-card',
     standalone: true,
-    imports: [NgIf,NgClass,DatePipe,UpperCasePipe],
+    imports: [NgIf,NgClass,DatePipe],
     templateUrl: './user-card.component.html',
     styleUrl: './user-card.component.scss'
 })

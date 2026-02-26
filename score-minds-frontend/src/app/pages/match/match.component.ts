@@ -15,7 +15,7 @@ import { SocketService } from '../../core/services/socket.service';
 @Component({
     selector: 'app-match',
     standalone: true,
-    imports: [MatchListComponent, NgIf, NgClass, CommonModule, MatchViewComponent],
+    imports: [MatchListComponent, NgIf, CommonModule],
     templateUrl: './match.component.html',
     styleUrl: './match.component.scss'
 })
@@ -79,7 +79,7 @@ export class MatchComponent implements OnInit, OnDestroy {
                     return currentMatches;
                 }
                 const newMatches = [...currentMatches];
-                newMatches[index] = { ...newMatches[index], status: data.status };
+                newMatches[index] = { ...newMatches[index], ...data };// ako ne radi vrati status nisi stigo ovo da testiras status:data.status tako bilo pre
                 
                 if (currentFilter === 'upcoming' && data.status === 'LIVE') {
                     newMatches.splice(index, 1);

@@ -17,7 +17,7 @@ import { PredictionAuditListComponent } from '../../components/prediction-audit-
 @Component({
     selector: 'app-prediction-audit',
     standalone: true,
-    imports: [PredictionAuditListComponent,NgIf,NgClass,CommonModule,MatchViewComponent],
+    imports: [PredictionAuditListComponent,NgIf,CommonModule,MatchViewComponent],
     templateUrl: './prediction-audit.component.html',
     styleUrl: './prediction-audit.component.scss'
 })

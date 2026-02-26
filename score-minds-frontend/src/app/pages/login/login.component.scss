@@ -1,25 +1,50 @@
+// .auth-page {
+//   min-height: 100vh;
+//   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 2rem;
+//   position: relative;
+//   overflow: hidden;
+// }
 .auth-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  // 1. Fiksiramo visinu
+  height: 100vh; 
+  width: 100vw;
+  overflow: hidden; 
+  margin: 0;
+  padding: 0;
+  
+  // 2. Centriranje forme
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 2rem;
-  position: relative;
-  overflow: hidden;
+  align-items: center;
+  
+  // 3. OVO JE KLJUČNO: Razdvajamo komande da sprečimo dupliranje!
+  background-image: 
+    linear-gradient(rgba(18, 18, 18, 0.4), rgba(18, 18, 18, 0.9)), 
+    url('/assets/pitch.jpg');
+    
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; // 📌 Ovo dodatno "zakucava" sliku da se ne pomera
+  
+  background-color: #121212; 
 }
 
-/* Background Pattern */
+/* 4. GASIMO PATTERN DIV (ili ga samo obriši iz HTML-a) */
 .background-pattern {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 25% 25%, rgba(0, 127, 159, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(111, 66, 193, 0.1) 0%, transparent 50%);
-  pointer-events: none;
+  display: none; 
+}
+
+// Ne zaboravi z-index za samu formu da ostane klikabilna
+.auth-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 450px;
 }
 
 /* Content Container */
@@ -53,7 +78,7 @@
     font-weight: 700;
     color: #ffffff;
     margin: 0;
-    background: linear-gradient(135deg, #007F9F, #6f42c1);
+    background: linear-gradient(135deg, #2bb907, #6f42c1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -93,7 +118,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #007F9F, #6f42c1);
+    background: linear-gradient(90deg, #2bb907, #6f42c1);
     border-radius: 20px 20px 0 0;
   }
 }

@@ -9,12 +9,13 @@ import { MatchBaseDto } from "../../../feature/match/data/match-base.dto";
 import { filter, finalize, forkJoin, of, Subscription, switchMap, tap } from "rxjs";
 import { MatchService } from "../../../feature/match/match.service";
 import { SocketService } from "../../../core/services/socket.service";
+import { AuthService } from "../../../core/auth/auth.service";
 
 
 @Component({
     selector: 'app-prediction-all',
     standalone: true,
-    imports: [PredictionListComponent, PredictionViewComponent, NgIf, RouterOutlet, CommonModule],
+    imports: [PredictionListComponent,  NgIf, RouterOutlet, CommonModule],
     templateUrl: './prediction-all.component.html',
     styleUrls: ['./prediction-all.component.scss']
 })
@@ -25,11 +26,13 @@ export class PredictionAllComponent {
     private router = inject(Router);
     private updateSub = new Subscription();
     private socketService = inject(SocketService);
-
+    private authService = inject(AuthService);
     predictions = signal<BaseUserPredictionDto[]>([]);
     matches = signal<MatchBaseDto[]>([]);
     selectedPredictionId = signal<number | null>(null);
 
+
+    currenUser=this.authService.currentUser;
     loading = signal(true);
     isDetailsOpen = signal(false);
 
@@ -57,10 +60,24 @@ export class PredictionAllComponent {
                 });
             })
         );
+
+        this.updateSub.add(
+            this.socketService.onPersonalListUpdate().subscribe((data) => {
+                console.log('Stigao update personalne liste predikcija:', data);
+                this.predictions.update((cp)=>{
+                    return cp.map((item) => {
+                        if (item.id === data.predictionId) {
+                            return { ...item, status: data.status,totalPoints:data.points };
+                        }
+                        return item;
+                    });
+                });
+            })
+        );
         
         this.socketService.joinRoom('all_matches_list');
 
-
+        this.socketService.joinRoom('personal_list_changed_'+this.currenUser()?.id);
 
 
         this.updateSub.add(

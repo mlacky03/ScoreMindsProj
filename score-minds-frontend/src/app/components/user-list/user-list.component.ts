@@ -9,7 +9,7 @@ import { GroupLeaderboardDto } from "../../feature/groups/data/group-leaderboard
 @Component({
     selector: 'app-user-list',
     standalone: true,
-    imports: [NgIf,NgClass,DatePipe,UserCardComponent,NgFor],
+    imports: [NgIf,DatePipe,UserCardComponent,NgFor],
     templateUrl: './user-list.component.html',
     styleUrl: './user-list.component.scss'
 })

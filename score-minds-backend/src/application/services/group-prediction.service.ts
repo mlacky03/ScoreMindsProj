@@ -117,7 +117,7 @@ export class GroupPredictionService {
     async findOne(id: number, groupId: number, userId: number): Promise<FullPredictionDto> {
         await this.groupService.chackMembership(userId, groupId);
         const prediction = await this.repo.findPredictionByGroupIdWithRelations(groupId, id);
-        const user = await this.userService.findOne(userId);
+        const user = await this.userService.findOne(prediction?.createdById!);
         if (!prediction) {
             throw new NotFoundException('Prediction not found');
         }

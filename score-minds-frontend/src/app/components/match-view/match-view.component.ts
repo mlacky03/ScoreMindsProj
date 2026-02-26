@@ -28,7 +28,7 @@ import { GroupSearchComponent } from '../group-search/group-search.component';
 @Component({
   selector: 'app-match-view',
   standalone: true,
-  imports: [NgIf, NgFor, NgOptimizedImage, MatDialogModule, PlayerListComponent, CommonModule, FormsModule],
+  imports: [NgIf, NgOptimizedImage, MatDialogModule, PlayerListComponent, CommonModule, FormsModule],
   templateUrl: './match-view.component.html',
   styleUrl: './match-view.component.scss',
 })

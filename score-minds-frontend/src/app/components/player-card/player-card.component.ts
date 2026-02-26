@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 @Component({
     selector: 'app-player-card',
     standalone: true,
-    imports: [NgIf, NgClass, FormsModule, ReactiveFormsModule, CommonModule],
+    imports: [NgIf, FormsModule, ReactiveFormsModule, CommonModule],
     templateUrl: './player-card.component.html',
     styleUrl: './player-card.component.scss',
 })

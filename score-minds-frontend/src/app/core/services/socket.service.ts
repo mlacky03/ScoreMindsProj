@@ -118,6 +118,15 @@ export class SocketService {
       });
     });
   }
+  onPersonalListUpdate():Observable<any>
+  {
+    return new Observable(observer => {
+      if (!this.socket) return;
+      this.socket.on('personal-list-changed', (data) => {
+        observer.next(data);
+      });
+    });
+  }
 
   onAddedToGroup(): Observable<any> {
     return this.on('added_to_group'); 

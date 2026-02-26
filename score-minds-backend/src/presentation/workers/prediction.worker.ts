@@ -14,4 +14,13 @@ export class PredictionWorker{
 
         this.appGateway.brodcastPredictionListChagne(data.id, data,data.groupId);
     }
+
+    @EventPattern('personal-list-changed')
+    handlePersonalListChanged(@Payload() data: any)
+    {
+        console.log(`📡 RabbitMQ -> WebSocket: Prediction list changed for personal status ${data.userId}`);
+
+        this.appGateway.brodcastPersonalListChange(data);
+
+    }
 }
