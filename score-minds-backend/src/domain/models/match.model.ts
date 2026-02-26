@@ -37,9 +37,6 @@ export class Match {
         return this._status === 'FT';
     }
 
-    // public updateMatch(match: Partial<Match>): void {
-    //     Object.assign(this, match);
-    // }
     public updateHomeScore(score:number):void{
         this._finalScoreHome = score;
     }

@@ -10,7 +10,6 @@ import {
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { Controller } from '@nestjs/common';
-import { EventPattern, Payload } from '@nestjs/microservices';
 
 @WebSocketGateway({ cors: { origin: 'http://localhost:4200', credentials: true } })
 @Controller()
@@ -73,7 +72,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`prediction_${predictionId}`).emit('prediction_computed', data);
   }
 
-  brodcastPredictionListChagne(predictionId: number, data: any,groupId:number) {
+  brodcastPredictionListChagne(data: any,groupId:number) {
     const roomName = `all_predictions_list_${groupId}`;
 
     this.server.to(roomName).emit('prediction-list-changed', data);

@@ -1,4 +1,4 @@
-import { AppGateway } from "src/gateway/app.gateway";
+import { AppGateway } from "src/gateway/app-gateway";
 import { Module } from "@nestjs/common";
 import { UserValidationService } from "src/common/services/user-validation.service";
 import { AuthModule } from "./auth.module";
@@ -14,4 +14,4 @@ import { forwardRef } from "@nestjs/common";
   providers: [AppGateway,   UserValidationService],
   exports: [AppGateway], 
 })
-export class GatewayModule {}
+export class AppGatewayModule {}

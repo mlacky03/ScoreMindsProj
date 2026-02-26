@@ -1,4 +1,4 @@
-// src/prediction/entities/prediction.entity.ts
+
 
 import {
   Entity,

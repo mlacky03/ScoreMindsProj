@@ -2,7 +2,7 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { CalculatingService } from '../../application/services/calculating.service';
-import { AppGateway } from 'src/gateway/app.gateway';
+import { AppGateway } from 'src/gateway/app-gateway';
 
 @Controller()
 export class CalculatingWorker {

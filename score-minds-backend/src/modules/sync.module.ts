@@ -13,8 +13,8 @@ import { MatchModule } from './matches.module';
 import { SyncWorker } from 'src/presentation/workers/sync.worker';
 import { PlayerModule } from './player.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AppGateway } from 'src/gateway/app.gateway';
-import { GatewayModule } from './app-gateway.module';
+import { AppGateway } from 'src/gateway/app-gateway';
+import { AppGatewayModule } from './app-gateway.module';
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { GatewayModule } from './app-gateway.module';
     UserModule,
     ScheduleModule.forRoot(),
     RabbitMQModule,
-    GatewayModule
+    AppGatewayModule
   ],
   controllers: [SyncController,SyncWorker],
   providers: [SyncService, FootballApiService,UserValidationService,Adapter],

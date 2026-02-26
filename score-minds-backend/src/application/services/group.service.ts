@@ -3,7 +3,6 @@ import { GroupUserService } from "./group-user.service";
 import { Group } from "src/domain/models/group.model";
 import { UserService } from "./user.service";
 import { BaseGroupDto } from "../dtos/group-dto/base-group.dto";
-import { COMMON_SELECT_FIELDS, getSelectFields } from "src/common/constants/pagination.constants";
 import { FullGroupDto } from "../dtos/group-dto/full-group.dto";
 import { GroupNotFoundException, UserNotFoundException } from "src/common/exceptions/all.exceptions";
 import { BaseUserDto } from "../dtos/user-dto/base-user.dto";

@@ -8,7 +8,7 @@ import { PersonalPredictionModule } from './personal-predictition.module';
 import { UserValidationService } from 'src/common/services/user-validation.service';
 import { UserModule } from './user.module';
 import { AuthModule } from './auth.module';
-import { GatewayModule } from './app-gateway.module';
+import { AppGatewayModule } from './app-gateway.module';
 import { RabbitMQModule } from 'src/infrastucture/messaging/rabbitmq.module';
 import { GroupPredictionModule } from './group-prediction.module';
 
@@ -20,7 +20,7 @@ import { GroupPredictionModule } from './group-prediction.module';
     forwardRef(()=>GroupPredictionModule),
     UserModule,
     AuthModule,
-    forwardRef(() => GatewayModule),
+    forwardRef(() => AppGatewayModule),
     RabbitMQModule
   ],
   controllers: [

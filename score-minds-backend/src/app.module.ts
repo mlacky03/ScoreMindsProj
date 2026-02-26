@@ -18,9 +18,9 @@ import { SyncModule } from './modules/sync.module';
 import { PersonalPredictionModule } from './modules/personal-predictition.module';
 import { PredictionAuditModule } from './modules/prediction-audit.module';
 import { GroupPredictionModule } from './modules/group-prediction.module';
-import { AppGateway } from './gateway/app.gateway';
+import { AppGateway } from './gateway/app-gateway';
 import { CalculatingModule } from './modules/calculating.module';
-import { GatewayModule } from './modules/app-gateway.module';
+import { AppGatewayModule } from './modules/app-gateway.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -63,7 +63,7 @@ import { GatewayModule } from './modules/app-gateway.module';
     PredictionAuditModule,
     GroupPredictionModule,
     CalculatingModule,
-    GatewayModule
+    AppGatewayModule
 
 ],
 controllers: [AppController],

@@ -1,4 +1,3 @@
-// base-prediction.abstract.ts
 import { Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Match } from './matches.entity';
 

@@ -1,4 +1,4 @@
-// src/infrastructure/persistence/mappers/prediction.mapper.ts
+
 import { PersonalPrediction } from 'src/domain/models/personal-prediction.model';
 import { PersonalPrediction as PersonalPredictionEntity } from '../entities/personal-prediction.entity';
 import { BaseMapper } from './base.mapper';

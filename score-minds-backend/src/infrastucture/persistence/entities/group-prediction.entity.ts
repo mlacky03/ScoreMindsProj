@@ -1,4 +1,3 @@
-// group-prediction.entity.ts
 import { Entity, ManyToOne, JoinColumn, Column, Index, OneToMany } from 'typeorm';
 import { BasePrediction } from './base-prediction.abstract';
 import { Group } from './group.entity';

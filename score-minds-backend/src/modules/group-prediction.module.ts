@@ -17,7 +17,7 @@ import { GroupPredictionController } from 'src/presentation/controllers/group-pr
 import { PredictionEvent } from 'src/infrastucture/persistence/entities/prediction-event.entity';
 import { RabbitMQModule } from 'src/infrastucture/messaging/rabbitmq.module';
 import { PredictionWorker } from 'src/presentation/workers/prediction.worker';
-import { GatewayModule } from './app-gateway.module';
+import { AppGatewayModule } from './app-gateway.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([GroupPrediction,PredictionEvent]),
@@ -29,7 +29,7 @@ import { GatewayModule } from './app-gateway.module';
     forwardRef(()=>GroupModule),
     forwardRef(()=>PredictionAuditModule),
     forwardRef(()=>RabbitMQModule),
-    forwardRef(()=>GatewayModule
+    forwardRef(()=>AppGatewayModule
 )
     ],
     controllers: [GroupPredictionController,PredictionWorker],

@@ -8,7 +8,6 @@ export class Group {
         private _createdAt: Date=new Date(),
         private _profileImageUrl: string|undefined,
         private _groupPoints: number=0,
-        // Opciono: Možemo čuvati listu članova ako nam treba za logiku
         private _members: GroupUser[] = [] 
     ) {
         if (!_name || _name.trim().length === 0) {

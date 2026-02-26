@@ -1,7 +1,7 @@
 import { Controller } from "@nestjs/common";
 import { EventPattern, Payload } from "@nestjs/microservices";
-import { AppGateway } from "src/gateway/app.gateway";
-import { PersonalPredictionRepository } from "src/infrastucture/persistence/repositories/personal-prediction.repository";
+import { AppGateway } from "src/gateway/app-gateway";
+
 
 @Controller()
 export class PredictionWorker{
@@ -12,7 +12,7 @@ export class PredictionWorker{
     handlePredictionListChanged(@Payload() data: any) {
         console.log(`📡 RabbitMQ -> WebSocket: Prediction list changed for group ${data.groupId}`);
 
-        this.appGateway.brodcastPredictionListChagne(data.id, data,data.groupId);
+        this.appGateway.brodcastPredictionListChagne(data,data.groupId);
     }
 
     @EventPattern('personal-list-changed')

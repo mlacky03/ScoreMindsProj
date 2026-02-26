@@ -3,7 +3,7 @@ import { EventPattern, Payload } from "@nestjs/microservices";
 import { SyncService } from "src/application/services/sync.service";
 import { MatchRepository } from "src/infrastucture/persistence/repositories/match.repository";
 import { PlayerRepository } from "src/infrastucture/persistence/repositories/player.repository";
-import { AppGateway } from "src/gateway/app.gateway";
+import { AppGateway } from "src/gateway/app-gateway";
 
 @Controller()
 export class SyncWorker {
