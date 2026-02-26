@@ -41,10 +41,11 @@ export class GroupPredictionService {
 
     async createPrediction(groupId: number, prediction: CreatePredictionDto, userId: number): Promise<FullPredictionDto> {
         try {
-            const match = await this.matchService.findOne(prediction.matchId);
+            const match = await this.matchService.findOneModel(prediction.matchId);
             if (!match) {
                 throw new NotFoundException(`Meč sa ID-jem ${prediction.matchId} nije pronađen.`);
             }
+            match.submitPrediction();
             if (prediction.events && prediction.events.length > 0) {
                 for (const eventDto of prediction.events) {
 
@@ -53,7 +54,7 @@ export class GroupPredictionService {
                         throw new BadRequestException(`Igrač sa ID ${eventDto.playerId} ne postoji.`);
                     }
 
-                    if (player.teamId !== match.hometeamId && player.teamId !== match.awayteamId) {
+                    if (player.teamId !== match.homeTeamId && player.teamId !== match.awayTeamId) {
                         throw new BadRequestException(`Igrač ${player.name} ne igra za timove u ovom meču.`);
                     }
                 }
@@ -129,7 +130,7 @@ export class GroupPredictionService {
         await this.groupService.chackMembership(userId, groupId);
         const prediction = await this.repo.findPredictionByGroupIdWithRelations(groupId, predictionId);
         if (!prediction) throw new NotFoundException('Prediction not found');
-
+        prediction.match?.submitPrediction();
         const cleanData = Object.fromEntries(
             Object.entries(predictionDto).filter(([_, value]) => value !== null && value !== undefined)
         );

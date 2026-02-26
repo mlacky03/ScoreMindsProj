@@ -6,6 +6,8 @@ import { ClientProxy } from "@nestjs/microservices";
 import { MatchRepository } from "src/infrastucture/persistence/repositories/match.repository";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Match } from "src/domain/models/match.model";
+import { ApiFootballAdapter } from "../interfaces/adapter-pattern/api-footbal-adapter";
+import type { IExternalApiAdapter } from "../interfaces/adapter-pattern/iexternal-api-adapter";
 
 
 @Injectable()
@@ -18,7 +20,7 @@ export class SyncService {
     private matchRepo: MatchRepository,
     @Inject('RABBITMQ_SERVICE')
     private readonly rabbitClient: ClientProxy,
-    private adapter: Adapter,
+    @Inject('IExternalApiAdapter') private readonly adapter: IExternalApiAdapter,
   ) { }
 
   @Cron(CronExpression.EVERY_MINUTE) 

@@ -15,6 +15,7 @@ import { PlayerModule } from './player.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppGateway } from 'src/gateway/app-gateway';
 import { AppGatewayModule } from './app-gateway.module';
+import { ApiFootballAdapter } from 'src/application/interfaces/adapter-pattern/api-footbal-adapter';
 
 @Module({
   imports: [
@@ -30,7 +31,10 @@ import { AppGatewayModule } from './app-gateway.module';
     AppGatewayModule
   ],
   controllers: [SyncController,SyncWorker],
-  providers: [SyncService, FootballApiService,UserValidationService,Adapter],
+  providers: [SyncService,{
+    provide: 'IExternalApiAdapter', 
+    useClass: ApiFootballAdapter   
+  }, FootballApiService,UserValidationService,Adapter],
   exports:[SyncService]
 })
 export class SyncModule {}

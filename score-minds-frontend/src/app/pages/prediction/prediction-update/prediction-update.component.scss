@@ -3,7 +3,7 @@
   color: #fff;
   padding: 24px;
   width: 100%;
-  border-radius: 8px; // Ako dialog već nema border-radius
+  border-radius: 8px; 
   box-sizing: border-box;
 }
 
@@ -64,7 +64,7 @@
         border-color: #3b82f6;
       }
 
-      /* Hide number arrows */
+      
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -77,7 +77,7 @@
     font-weight: bold;
     color: #555;
     font-size: 1.2rem;
-    margin-top: 15px; // Align visually with inputs
+    margin-top: 15px; 
   }
 }
 
@@ -184,16 +184,16 @@
   margin-top: 20px;
   margin-bottom: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  // Sklonili smo padding-top da bi header (klikabilni deo) imao lepši prostor
+  
 
   // --- HEADER (Klikabilni deo) ---
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 0; // Ovde dajemo prostor za klik
-    cursor: pointer; // Pokazuje ruku (pointer)
-    user-select: none; // Da se ne selektuje tekst kad klikaš
+    padding: 15px 0;
+    cursor: pointer; 
+    user-select: none; 
     transition: opacity 0.2s;
 
     &:hover {
@@ -224,9 +224,9 @@
     .arrow-icon {
       font-size: 0.8rem;
       color: #888;
-      transition: transform 0.3s ease; // Animacija rotacije
+      transition: transform 0.3s ease; 
 
-      // Kad je otvoreno, rotiraj
+    
       &.open {
         transform: rotate(180deg);
         color: #3b82f6;
@@ -243,7 +243,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 150px; // Scroll ako ih ima puno
+  max-height: 150px;
   overflow-y: auto;
 }
 
@@ -342,7 +342,7 @@
   font-size: 1rem;
   padding: 4px;
   border-radius: 4px;
-  //transition: background 0.2s;
+ 
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -364,7 +364,7 @@
 
 .player-search-container {
   padding: 10px 15px;
-  position: relative; // Bitno za pozicioniranje dropdown-a
+  position: relative; 
   background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
@@ -377,7 +377,7 @@
     padding: 0 10px;
 
     &:focus-within {
-      border-color: #7b1fa2; // Tvoja ljubičasta boja
+      border-color: #7b1fa2; 
       box-shadow: 0 0 0 2px rgba(123, 31, 162, 0.2);
     }
 
@@ -416,10 +416,10 @@
   // Padajuća lista
   .search-results-dropdown {
     position: absolute;
-    top: 100%; // Odmah ispod inputa
+    top: 100%; 
     left: 15px;
     right: 15px;
-    background: #1e1e1e; // Tamna pozadina
+    background: #1e1e1e; 
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);

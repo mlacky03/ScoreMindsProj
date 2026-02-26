@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { FullMatchDto } from '../dtos/matches-dto/full-match.dto';
 import { BaseMatchDto } from '../dtos/matches-dto/base-match.dto';
 import { MatchRepository } from 'src/infrastucture/persistence/repositories/match.repository';
+import { Match } from 'src/domain/models/match.model';
 
 @Injectable()
 export class MatchService {
@@ -17,16 +18,16 @@ export class MatchService {
     return res.map((m) => new BaseMatchDto(m));
   }
 
-  async findAll(page:number,size:number): Promise<BaseMatchDto[]> {
-    const skip=(page-1)*size;
-    const res = await this.matchRepository.findAllPagginated(skip,size);
+  async findAll(page: number, size: number): Promise<BaseMatchDto[]> {
+    const skip = (page - 1) * size;
+    const res = await this.matchRepository.findAllPagginated(skip, size);
     return res.map((m) => new BaseMatchDto(m));
   }
 
 
-  async findUpcoming(page:number,size:number): Promise<BaseMatchDto[]> {
-     const skip=(page-1)*size;
-    const res = await this.matchRepository.findUpcomingPagginated(skip,size);
+  async findUpcoming(page: number, size: number): Promise<BaseMatchDto[]> {
+    const skip = (page - 1) * size;
+    const res = await this.matchRepository.findUpcomingPagginated(skip, size);
     return res.map((m) => new BaseMatchDto(m));
   }
 
@@ -39,9 +40,17 @@ export class MatchService {
     return new FullMatchDto(match);
   }
 
-  async findLiveMatches(page:number,size:number): Promise<BaseMatchDto[]> {
-    const skip=(page-1)*size;
-    const res = await this.matchRepository.findLiveMatchesPagginated(skip,page);
+  async findOneModel(id: number): Promise<Match> {
+    const match = await this.matchRepository.findById(id);
+    if (!match) {
+      throw new NotFoundException(`Meč sa ID-jem ${id} nije pronađen.`);
+    }
+    return match;
+  }
+
+  async findLiveMatches(page: number, size: number): Promise<BaseMatchDto[]> {
+    const skip = (page - 1) * size;
+    const res = await this.matchRepository.findLiveMatchesPagginated(skip, page);
     return res.map((m) => new BaseMatchDto(m));
   }
 }

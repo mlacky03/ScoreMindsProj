@@ -5,6 +5,7 @@ import { PersonalPredictionRepository } from 'src/infrastucture/persistence/repo
 import { PredictionStatus } from 'src/infrastucture/persistence/entities/personal-prediction.entity';
 import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 import { GroupPredictionRepository } from 'src/infrastucture/persistence/repositories/group-prediction.repository';
+import { StandardPointsStrategy } from '../interfaces/points-strategies-pattern/standard-points-strategy';
 
 @Injectable()
 export class CalculatingService {
@@ -79,24 +80,9 @@ export class CalculatingService {
             this.logger.log(`No personal predictions found for match: ${match.id}`)
             return;
         }
+        const calculationStrategy = new StandardPointsStrategy();
         const updatePromises = personalPredictions.map(async (prediction) => {
-            let totalPoints = 0;
-
-            if (prediction.winner === actualWinner) {
-                totalPoints += this.POINTS_WINNER;
-            }
-
-            if (
-                prediction.predictedHomeScore === match.finalScoreHome &&
-                prediction.predictedAwayScore === match.finalScoreAway
-            ) {
-                totalPoints += this.POINTS_EXACT_SCORE;
-            }
-
-            if (prediction.predictedEvents && prediction.predictedEvents.length > 0) {
-                const eventPoints = this.calculateEventPoints(prediction.predictedEvents, match);
-                totalPoints += eventPoints;
-            }
+            let totalPoints = calculationStrategy.calculatePoints(prediction, match, actualWinner);
 
             prediction.addPoints(totalPoints);
             prediction.updateStatus(PredictionStatus.PROCESSED);
@@ -134,24 +120,11 @@ export class CalculatingService {
             this.logger.log(`No group predictions found for match: ${match.id}`)
             return;
         }
+        const calculationStrategy = new StandardPointsStrategy();
         const updatePromises = groupPredictions.map(async (prediction) => {
-            let totalPoints = 0;
+            let totalPoints = calculationStrategy.calculatePoints(prediction, match, actualWinner);
 
-            if (prediction.winner === actualWinner) {
-                totalPoints += this.POINTS_WINNER;
-            }
-
-            if (
-                prediction.predictedHomeScore === match.finalScoreHome &&
-                prediction.predictedAwayScore === match.finalScoreAway
-            ) {
-                totalPoints += this.POINTS_EXACT_SCORE;
-            }
-
-            if (prediction.predictedEvents && prediction.predictedEvents.length > 0) {
-                const eventPoints = this.calculateEventPoints(prediction.predictedEvents, match);
-                totalPoints += eventPoints;
-            }
+           
 
             prediction.addPoints(totalPoints);
             prediction.updateStatus(PredictionStatus.PROCESSED);

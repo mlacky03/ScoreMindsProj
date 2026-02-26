@@ -12,6 +12,7 @@ import { PlayerService } from "./player.service";
 import { FullMatchDto } from "../dtos/matches-dto/full-match.dto";
 import { PredictionStatus } from "src/infrastucture/persistence/entities/personal-prediction.entity";
 import { UserService } from "./user.service";
+import { Match } from "../../domain/models/match.model";
 @Injectable()
 export class PersonalPredictionService {
     constructor(
@@ -36,15 +37,12 @@ export class PersonalPredictionService {
         try {
 
 
-            const match = await this.matchService.findOne(prediction.matchId);
-            const matchTime = new Date(match.startTime).getTime(); // Sigurno pretvara string ili Date u broj
-            const now = new Date().getTime();
+            const match = await this.matchService.findOneModel(prediction.matchId);
             if (!match) {
                 throw new NotFoundException(`Meč sa ID-jem ${prediction.matchId} nije pronađen.`);
             }
-            if (matchTime < now) {
-                throw new BadRequestException(`Meč sa ID-jem ${prediction.matchId} je već počeo.`);
-            }
+            match.submitPrediction();
+            
             if (prediction.events && prediction.events.length > 0) {
                 for (const eventDto of prediction.events) {
 
@@ -53,7 +51,7 @@ export class PersonalPredictionService {
                         throw new BadRequestException(`Igrač sa ID ${eventDto.playerId} ne postoji.`);
                     }
 
-                    if (player.teamId !== match.hometeamId && player.teamId !== match.awayteamId) {
+                    if (player.teamId !== match.homeTeamId && player.teamId !== match.awayTeamId) {
                         throw new BadRequestException(`Igrač ${player.name} ne igra za timove u ovom meču.`);
                     }
                 }
@@ -105,15 +103,15 @@ export class PersonalPredictionService {
         return new FullPredictionDto(prediction);
     }
 
+   
+
+    
+
 
     async updatePrediction(predictionId: number, userId: number, predictionDto: UpdatePredictionDto): Promise<FullPredictionDto> {
         const prediction = await this.repo.findPredictionByUserWithRelations(userId, predictionId);
         if (!prediction) throw new NotFoundException('Prediction not found');
-        const matchTime = new Date(prediction.match!.startTime).getTime();
-        const now = new Date().getTime();
-        if (matchTime < now) {
-            throw new BadRequestException('Mec je vec poceo ne mozes uraditi update');
-        }
+        prediction.match?.submitPrediction();
         const cleanData = Object.fromEntries(
             Object.entries(predictionDto).filter(([_, value]) => value !== null && value !== undefined)
         );

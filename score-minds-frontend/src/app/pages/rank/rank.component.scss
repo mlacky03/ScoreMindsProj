@@ -3,7 +3,7 @@
     margin: 0 auto;
     padding: 20px;
 
-    /* Kontejner za tab dugmiće */
+    
     .tabs-header {
         display: flex;
         justify-content: center;
@@ -15,7 +15,7 @@
         border: 1px solid rgba(255, 255, 255, 0.05);
 
         .tab-btn {
-            flex: 1; /* Da oba dugmeta budu iste širine */
+            flex: 1; 
             padding: 12px 24px;
             background: transparent;
             color: #9ca3af;
@@ -31,9 +31,9 @@
                 background: rgba(255, 255, 255, 0.05);
             }
 
-            /* Aktivni (selektovani) tab */
+            
             &.active {
-                background: #3b82f6; /* Plava boja */
+                background: #3b82f6; 
                 color: #ffffff;
                 box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
             }
@@ -41,11 +41,11 @@
     }
 
     .content-area {
-        min-height: 400px; /* Sprečava da se stranica 'skupi' dok se vrti spinner */
+        min-height: 400px; 
         position: relative;
     }
 
-    /* Spinner CSS (već poznat) */
+    
     .loading-state {
         display: flex;
         justify-content: center;

@@ -14,7 +14,7 @@
     display: flex;
     background: #f0f2f5;
     padding: 5px;
-    border-radius: 25px; // "Pilula" oblik kontejnera
+    border-radius: 25px; 
     gap: 5px;
 
     .filter-btn {
@@ -32,10 +32,10 @@
         background-color: rgba(0, 0, 0, 0.05);
       }
 
-      // Kada je dugme aktivno (selektovano)
+      
       &.active {
         background-color: #fff;
-        color: #1877f2; // Ili tvoja glavna boja teme
+        color: #1877f2; 
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     }
@@ -51,7 +51,7 @@
 
     .page-btn {
       background-color: #374151;
-      /* Tamno siva pozadina */
+      
       color: white;
       border: none;
       padding: 8px 16px;
@@ -62,7 +62,7 @@
 
       &:hover:not(:disabled) {
         background-color: #3b82f6;
-        /* Plava na hover */
+        
       }
 
       &:disabled {

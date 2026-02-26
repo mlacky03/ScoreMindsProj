@@ -1,4 +1,8 @@
 import { EventRecord } from "src/application/interfaces/event-record";
+import { FinishedState } from "src/application/interfaces/match-state-pattern/finish.state";
+import { IMatchState } from "src/application/interfaces/match-state-pattern/imatch.state";
+import { LiveState } from "src/application/interfaces/match-state-pattern/live.state";
+import { NotStartedState } from "src/application/interfaces/match-state-pattern/not-started.state";
 
 export class Match {
     constructor(
@@ -16,18 +20,39 @@ export class Match {
         private _awayTeamLogo: string ,
         private _events: EventRecord[] = [],
         private _isComputed: boolean = false
-    ) {}
+    ) {
+        this.initializeState();
+    }
 
+    private initializeState() {
+        switch (this._status) {
+            case 'NS':
+                this.currentState = new NotStartedState();
+                break;
+            case 'LIVE':
+            case 'FT':
+            case 'AET': 
+                this.currentState = new FinishedState();
+                break;
+            default:
+                this.currentState = new NotStartedState();
+        }
+    }   
+    private currentState: IMatchState;
     
     public finishMatch(): void {
         this._status = 'FT';
+        this.initializeState();
     }
 
     public startMatch(): void {
         this._status = 'LIVE';
+        this.initializeState();
     }
 
-
+    public submitPrediction() {
+        this.currentState.handlePrediction(this);
+    }
     
     public hasStarted(): boolean {
         return new Date() >= this._startTime || this._status !== 'NS';

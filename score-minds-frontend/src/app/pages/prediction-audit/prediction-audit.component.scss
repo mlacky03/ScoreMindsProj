@@ -9,9 +9,9 @@
         width: 100%;
         height: 100%;
         background-color: #121212;
-        //overflow-y: auto; // Skrolovanje celog panela
+        
 
-        // Custom scrollbar
+        
         &::-webkit-scrollbar { width: 8px; }
         &::-webkit-scrollbar-track { background: #121212; }
         &::-webkit-scrollbar-thumb {
@@ -19,12 +19,12 @@
             border-radius: 4px;
         }
         
-        // Dajemo malo prostora oko tvoje komponente
+       
         app-audit-list {
             display: block;
             padding: 20px;
-            max-width: 800px; // Ograničava širinu na većim ekranima
-            margin: 0 auto;   // Centrira na sredinu ekrana
+            max-width: 800px;
+            margin: 0 auto;  
         }
     }
 }
