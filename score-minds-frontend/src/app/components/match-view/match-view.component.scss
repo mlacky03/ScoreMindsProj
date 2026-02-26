@@ -1,29 +1,29 @@
 .match-grid {
   display: grid;
-  // Srednja kolona je fiksna (350px), strane se šire (1fr)
+ 
   grid-template-columns: 1fr 350px 1fr;
   gap: 2rem;
   align-items: start;
 
-  // 🔥 PROMENA 1: Povećana širina da popuni ekran
+  
   width: 95%;
-  max-width: 1800px; // Ranije je bilo 1200px
+  max-width: 1800px; 
   margin: 0 auto;
   padding: 2rem 1rem;
 
   @media (max-width: 1024px) {
-    grid-template-columns: 1fr; // Na tabletu/mobilnom jedna kolona
+    grid-template-columns: 1fr; 
     max-width: 100%;
   }
 }
 
-// --- KOLONE TIMOVA ---
+
 .team-column {
   display: flex;
   flex-direction: column;
-  gap: 30px; // Veći razmak između elemenata
+  gap: 30px; 
 
-  // Poravnanje ostaje isto
+  
   &.home {
     text-align: right;
     align-items: flex-end;
@@ -51,7 +51,7 @@
   }
 
   .team-name {
-    // 🔥 PROMENA 2: Veći font za imena timova
+  
     font-size: 2.2rem;
     font-weight: 800;
     margin-top: 15px;
@@ -60,10 +60,10 @@
   }
 }
 
-// --- LOGO (VEĆI) ---
+
 .team-logo-wrapper {
   position: relative;
-  // 🔥 PROMENA 3: Logo povećan sa 120px na 160px
+
   width: 160px;
   height: 160px;
   padding: 15px;
@@ -71,7 +71,7 @@
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
   cursor: pointer;
-  border: 5px solid transparent; // Deblji border
+  border: 5px solid transparent; 
 
   img {
     width: 100%;
@@ -82,12 +82,12 @@
 
   &:not(.locked):hover {
     background: rgba(255, 255, 255, 0.1);
-    transform: scale(1.1); // Jače uvećanje na hover
+    transform: scale(1.1); 
   }
 
   &.selected {
     border-color: #22c55e;
-    box-shadow: 0 0 30px rgba(34, 197, 94, 0.5); // Jači sjaj
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.5); 
 
     .check-mark {
       position: absolute;
@@ -95,7 +95,7 @@
       right: 0;
       background: #22c55e;
       color: white;
-      width: 40px; // Veća kvačica
+      width: 40px; 
       height: 40px;
       border-radius: 50%;
       display: flex;
@@ -116,18 +116,18 @@
   }
 }
 
-// --- BELI KARTON ZA IGRAČE (NOVO) ---
+
 .players-list-wrapper {
-  // 🔥 PROMENA 4: Beli "kontejner"
+  
   background-color: #ffffff;
-  color: #1a1a1a; // Tamna slova jer je pozadina bela
+  color: #1a1a1a;
 
   width: 100%;
-  max-width: 500px; // Ograničimo širinu da ne bude preširoko na ogromnim ekranima
+  max-width: 500px; 
 
-  border-radius: 20px; // Lepo zaobljeno
-  padding: 2rem; // Unutrašnji razmak
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); // Senka da "lebdi" iznad tamne pozadine
+  border-radius: 20px;
+  padding: 2rem; 
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
 
   .list-title {
     font-size: 1.2rem;
@@ -138,17 +138,17 @@
     border-bottom: 2px solid #eee;
     padding-bottom: 0.5rem;
 
-    // Centriramo naslov liste uvek
+    
     text-align: center;
   }
 }
 
-// --- SREDNJA KOLONA (Inputi) ---
+
 .match-info-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 30px; // Spušteno da prati veće logoe
+  padding-top: 30px; 
 }
 
 .score-input-container {

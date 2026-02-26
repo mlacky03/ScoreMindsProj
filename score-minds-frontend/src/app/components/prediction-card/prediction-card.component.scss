@@ -1,6 +1,6 @@
 .prediction-card {
-  position: relative; // OVO JE BITNO ZA OVERLAY
-  overflow: hidden;   // OVO JE BITNO ZA OVERLAY
+  position: relative; 
+  overflow: hidden;   
   background: #1e1e1e;
   border-radius: 12px;
   cursor: pointer;
@@ -9,33 +9,32 @@
 
   // --- 1. DEFAULT STATE (GRID / KOCKA) ---
   display: flex;
-  flex-direction: column; // Slažemo elemente vertikalno
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
   padding: 20px;
-  min-height: 220px; // Visina kocke
+  min-height: 220px; 
   gap: 15px;
 
-  // Osnovni hover efekat cele kartice
   &:hover {
     background: #252525;
     border-color: rgba(255, 255, 255, 0.1);
     transform: translateY(-4px);
   }
   &.points-won {
-    border-color: #28a745 !important; // Zeleni border
-    background-color: rgba(40, 167, 69, 0.1) !important; // Bledo zelena pozadina (10% providnosti)
+    border-color: #28a745 !important; 
+    background-color: rgba(40, 167, 69, 0.1) !important; 
     
-    // Ako želiš i blagi unutrašnji sjaj (glow)
+
     box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.05);
 
     &:hover {
-        background-color: rgba(40, 167, 69, 0.15) !important; // Malo jača boja na hover
+        background-color: rgba(40, 167, 69, 0.15) !important; 
     }
   }
   &.points-lost {
-    border-color: #dc3545 !important; // Crveni border
-    background-color: rgba(220, 53, 69, 0.1) !important; // Bledo crvena pozadina
+    border-color: #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.1) !important; 
     
     
     
@@ -55,21 +54,21 @@
     width: 100%;
     height: 100%;
     
-    // Polu-providna tamna pozadina sa zamućenjem
+ 
     background-color: rgba(18, 18, 18, 0.75); 
-    backdrop-filter: blur(6px); // Glavni Blur efekat
+    backdrop-filter: blur(6px); 
     
     display: flex;
-    flex-direction: column; // Dugmad idu jedno ispod drugog
+    flex-direction: column; 
     justify-content: center;
     align-items: center;
     gap: 12px;
     
-    // Početno stanje - skriveno
+    
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); // Glatka tranzicija
-    z-index: 10; // Da bude iznad svih grbova i tekstova
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    z-index: 10; 
 
     .overlay-btn {
       display: flex;
@@ -82,18 +81,18 @@
       border-radius: 8px;
       border: none;
       cursor: pointer;
-      width: 170px; // Ista širina za oba dugmeta
+      width: 170px;
       transition: transform 0.2s ease, background-color 0.2s ease;
       
       &.view-btn {
-        background-color: #3b82f6; // Plava boja
+        background-color: #3b82f6; 
         color: white;
         
         &:hover { background-color: #2563eb; }
       }
 
       &.audit-btn {
-        background-color: #374151; // Tamno siva boja
+        background-color: #374151; 
         color: white;
         border: 1px solid #4b5563;
         
@@ -101,24 +100,24 @@
       }
 
       &:active {
-        transform: scale(0.95); // Suptilan efekat na klik
+        transform: scale(0.95); 
       }
     }
   }
 
-  // Aktivacija overlay-a na hover kartice (Samo kada NIJE u compact modu)
+  
   &:not(.compact-mode):hover {
     .hover-overlay {
       opacity: 1;
       visibility: visible;
     }
   }
-  // ==========================================
+ 
 
-  // Zajednički stilovi za timove
+ 
   .team-container {
     display: flex;
-    flex-direction: column; // Grb gore, ime dole
+    flex-direction: column; 
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -126,7 +125,7 @@
     gap: 8px;
 
     .team-logo {
-      width: 60px; // Veliki logo
+      width: 60px; 
       height: 60px;
       object-fit: contain;
       img { width: 100%; height: 100%; object-fit: contain; }
@@ -136,18 +135,18 @@
       font-size: 1.2rem;
       font-weight: 800;
       color: #fff;
-      background: #333; // Tamna pozadina okvira
-      padding: 4px 12px; // Unutrašnji razmak da bude širi
-      border-radius: 8px; // Zaobljene ivice
-      border: 1px solid #444; // Tanak okvir
+      background: #333; 
+      padding: 4px 12px;
+      border-radius: 8px; 
+      border: 1px solid #444;
       min-width: 40px;
       text-align: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 
-      // Ako je pobednik, oboj pozadinu u zeleno
+      
       &.winner-bg {
-        background: #166534; // Tamno zelena
-        border-color: #22c55e; // Svetlo zelena ivica
+        background: #166534; 
+        border-color: #22c55e;
         color: #fff;
       }
     }
@@ -191,57 +190,56 @@
     }
   }
 
-  .card-arrow { display: none; } // Ne treba nam strelica u kocki
+  .card-arrow { display: none; } 
 
-  // --- 2. COMPACT STATE (SIDEBAR / LISTA) ---
-  // Ovo se aktivira kad je [compact]="true"
+  
   &.compact-mode {
-    flex-direction: row; // Vraćamo u red (horizontalno)
+    flex-direction: row; 
     justify-content: space-between;
     padding: 10px 15px;
-    min-height: auto; // Reset visine
+    min-height: auto; 
     gap: 10px;
 
-    // Kad je u compact modu gasimo hover transformaciju da se ne diže previse
+    
     &:hover {
       transform: none;
       background: #2a2a2a;
     }
 
-    // Resetujemo timove da budu horizontalni
+    
     .team-container {
-      flex-direction: row; // Logo pored imena
+      flex-direction: row; 
       width: auto;
       gap: 10px;
       
-      // Za goste (desna strana) obrćemo redosled (Ime pa Logo)
+      
       &.away { flex-direction: row-reverse; text-align: right; }
       &.home { text-align: left; }
 
       .team-logo {
-        width: 30px; // Mali logo
+        width: 30px; 
         height: 30px;
       }
 
       .team-name {
         font-size: 0.85rem;
-        max-width: 70px; // Kraće ime da stane u sidebar
+        max-width: 70px; 
       }
       
       .prediction-score {
           font-size: 1rem;
       }
       .score-badge {
-        font-size: 1rem; // Manji font u listi
+        font-size: 1rem; 
         padding: 2px 8px;
         min-width: 30px;
       }
     }
 
-    // Sredina u sidebaru
+    
     .match-center {
       .vs-badge { font-size: 0.9rem; margin: 0; }
-      .match-meta { display: none; } // Sakrivamo datum da ne guši prostor
+      .match-meta { display: none; } 
     }
   }
 }

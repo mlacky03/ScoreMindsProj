@@ -1,15 +1,15 @@
-// Promenljive za boje (prilagodi svojoj temi)
+
 $bg-dark: #121212;
 $bg-card: #1e1e1e;
 $text-main: #ffffff;
 $text-muted: #aaaaaa;
-$color-winner: #2ecc71; // Zelena za pobednika
+$color-winner: #2ecc71; 
 $color-loser: #e74c3c;
 $color-draw: #f1c40f;
 $color-accent: #3b82f6;
 
-$color-processed: #2ecc71; // Zelena za bodove
-$color-pending: #f39c12; // Narandžasta za čekanje
+$color-processed: #2ecc71; 
+$color-pending: #f39c12; 
 $color-bg-card: #ffffff;
 $color-text-main: #2c3e50;
 $color-text-muted: #95a5a6;
@@ -23,7 +23,7 @@ $color-text-muted: #95a5a6;
   margin: 0 auto;
 }
 
-// --- HEADER (Match Score & Logos) ---
+
 .prediction-header {
   display: flex;
   flex-direction: column;
@@ -41,12 +41,12 @@ $color-text-muted: #95a5a6;
 
   .match-container {
     display: flex;
-    justify-content: center; // Centriramo sve
-    align-items: center; // Poravnanje po vertikali
+    justify-content: center; 
+    align-items: center; 
     gap: 15px;
 
     @media (max-width: 650px) {
-      flex-direction: column; // Na mobilnom jedan ispod drugog
+      flex-direction: column; 
       gap: 30px;
     }
   }
@@ -75,11 +75,9 @@ $color-text-muted: #95a5a6;
 
     &:hover {
       background-color: #fef2f2;
-      /* Jako svetla, pastelno crvena pozadina */
       border-color: #fca5a5;
-      /* Bleda crvena ivica */
       color: #dc2626;
-      /* Zatamnjen tekst */
+      
 
       svg {
         transform: scale(1.1) rotate(5deg);
@@ -95,14 +93,14 @@ $color-text-muted: #95a5a6;
 
 .team-section {
   display: flex;
-  flex-direction: column; // 🔥 Ime IZNAD tela (grb+skor)
-  align-items: center; // Centrira ime
+  flex-direction: column;
+  align-items: center; 
   flex: 1;
 
   .team-name {
     font-size: 1.2rem;
     font-weight: 700;
-    margin: 0 0 15px 0; // Razmak između imena i grba
+    margin: 0 0 15px 0; 
     color: $text-main;
     text-align: center;
     white-space: nowrap;
@@ -111,16 +109,16 @@ $color-text-muted: #95a5a6;
     max-width: 100%;
   }
 
-  // Novi wrapper koji drži Grb i Skor u istoj liniji
+  
   .team-body {
     display: flex;
     align-items: center;
-    gap: 20px; // Razmak između grba i rezultata
+    gap: 20px; 
   }
 
-  // Stil za rezultat
+  
   .prediction-score {
-    font-size: 2.5rem; // Veliki rezultat
+    font-size: 2.5rem;
     font-weight: 800;
  
     color: $text-main;
@@ -130,27 +128,27 @@ $color-text-muted: #95a5a6;
   }
 
   .real-score {
-  // Povećao sam font-size na 2rem kao što si tražio, ali uz tanji font izgledaće diskretnije
-  font-size: 2.5rem; 
-  font-weight: 200; // Još tanja slova za "ghost" efekat
   
-  // Svetlo zelena sa niskim opasitetom (providnošću)
+  font-size: 2.5rem; 
+  font-weight: 200;
+  
+  
   color: rgba(40, 167, 69, 0.3); 
   
-  // Sjaj (glow) koji daje taj "drugi plan" efekat
+  
   text-shadow: 0 0 8px rgba(40, 167, 69, 0.2); 
 
   display: block;
-  margin-top: -5px; // Malo ga približavamo glavnom rezultatu
+  margin-top: -5px; 
   letter-spacing: -1px;
 
-  // VAŽNO: Uklonjen grayscale(1) jer on pravi sivu boju
+
   filter: opacity(0.8); 
 
   user-select: none;
   pointer-events: none;
   
-  // Da bi izgledalo kao senka iza glavnog rezultata
+  
   position: relative;
   z-index: 1;
 }
@@ -159,7 +157,7 @@ $color-text-muted: #95a5a6;
 
 .team-logo-wrapper {
   position: relative;
-  width: 80px; // Povećan grb
+  width: 80px;
   height: 80px;
   border-radius: 50%;
   padding: 4px;
@@ -170,13 +168,13 @@ $color-text-muted: #95a5a6;
     width: 100%;
     height: 100%;
     object-fit: contain;
-    // border-radius: 50%; // Nije nužno ako je slika transparentan PNG
+    
   }
 
-  // ✨ WINNER GLOW EFEKAT ✨
+ 
   &.winner-glow {
     background: transparent;
-    box-shadow: 0 0 20px rgba($color-winner, 0.6); // Jači sjaj
+    box-shadow: 0 0 20px rgba($color-winner, 0.6); 
     border: 2px solid $color-winner;
     transform: scale(1.05);
   }
@@ -196,14 +194,14 @@ $color-text-muted: #95a5a6;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 25px; // Malo spuštanje zbog imena iznad
+  margin-top: 25px; 
   padding: 0 20px;
   min-width: 100px;
 
   .vs-badge {
     font-weight: 900;
     font-size: 1.4rem;
-    color: #555; // Tamnija boja
+    color: #555; 
     margin-bottom: 5px;
   }
 
@@ -242,8 +240,8 @@ $color-text-muted: #95a5a6;
     }
 
     .btn-action {
-      margin-top: 8px; // Razmak od statusa
-      background-color: #3b82f6; // Tvoja plava boja
+      margin-top: 8px; 
+      background-color: #3b82f6; 
       color: white;
       border: none;
       border-radius: 6px;
@@ -258,7 +256,7 @@ $color-text-muted: #95a5a6;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
       &:hover:not(:disabled) {
-        background-color: #2563eb; // Tamnija plava na hover
+        background-color: #2563eb; 
         transform: translateY(-1px);
       }
 
@@ -266,10 +264,10 @@ $color-text-muted: #95a5a6;
         transform: translateY(0);
       }
 
-      // 🔒 KAD JE DISABLED (Status nije NS)
+      
       &:disabled {
-        background-color: #333; // Tamno siva
-        color: #666; // Svetlo siva slova
+        background-color: #333; 
+        color: #666; 
         cursor: not-allowed;
         box-shadow: none;
         opacity: 0.7;
@@ -293,7 +291,7 @@ $color-text-muted: #95a5a6;
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
       }
 
-      // Zajednički stil za značke (badges)
+      
       .badge {
         padding: 6px 12px;
         border-radius: 20px;
@@ -315,7 +313,7 @@ $color-text-muted: #95a5a6;
         }
       }
 
-      // Stil za prikaz poena
+      
       .points-container {
         text-align: right;
         margin-left: 2px;
@@ -387,7 +385,7 @@ $color-text-muted: #95a5a6;
 
 .events-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); // Responsive grid
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
   gap: 15px;
 }
 
@@ -410,7 +408,7 @@ $color-text-muted: #95a5a6;
   position: relative;
   width: 40px;
   height: 40px;
-  flex-shrink: 0; // Da se ne spljeska
+  flex-shrink: 0; 
 
   .avatar-img {
     width: 100%;
@@ -508,7 +506,6 @@ $color-text-muted: #95a5a6;
   color: $text-muted;
 
   .spinner {
-    // Dodaj stil za spinner ako ga nemaš globalno
     border: 4px solid rgba(255, 255, 255, 0.1);
     border-left-color: $color-accent;
     border-radius: 50%;

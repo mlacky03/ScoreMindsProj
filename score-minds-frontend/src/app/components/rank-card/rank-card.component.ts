@@ -5,20 +5,20 @@ import { GroupLeaderboardDto } from "../../feature/groups/data/group-leaderboard
 
 
 @Component({
-    selector: 'app-user-card',
+    selector: 'app-rank-card',
     standalone: true,
     imports: [NgIf,NgClass,DatePipe],
-    templateUrl: './user-card.component.html',
-    styleUrl: './user-card.component.scss'
+    templateUrl: './rank-card.component.html',
+    styleUrl: './rank-card.component.scss'
 })
-export class UserCardComponent {
-    @Input({required: true}) user!: UserLeaderboardDto|GroupLeaderboardDto;
+export class RankCardComponent {
+    @Input({required: true}) item!: UserLeaderboardDto|GroupLeaderboardDto;
 
 
     getRankClass(): string {
-    if (this.user.rank === 1) return 'rank-gold';
-    if (this.user.rank === 2) return 'rank-silver';
-    if (this.user.rank === 3) return 'rank-bronze';
+    if (this.item.rank === 1) return 'rank-gold';
+    if (this.item.rank === 2) return 'rank-silver';
+    if (this.item.rank === 3) return 'rank-bronze';
     return 'rank-standard'; 
   }
 

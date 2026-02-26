@@ -18,8 +18,8 @@ $transition-speed: 0.2s;
 .player-card-container {
   border-radius: $border-radius;
   transition: background-color $transition-speed;
-  border: 1px solid transparent; // Rezervacija mesta
-  position: relative; // Za svaki slučaj
+  border: 1px solid transparent;
+  position: relative; 
   display: flex;
   cursor: pointer;
   align-items: center;
@@ -31,7 +31,7 @@ $transition-speed: 0.2s;
   padding: 1rem;
   border: 1px solid #404040;
 
-  // Hover efekat na celu karticu (samo kad nismo u edit modu)
+
   &:hover {
     background: #333333;
     border-color: #ffffff;
@@ -40,7 +40,7 @@ $transition-speed: 0.2s;
     transform: translateX(4px);
     color: white;
 
-    // Kad pređemo mišem preko kartice, prikaži akcije u View Modu
+    
     .player-view .player-actions {}
 
   }
@@ -49,7 +49,7 @@ $transition-speed: 0.2s;
     outline: none;
   }
 
-  /* Ponekad browser to dodeli i na sam trenutak klika (:active) */
+
   &:active {
     outline: none;
   }

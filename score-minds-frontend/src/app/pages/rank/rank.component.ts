@@ -7,13 +7,13 @@ import { UserService } from "../../feature/users/user.service";
 import { SocketService } from "../../core/services/socket.service";
 import { UserLeaderboardDto } from "../../feature/users/data/user-leaderboard.dto";
 import { GroupLeaderboardDto } from "../../feature/groups/data/group-leaderboard.dto";
-import { UserListComponent } from "../../components/user-list/user-list.component";
+import { RankListComponent } from "../../components/rank-list/rank-list.component";
 import { GroupListComponent } from "../../components/group-list/group-list.component";
 
 @Component({
     selector: 'app-rank',
     standalone: true,
-    imports: [UserListComponent,CommonModule,NgIf   ],
+    imports: [RankListComponent,CommonModule,NgIf   ],
     templateUrl: './rank.component.html',
     styleUrl: './rank.component.scss'
 })

@@ -2,18 +2,18 @@ import { Component, Input } from "@angular/core";
 import { UserBaseDto } from "../../feature/users/data/user-base.dto";
 import { UserLeaderboardDto } from "../../feature/users/data/user-leaderboard.dto";
 import { NgIf, NgClass, DatePipe, NgFor } from "@angular/common";
-import { UserCardComponent } from "../user-card/user-card.component";
+import { RankCardComponent } from "../rank-card/rank-card.component";
 import { GroupLeaderboardDto } from "../../feature/groups/data/group-leaderboard.dto";
 
 
 @Component({
-    selector: 'app-user-list',
+    selector: 'app-rank-list',
     standalone: true,
-    imports: [NgIf,DatePipe,UserCardComponent,NgFor],
-    templateUrl: './user-list.component.html',
-    styleUrl: './user-list.component.scss'
+    imports: [NgIf,DatePipe,RankCardComponent,NgFor],
+    templateUrl: './rank-list.component.html',
+    styleUrl: './rank-list.component.scss'
 })
-export class UserListComponent {
+export class RankListComponent {
     @Input({required: true}) users!: (UserLeaderboardDto | GroupLeaderboardDto)[];
     
 }
