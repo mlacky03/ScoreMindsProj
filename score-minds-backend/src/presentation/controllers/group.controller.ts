@@ -59,7 +59,7 @@ export class GroupController {
     }
 
 
-    @UseGuards(JwtAuthGuard)
+   
     @Get("leaderboard")
     async findLeaderboard(): Promise<RankGroupDto[]> {
          const groups=await this.groupService.getLeaderboard();

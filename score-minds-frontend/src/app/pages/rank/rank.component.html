@@ -24,11 +24,11 @@
         <ng-template #loadedContent>
             
             <div class="tab-content" *ngIf="activeTab() === 'users'">
-                <app-user-list [users]="users()"></app-user-list>
+                <app-rank-list [users]="users()"></app-rank-list>
             </div>
 
             <div class="tab-content" *ngIf="activeTab() === 'groups'">
-                <app-user-list [users]="groups()"></app-user-list>
+                <app-rank-list [users]="groups()"></app-rank-list>
             </div>
 
             <!-- <div class="tab-content" *ngIf="activeTab() === 'groups'">

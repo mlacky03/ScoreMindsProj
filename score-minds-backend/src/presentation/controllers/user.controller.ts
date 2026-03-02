@@ -52,7 +52,7 @@ export class UserController {
         }));
     }
 
-    @UseGuards(JwtAuthGuard)
+    
     @Get("leaderboard")
     async findLeaderboard(): Promise<RankUserDto[]> {
         const users = await this.userService.getLeaderboard();
