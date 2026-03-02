@@ -22,7 +22,7 @@
         font-size: 2.5rem;
         font-weight: 700;
         margin: 0 0 0.5rem 0;
-        background: linear-gradient(135deg, #007F9F, #6f42c1);
+        background: linear-gradient(135deg, #2bb907, #6f42c1);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -57,11 +57,11 @@
   }
   
   &.primary {
-    background: linear-gradient(135deg, #007F9F, #005a7a);
+    background: linear-gradient(135deg, #2bb907, #1a6e05);
     color: #ffffff;
     
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, #005a7a, #004466);
+      background: linear-gradient(135deg, #1a6e05, #156301);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0, 127, 159, 0.3);
     }

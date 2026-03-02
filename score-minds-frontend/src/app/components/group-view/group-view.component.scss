@@ -132,11 +132,11 @@
       }
       
       &.primary {
-        background: linear-gradient(135deg, #007F9F, #005a7a);
+        background: linear-gradient(135deg, #2bb907, #1c7705);
         color: #ffffff;
         
         &:hover {
-          background: linear-gradient(135deg, #005a7a, #004466);
+          background: linear-gradient(135deg, #1c7705, #1c77059a);
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(0, 127, 159, 0.3);
         }
@@ -144,8 +144,8 @@
       
       &.secondary {
         background: transparent;
-        color: #007F9F;
-        border: 1px solid #007F9F;
+        color: #2bb907;
+        border: 1px solid #2bb907;
         
         &:hover {
           background: rgba(0, 127, 159, 0.1);
@@ -317,7 +317,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #007F9F, #6f42c1);
+    background: linear-gradient(135deg, #2bb907, #6f42c1);
     color: #ffffff;
     border: none;
     border-radius: 8px;

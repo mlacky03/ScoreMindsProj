@@ -43,7 +43,7 @@
                 h2 {
                     margin: 0;
                     font-size: 1.2rem;
-                    color:#007F9F;
+                    color:#2bb907;
                 }
 
                 .group-dropdown {
@@ -55,7 +55,7 @@
                     font-size: 1rem;
                     cursor: pointer;
                     outline: none;
-                    color:#007F9F;
+                    color:#2bb907;
 
                     &:focus {
                         border-color: var(--primary-color);
@@ -117,7 +117,7 @@
         width: 40px;
         height: 40px;
         border: 4px solid rgba(255, 255, 255, 0.1);
-        border-left-color: #3b82f6;
+        border-left-color: #2bb907;
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }

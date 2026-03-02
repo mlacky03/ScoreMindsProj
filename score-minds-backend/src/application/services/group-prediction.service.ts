@@ -195,9 +195,9 @@ export class GroupPredictionService {
 
         //await this.predictionAuditService.createUpdateAudit(snapshotBeforeUpdate, prediction);
 
-        const freshPrediction = await this.repo.findPredictionByGroupIdWithRelations(groupId, predictionId);
+        const freshPrediction = this.findOne(predictionId, groupId, userId);
 
-        return new FullPredictionDto(freshPrediction!, "");
+        return freshPrediction;
 
     }
     async deletePrediction(predictionId: number, groupId: number, userId: number): Promise<{ message: string }> {

@@ -2,7 +2,7 @@
 
     <div class="prediction-header">
         <div class="info-group" *ngIf="getMode() === 'group'">
-            <h3 class="owner-name">Creator:  {{ prediction()?.createdByName }}</h3>
+            <h3 class="owner-name">Creator: {{ prediction()?.createdByName }}</h3>
         </div>
         <div class="match-container">
 
@@ -36,24 +36,26 @@
                         Edit ✏️
                     </button>
 
-                    <div class="prediction-info">
-
+                    <div class="prediction-info" *ngIf="prediction()?.status">
                         <div class="status-side">
                             <span *ngIf="prediction()?.status === 'PROCESSED'; else pendingBadge"
                                 class="badge status-processed">
                                 Završeno
                             </span>
-
                             <ng-template #pendingBadge>
                                 <span class="badge status-pending">U toku</span>
                             </ng-template>
                         </div>
 
+                        <div class="points-divider" *ngIf="prediction()?.status === 'PROCESSED'"></div>
+
                         <div class="points-container" *ngIf="prediction()?.status === 'PROCESSED'">
                             <span class="label">Osvojeno</span>
-                            <span class="value">{{ prediction()?.totalPoints || 0 }}</span>
+                            <span class="value" [class.won]="(prediction()?.totalPoints || 0) > 0"
+                                [class.lost]="(prediction()?.totalPoints || 0) === 0">
+                                {{ prediction()?.totalPoints || 0 }}
+                            </span>
                         </div>
-
                     </div>
 
                 </div>
@@ -76,8 +78,16 @@
 
         </div>
 
-        <button *ngIf="getMode()==='personal' || (getMode()==='group' && getOwnerName()==currentUser()?.username)" class="btn-delete" [disabled]="match()?.status !== 'NS'" (click)="onDelete()" title="Delete Prediction">
-            Delete 🗑️
+        <button *ngIf="getMode()==='personal' || (getMode()==='group' && getOwnerName()==currentUser()?.username)"
+            class="btn-delete" [disabled]="match()?.status !== 'NS'" (click)="onDelete()" title="Delete Prediction">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+            Delete
         </button>
     </div>
 

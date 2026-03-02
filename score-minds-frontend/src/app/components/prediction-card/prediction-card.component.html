@@ -1,12 +1,13 @@
 <div class="prediction-card" (click)="handleClick()" tabindex="0" role="button" (keydown.enter)="handleClick()"
   [class.compact-mode]="compact" [class.points-won]="(prediction?.totalPoints || 0) > 0" [class.points-lost]="(prediction?.totalPoints || 0) === 0 && match?.status === 'FT'">
-  <div class="team-details">
+ 
+  <div class="team-container home">
+    <div class="team-details" >
     <span class="team-name" [class.winner-text]="prediction.winner === 'HOME'"
       [class.loser-text]="prediction.winner === 'AWAY'">
-      {{ match.homeTeamName }}
+      {{ compact ? match.homeTeamName?.slice(0, 3)?.toUpperCase() : match.homeTeamName }}
     </span>
   </div>
-  <div class="team-container home">
     <div class="team-logo">
       <img *ngIf="match.homeTeamLogo; else homeFallback" [src]="match.homeTeamLogo" alt="{{ match.homeTeamName }}"
         (error)="onImgError($event)" />
@@ -14,6 +15,7 @@
         <div class="fallback-icon">🛡️</div>
       </ng-template>
     </div>
+
     <div class="score-badge" [class.winner-bg]="prediction?.winner === 'HOME'"
       *ngIf="prediction?.predictedHomeScore !== undefined">
       {{ prediction?.predictedHomeScore===null ?'X': prediction?.predictedHomeScore }}
@@ -34,7 +36,7 @@
     </div>
   </div>
 
-  <div class="team-container away">
+  <div class="team-container away" >
     <div class="score-badge" [class.winner-bg]="prediction?.winner === 'AWAY'"
       *ngIf="prediction?.predictedAwayScore !== undefined">
       {{ prediction?.predictedAwayScore===null ? 'X': prediction?.predictedAwayScore }}
@@ -42,7 +44,7 @@
     <div class="team-details">
       <span class="team-name" [class.winner-text]="prediction?.winner === 'AWAY'"
         [class.loser-text]="prediction?.winner === 'HOME'">
-        {{ match.awayTeamName }}
+        {{ compact ? match.awayTeamName?.slice(0, 3)?.toUpperCase() : match.awayTeamName }}
       </span>
 
     </div>
@@ -55,6 +57,7 @@
       </ng-template>
     </div>
   </div>
+  
 
   <div class="card-arrow" *ngIf="!compact">
     <span class="arrow-icon">→</span>

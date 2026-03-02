@@ -1,6 +1,6 @@
 .prediction-card {
-  position: relative; 
-  overflow: hidden;   
+  position: relative;
+  overflow: hidden;
   background: #1e1e1e;
   border-radius: 12px;
   cursor: pointer;
@@ -9,11 +9,11 @@
 
   // --- 1. DEFAULT STATE (GRID / KOCKA) ---
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  min-height: 220px; 
+  min-height: 220px;
   gap: 15px;
 
   &:hover {
@@ -21,26 +21,28 @@
     border-color: rgba(255, 255, 255, 0.1);
     transform: translateY(-4px);
   }
+
   &.points-won {
-    border-color: #28a745 !important; 
-    background-color: rgba(40, 167, 69, 0.1) !important; 
-    
+    border-color: #28a745 !important;
+    background-color: rgba(40, 167, 69, 0.1) !important;
+
 
     box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.05);
 
     &:hover {
-        background-color: rgba(40, 167, 69, 0.15) !important; 
+      background-color: rgba(40, 167, 69, 0.15) !important;
     }
   }
+
   &.points-lost {
     border-color: #dc3545 !important;
-    background-color: rgba(220, 53, 69, 0.1) !important; 
-    
-    
-    
-    
+    background-color: rgba(220, 53, 69, 0.1) !important;
+
+
+
+
     &:hover {
-        background-color: rgba(220, 53, 69, 0.15) !important;
+      background-color: rgba(220, 53, 69, 0.15) !important;
     }
   }
 
@@ -53,22 +55,22 @@
     left: 0;
     width: 100%;
     height: 100%;
-    
- 
-    background-color: rgba(18, 18, 18, 0.75); 
-    backdrop-filter: blur(6px); 
-    
+
+
+    background-color: rgba(18, 18, 18, 0.75);
+    backdrop-filter: blur(6px);
+
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 12px;
-    
-    
+
+
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-    z-index: 10; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
 
     .overlay-btn {
       display: flex;
@@ -83,41 +85,45 @@
       cursor: pointer;
       width: 170px;
       transition: transform 0.2s ease, background-color 0.2s ease;
-      
+
       &.view-btn {
-        background-color: #3b82f6; 
+        background-color: #3b82f6;
         color: white;
-        
-        &:hover { background-color: #2563eb; }
+
+        &:hover {
+          background-color: #2563eb;
+        }
       }
 
       &.audit-btn {
-        background-color: #374151; 
+        background-color: #374151;
         color: white;
         border: 1px solid #4b5563;
-        
-        &:hover { background-color: #4b5563; }
+
+        &:hover {
+          background-color: #4b5563;
+        }
       }
 
       &:active {
-        transform: scale(0.95); 
+        transform: scale(0.95);
       }
     }
   }
 
-  
+
   &:not(.compact-mode):hover {
     .hover-overlay {
       opacity: 1;
       visibility: visible;
     }
   }
- 
 
- 
+
+
   .team-container {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -125,27 +131,32 @@
     gap: 8px;
 
     .team-logo {
-      width: 60px; 
+      width: 60px;
       height: 60px;
       object-fit: contain;
-      img { width: 100%; height: 100%; object-fit: contain; }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
     }
-    
+
     .score-badge {
       font-size: 1.2rem;
       font-weight: 800;
       color: #fff;
-      background: #333; 
+      background: #333;
       padding: 4px 12px;
-      border-radius: 8px; 
+      border-radius: 8px;
       border: 1px solid #444;
       min-width: 40px;
       text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
-      
+
       &.winner-bg {
-        background: #166534; 
+        background: #166534;
         border-color: #22c55e;
         color: #fff;
       }
@@ -162,9 +173,9 @@
     }
 
     .prediction-score {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #ddd;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ddd;
     }
   }
 
@@ -190,56 +201,79 @@
     }
   }
 
-  .card-arrow { display: none; } 
+  .card-arrow {
+    display: none;
+  }
 
-  
+
   &.compact-mode {
-    flex-direction: row; 
+    flex-direction: row;
     justify-content: space-between;
     padding: 10px 15px;
-    min-height: auto; 
+    min-height: auto;
     gap: 10px;
 
-    
+
     &:hover {
       transform: none;
       background: #2a2a2a;
     }
 
-    
+
     .team-container {
-      flex-direction: row; 
+      flex-direction: row;
       width: auto;
       gap: 10px;
-      
-      
-      &.away { flex-direction: row-reverse; text-align: right; }
-      &.home { text-align: left; }
+
+
+      &.away {
+        text-align: right;
+      }
+
+      &.home {
+        .team-logo {
+          order: 1;
+        }
+        .team-details {
+          order: 2;
+        }
+        .score-badge {
+          order: 3;
+        }
+        text-align: left;
+      }
 
       .team-logo {
-        width: 30px; 
+        width: 30px;
         height: 30px;
       }
 
       .team-name {
         font-size: 0.85rem;
-        max-width: 70px; 
+        max-width: 70px;
       }
-      
+
       .prediction-score {
-          font-size: 1rem;
+        font-size: 1rem;
       }
+
       .score-badge {
-        font-size: 1rem; 
+        font-size: 1rem;
         padding: 2px 8px;
         min-width: 30px;
       }
     }
 
-    
+
     .match-center {
-      .vs-badge { font-size: 0.9rem; margin: 0; }
-      .match-meta { display: none; } 
+      .vs-badge {
+        font-size: 0.9rem;
+        margin: 0;
+      }
+
+      .match-meta {
+        display: none;
+      }
     }
   }
 }

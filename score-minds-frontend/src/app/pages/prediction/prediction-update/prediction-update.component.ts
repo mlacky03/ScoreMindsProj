@@ -229,7 +229,8 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
     p.predictedAwayScore = (formValue.predictedAwayScore === '-' || formValue.predictedAwayScore === ' ') ? undefined : Number(formValue.predictedAwayScore);
     p.predictedHomeScore = (formValue.predictedHomeScore === '-' || formValue.predictedHomeScore === ' ') ? undefined : Number(formValue.predictedHomeScore);
     p.winner = formValue.predictedWinner!;
-    p.events = formValue.events as unknown as PredictionEventUpdateDto[];
+    p.events = formValue.events as unknown as PredictionEventUpdateDto[]; 
+
     this.activePredictionService(p).subscribe({
       next: (prediction: any) => {
         this.isSaved = true;
