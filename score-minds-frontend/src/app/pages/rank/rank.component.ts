@@ -32,7 +32,9 @@ export class RankComponent implements OnInit, OnDestroy {
     activeTab = signal<'users' | 'groups'>('users');
 
     ngOnInit() {
-        this.store.dispatch(RankActions.loadLeaderboards());
+        const hasUsers = this.users().length > 0;
+        if(!hasUsers)
+            this.store.dispatch(RankActions.loadLeaderboards());
     }
 
     
