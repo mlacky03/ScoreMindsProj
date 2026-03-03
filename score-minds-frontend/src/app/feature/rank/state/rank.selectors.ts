@@ -1,5 +1,7 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { RankState, userRankAdapter, groupRankAdapter } from './rank.reducer';
+import { GroupLeaderboardDto } from '../../groups/data/group-leaderboard.dto';
+import { UserLeaderboardDto } from '../../users/data/user-leaderboard.dto';
 
 export const selectRankState = createFeatureSelector<RankState>('rank');
 
@@ -15,13 +17,14 @@ export const selectRankGroupsState = createSelector(
 
 export const selectAllRankUsers = createSelector(
   selectRankUsersState,
-  userRankAdapter.getSelectors().selectAll
+  (state): UserLeaderboardDto[] => userRankAdapter.getSelectors().selectAll(state)
 );
 
 export const selectAllRankGroups = createSelector(
   selectRankGroupsState,
-  groupRankAdapter.getSelectors().selectAll
-);
+  (state): GroupLeaderboardDto[] => groupRankAdapter.getSelectors().selectAll(state)
+);    
+
 
 export const selectRankLoading = createSelector(
   selectRankState,

@@ -7,6 +7,8 @@ import { UserDto } from "./data/user.dto";
 import { UserUpdateDto } from "./data/user-update.dto";
 import { catchError } from "rxjs";
 import { ErrorService } from "../../core/services/error.service";
+import { UserLeaderboardDto } from "./data/user-leaderboard.dto";
+import { GroupLeaderboardDto } from "../groups/data/group-leaderboard.dto";
 
 @Injectable({
     providedIn: 'root'

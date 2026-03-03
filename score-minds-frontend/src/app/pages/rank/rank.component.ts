@@ -1,14 +1,8 @@
 import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
-import { CommonModule, NgClass, NgIf } from "@angular/common";
+import { CommonModule,  NgIf } from "@angular/common";
 import { forkJoin, Subscription } from "rxjs";
 
-import { GroupService } from "../../feature/groups/group.service";
-import { UserService } from "../../feature/users/user.service";
-import { SocketService } from "../../core/services/socket.service";
-import { UserLeaderboardDto } from "../../feature/users/data/user-leaderboard.dto";
-import { GroupLeaderboardDto } from "../../feature/groups/data/group-leaderboard.dto";
 import { RankListComponent } from "../../components/rank-list/rank-list.component";
-import { GroupListComponent } from "../../components/group-list/group-list.component";
 import { Store } from "@ngrx/store";
 import { selectAllRankGroups, selectAllRankUsers, selectRankLoading } from "../../feature/rank/state/rank.selectors";
 import { RankActions } from "../../feature/rank/state/rank.actions";
@@ -32,14 +26,13 @@ export class RankComponent implements OnInit, OnDestroy {
     activeTab = signal<'users' | 'groups'>('users');
 
     ngOnInit() {
-        const hasUsers = this.users().length > 0;
-        if(!hasUsers)
-            this.store.dispatch(RankActions.loadLeaderboards());
+        this.store.dispatch(RankActions.loadLeaderboards());
     }
 
     
     switchTab(tab: 'users' | 'groups') {
         this.activeTab.set(tab);
+        console.log(this.users());
     }
 
     ngOnDestroy(): void {
