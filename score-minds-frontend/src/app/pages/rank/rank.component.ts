@@ -9,6 +9,9 @@ import { UserLeaderboardDto } from "../../feature/users/data/user-leaderboard.dt
 import { GroupLeaderboardDto } from "../../feature/groups/data/group-leaderboard.dto";
 import { RankListComponent } from "../../components/rank-list/rank-list.component";
 import { GroupListComponent } from "../../components/group-list/group-list.component";
+import { Store } from "@ngrx/store";
+import { selectAllRankGroups, selectAllRankUsers, selectRankLoading } from "../../feature/rank/state/rank.selectors";
+import { RankActions } from "../../feature/rank/state/rank.actions";
 
 @Component({
     selector: 'app-rank',
@@ -18,40 +21,18 @@ import { GroupListComponent } from "../../components/group-list/group-list.compo
     styleUrl: './rank.component.scss'
 })
 export class RankComponent implements OnInit, OnDestroy {
-    private groupService = inject(GroupService);
-    private userService = inject(UserService);
-    private socketService = inject(SocketService);
+    private store = inject(Store);
     private sub = new Subscription();
 
-    users = signal<UserLeaderboardDto[]>([]);
-    groups = signal<GroupLeaderboardDto[]>([]);
+    users = this.store.selectSignal(selectAllRankUsers);
+    groups = this.store.selectSignal(selectAllRankGroups);
+    loading = this.store.selectSignal(selectRankLoading);   
     
     
     activeTab = signal<'users' | 'groups'>('users');
-    loading = signal(true);
 
     ngOnInit() {
-        this.loading.set(true);
-        
-        
-        this.sub.add(
-            forkJoin({
-                users: this.userService.getLeaderboard(),
-                groups: this.groupService.getLeaderboard()
-            }).subscribe({
-                next: (res) => {
-                    this.users.set(res.users as UserLeaderboardDto[]);
-                    this.groups.set(res.groups as GroupLeaderboardDto[]);
-                    console.log(this.users());
-                    console.log(this.groups());
-                    this.loading.set(false); 
-                },
-                error: (err) => {
-                    console.error('Greška pri učitavanju tabele', err);
-                    this.loading.set(false);
-                }
-            })
-        );
+        this.store.dispatch(RankActions.loadLeaderboards());
     }
 
     

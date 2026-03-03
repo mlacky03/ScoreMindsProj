@@ -8,13 +8,15 @@ import { provideState, provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { authReducer } from './core/auth/state/auth.reducer';
 import { AuthEffects } from './core/auth/state/auth.effects';
+import { RankEffects } from './feature/rank/state/rank.effects';
+import { rankReducer } from './feature/rank/state/rank.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideStore({auth: authReducer}),
-    provideEffects(AuthEffects),
+    provideStore({auth: authReducer,rank:rankReducer}),
+    provideEffects(AuthEffects,RankEffects),
 ],
 };

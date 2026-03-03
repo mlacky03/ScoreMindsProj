@@ -13,19 +13,19 @@ export class AuthEffects {
   private tokens = inject(TokenState);
   private router = inject(Router);
 
-  //On login: set token and load user
+ 
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.login),
-      //exhaustMap to prevent multiple login requests
+      
       exhaustMap(({ email, password }) =>
         this.api.login({ email, password }).pipe(
           tap((t: any) =>
             this.tokens.setToken(t.accessToken ?? t.access_token)
           ),
-          //load user
+          
           switchMap(() => this.api.me()),
-          //dispatch login success and load user success
+         
           switchMap((user) =>
             of(
               AuthActions.loginSuccess({
@@ -46,7 +46,7 @@ export class AuthEffects {
     )
   );
 
-  //On load user: load current user
+  
   loadMe$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loadUser),
@@ -61,7 +61,7 @@ export class AuthEffects {
     )
   );
 
-//On load user success: navigate to the current url or to the root url
+
 navigateAfterLogin$ = createEffect(
   () =>
     this.actions$.pipe(
@@ -86,17 +86,17 @@ navigateAfterLogin$ = createEffect(
   { dispatch: false }
 );
 
-  //On init: load user if token exists
+ 
   init$ = createEffect(() =>
     of(this.tokens.accessToken()).pipe(
-      //only dispatch if we actually have a token
+      
       map((t) => !!t),
       filter(Boolean),
       map(() => AuthActions.loadUser())
     )
   );
 
-  //On logout: clear tokens and go to /login
+  
   logout$ = createEffect(
     () =>
       this.actions$.pipe(
