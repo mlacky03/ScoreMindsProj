@@ -12,6 +12,7 @@ import {
     Patch,
     Post,
     Put,
+    Query,
     UploadedFile,
     UseGuards,
     UseInterceptors,
@@ -41,8 +42,11 @@ export class PersonalPredictionController {
 
     @Get('all')
     @UseGuards(JwtAuthGuard)
-    async findAll(@CurrentUser() id: number):Promise<BasePredictionDto[]> {
-        const predictions = await this.predictionService.findAll(id);
+    async findAll(@CurrentUser() id: number,@Query('page') page: string,
+        @Query('size') size: string,@Query('mode') mode:string):Promise<BasePredictionDto[]> {
+        const pageNumber = page ? parseInt(page, 10) : 1;
+        const sizeNumber = size ? parseInt(size, 10) : 10;
+        const predictions = await this.predictionService.findAll(id,pageNumber,sizeNumber,mode);
         return predictions;
     }
 

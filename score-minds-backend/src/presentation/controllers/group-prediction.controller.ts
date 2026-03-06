@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { JwtAuthGuard } from "src/common/guards/jwt-auth.guard";
@@ -24,8 +24,11 @@ export class GroupPredictionController {
 
     @Get('all/:groupId')
     @UseGuards(JwtAuthGuard)
-    async findAll(@CurrentUser() id: number, @Param('groupId') groupId: number):Promise<BasePredictionDto[]> {
-        const predictions = await this.groupPredictionService.findAll(groupId,id);
+    async findAll(@CurrentUser() id: number, @Param('groupId') groupId: number,@Query('page') page: string,
+            @Query('size') size: string,@Query('mode') mode:string):Promise<BasePredictionDto[]> {
+        const pageNumber = page ? parseInt(page, 10) : 1;
+        const sizeNumber = size ? parseInt(size, 10) : 10;
+        const predictions = await this.groupPredictionService.findAll(groupId,id,pageNumber,sizeNumber,mode);
         return predictions;
     }
 

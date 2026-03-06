@@ -1,19 +1,25 @@
+$primary: #2bb907;
+$bg-dark: #000000;
+$surface: #000000;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
 .layout-container {
     display: flex;
-    height: 100vh;
+    min-height: 90vh;
     width: 100%;
     overflow: visible;
     transition: all 0.3s ease;
     margin-top: 12px;
-    background-color: #121212;
-   
+
+
 
     .list-panel {
         width: 100%;
         height: 100%;
-        background-color: #121212;
-        
-        
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+
         &::-webkit-scrollbar {
             width: 8px;
         }
@@ -29,21 +35,26 @@
 
         .group-selector-header {
             padding: 16px;
-            background-color: var(--bg-surface);            
+            background-color: var(--bg-surface);
             border-bottom: 1px solid var(--border-color);
-            position: sticky;         
+            position: sticky;
             top: 0;
+            display: flex;
+
+            flex-direction: row;
             z-index: 10;
+
 
             .header-content {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                margin-right: 10px;
 
                 h2 {
                     margin: 0;
                     font-size: 1.2rem;
-                    color:#2bb907;
+                    color: #2bb907;
                 }
 
                 .group-dropdown {
@@ -55,11 +66,40 @@
                     font-size: 1rem;
                     cursor: pointer;
                     outline: none;
-                    color:#2bb907;
+                    color: #2bb907;
 
                     &:focus {
                         border-color: var(--primary-color);
-                        
+
+                    }
+                }
+            }
+
+            .filter-tabs {
+                display: flex;
+                gap: 0.5rem;
+
+                button {
+                    flex: 1;
+                    padding: 0.75rem 1rem;
+                    border: none;
+                    background: transparent;
+                    color: #94a3b8;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: $transition;
+                    white-space: nowrap;
+
+                    &:hover {
+                        background: rgba(255, 255, 255, 0.05);
+                        color: white;
+                    }
+
+                    &.active {
+                        background: $primary;
+                        color: $bg-dark;
+                        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
                     }
                 }
             }
@@ -68,9 +108,48 @@
         app-prediction-list {
             display: block;
             width: 100%;
-            min-height: 100%;
-           
-           
+            flex: 1;
+
+
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+
+            .page-info {
+                font-size: 0.875rem;
+                color: #94a3b8;
+                font-weight: 500;
+            }
+
+            .page-btn {
+                background: #1e293b;
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+
+                &:hover:not(:disabled) {
+                    background: #10b981; // Fudbalska zelena na hover
+                    color: #0f172a;
+                    border-color: #10b981;
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                    background: transparent;
+                }
+            }
         }
     }
 
@@ -87,16 +166,16 @@
     // --- 2. SPLIT STANJE (SIDEBAR MODE) ---
     &.is-split-view {
 
-       
+
         .list-panel {
             width: 400px;
             flex-shrink: 0;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
 
-            
+
         }
 
-       
+
         .detail-panel {
             flex: 1;
             width: auto;
@@ -110,7 +189,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%; 
+    height: 100%;
     width: 100%;
 
     .spinner {
@@ -136,7 +215,7 @@
             display: none;
         }
 
-        
+
         .detail-panel {
             width: 100%;
             flex: none;

@@ -24,7 +24,6 @@ export class GroupPredictionService {
         private readonly repo: GroupPredictionRepository,
         private readonly predictionEventService: PredictionEventService,
         private readonly matchService: MatchService,
-        private readonly predictionAuditService: PredictionAuditService,
         private readonly playerService: PlayerService,
         private readonly groupService: GroupService,
         private readonly userService: UserService,
@@ -32,11 +31,17 @@ export class GroupPredictionService {
         private readonly rabbitClient: ClientProxy,
     ) { }
 
-    async findAll(id: number, userId: number): Promise<BasePredictionDto[]> {
+    async findAll(id: number, userId: number, page: number, size: number, mode: string): Promise<BasePredictionDto[]> {
         await this.groupService.chackMembership(userId, id);
-        const res = await this.repo.findByGroupId(id);
-
+        let res: GroupPrediction[];
+        if(mode=='upcoming'){
+            res = await this.repo.findByGroupIdUpcoming(id, page, size);
+        }
+        else {
+            res = await this.repo.findByGroupIdHistory(id, page, size);
+        }
         return res.map((p) => new BasePredictionDto(p));
+        
     }
 
     async createPrediction(groupId: number, prediction: CreatePredictionDto, userId: number): Promise<FullPredictionDto> {

@@ -1,9 +1,8 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, effect, inject, signal } from "@angular/core";
 import { PredictionListComponent } from "../../../components/prediction-list/predicton-list.component";
 import { PredictionViewComponent } from "../../../components/prediction-view/prediction-view.component";
 import { CommonModule, NgIf } from "@angular/common";
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from "@angular/router";
-import { BaseUserPredictionDto } from "../../../feature/predictions/personal-predictions/data/base-p-prediction.dto";
 import { MatchBaseDto } from "../../../feature/match/data/match-base.dto";
 import { filter, finalize, forkJoin, of, Subscription, switchMap, tap } from "rxjs";
 import { MatchService } from "../../../feature/match/match.service";
@@ -12,7 +11,6 @@ import { GroupPredictionService } from "../../../feature/predictions/group-predi
 import { BaseGroupPredictionDto } from "../../../feature/predictions/group-predictions/data/base-g-predicton.dto";
 import { GroupBaseDto } from "../../../feature/groups/data/group-base.dto";
 import { GroupService } from "../../../feature/groups/group.service";
-import { FullGroupPredictionDto } from "../../../feature/predictions/group-predictions/data/full-g-predicton.dto";
 
 
 @Component({
@@ -30,12 +28,18 @@ export class PredictionAllComponent {
     private router = inject(Router);
     private updateSub = new Subscription();
     private socketService = inject(SocketService);
+    private activeMatchRooms: number[] = [];
 
     predictions = signal<BaseGroupPredictionDto[]>([]);
     matches = signal<MatchBaseDto[]>([]);
     selectedPredictionId = signal<number | null>(null);
     groups = signal<GroupBaseDto[]>([])
     selectedGroupId = signal<number | null>(null);
+
+    page = signal<number>(1);
+    pageSize = signal<number>(8);
+    totalItems = signal<number>(0);
+    filterMode = signal<'upcoming' | 'history'>('upcoming');
 
     loading = signal(true);
     isDetailsOpen = signal(false);
@@ -51,6 +55,12 @@ export class PredictionAllComponent {
         if (routerState && routerState['passedGroupId']) {
             this.selectedGroupId.set(routerState['passedGroupId']);
         }
+        effect(() => {
+
+            this.fetchData();
+            
+
+        }, { allowSignalWrites: true });        
     }
 
     ngOnInit() {
@@ -103,8 +113,6 @@ export class PredictionAllComponent {
         );
        
 
-        this.socketService.joinRoom('all_matches_list');
-
 
 
 
@@ -127,6 +135,13 @@ export class PredictionAllComponent {
                 );
             })
         );
+        
+        
+
+    }
+
+    fetchData()
+    {
         this.loading.set(true);
         this.groupService.searchGroups().subscribe({
             next: (groups) => {
@@ -137,9 +152,10 @@ export class PredictionAllComponent {
                     const defaultGroupId = groups[0].id;
                     if (this.selectedGroupId() === null) {
                         this.selectedGroupId.set(defaultGroupId);
+                        this.socketService.joinRoom('all_predictions_list_' + this.selectedGroupId());
+
                     }
 
-                    this.socketService.joinRoom(`all_predictions_list_${defaultGroupId}`);
                     this.loadDataForGroup(this.selectedGroupId()!);
                 } else {
 
@@ -151,8 +167,6 @@ export class PredictionAllComponent {
                 this.loading.set(false);
             }
         });
-        
-
     }
     
     onGroupChange(newGroupIdStr: string | number) {
@@ -171,16 +185,26 @@ export class PredictionAllComponent {
         this.predictions.set([]);
         this.matches.set([]);
 
-
+        this.page.set(1);
         this.loadDataForGroup(newGroupId);
     }
+    changePage(step: number) {
+        const newPage = this.page() + step;
 
+
+        if (newPage > 0) {
+            this.page.set(newPage);
+
+
+            this.loadDataForGroup(this.selectedGroupId()!);
+        }
+    }
 
     loadDataForGroup(groupId: number) {
         this.loading.set(true);
 
 
-        this.predictionService.getAllPrediction(groupId)
+        this.predictionService.getAllPrediction(groupId, this.page(), this.pageSize(), this.filterMode())
             .pipe(
                 tap((predictions) => {
                     this.predictions.set(predictions);
@@ -200,12 +224,23 @@ export class PredictionAllComponent {
             .subscribe({
                 next: (matches) => {
                     this.matches.set(matches as MatchBaseDto[]);
+                    this.matches.set(matches as MatchBaseDto[]);
+                    if (this.activeMatchRooms.length > 0) {
+                        this.socketService.leaveMatchRooms(this.activeMatchRooms);
+                        this.activeMatchRooms = [];
+                    }
+                    if (this.filterMode() === 'upcoming') {
+                        const newMatchIds = matches.map((m: any) => m.id);
+                        this.socketService.joinMatchRooms(newMatchIds);
+                        this.activeMatchRooms = newMatchIds;
+                    }
                 },
                 error: (error) => {
                     console.error('Error loading group data:', error);
                 }
             });
     }
+   
 
     onActivate() {
         this.isDetailsOpen.set(true);
@@ -234,7 +269,9 @@ export class PredictionAllComponent {
         if (this.updateSub) {
             this.updateSub.unsubscribe();
         }
-        this.socketService.leaveRoom('all_matches_list');
+        if (this.activeMatchRooms.length > 0) {
+            this.socketService.leaveMatchRooms(this.activeMatchRooms);
+        }
         this.socketService.leaveRoom(`all_predictions_list_${this.selectedGroupId()}`);
     }
 

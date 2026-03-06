@@ -1,19 +1,28 @@
 <div class="layout-container" [class.is-split-view]="isDetailsOpen()">
 
-    <div class="list-panel" >
-        
+    <div class="list-panel">
+
         <div class="group-selector-header" *ngIf="groups().length > 0">
             <div class="header-content">
-                <h2>Predikcije grupe</h2>
-                <select 
-                    class="group-dropdown" 
-                    [value]="selectedGroupId()" 
-                    (change)="onGroupChange($any($event.target).value)"
-                    >
-                    <option *ngFor="let group of groups()" [value]="group.id" [selected]="group.id === selectedGroupId()">
+                <select class="group-dropdown" [value]="selectedGroupId()"
+                    (change)="onGroupChange($any($event.target).value)">
+                    <option *ngFor="let group of groups()" [value]="group.id"
+                        [selected]="group.id === selectedGroupId()">
                         {{ group.name }}
                     </option>
                 </select>
+            </div>
+            <div class="filter-header">
+                <div class="filter-tabs">
+                    <button [class.active]="filterMode() === 'upcoming'"
+                        (click)="filterMode.set('upcoming'); page.set(1)">
+                        <i class="icon-calendar"></i> upcoming
+                    </button>
+                    <button [class.active]="filterMode() === 'history'"
+                        (click)="filterMode.set('history'); page.set(1)">
+                        <i class="icon-history"></i> history
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -26,6 +35,18 @@
                 (predictionSelected)="onSelect($event.predictionId, $event.matchId)"
                 [currentGroupId]="getSelectedGroupId()">
             </app-prediction-list>
+
+            <div class="pagination-controls">
+                <button class="page-btn" [disabled]="page() === 1" (click)="changePage(-1)">
+                    <i class="icon-arrow-left"></i> Nazad
+                </button>
+
+                <span class="page-info">Strana {{ page() }}</span>
+
+                <button class="page-btn" [disabled]="predictions().length < pageSize()" (click)="changePage(1)">
+                    Napred <i class="icon-arrow-right"></i>
+                </button>
+            </div>
         </ng-template>
     </div>
 

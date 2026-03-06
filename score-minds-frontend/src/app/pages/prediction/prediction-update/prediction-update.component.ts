@@ -83,7 +83,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
           }
         })
       );
-
+     
       this.subs.add(
         this.socketService.on('live_form_update').subscribe((newData: any) => {
           this.form.patchValue(newData, { emitEvent: false });
@@ -106,6 +106,10 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
         })
       );
     }
+     else{
+        this.hasLock=true;
+      }
+
     if (this.prediction.predictedEvents) {
       this.prediction.predictedEvents.forEach(event => {
         this.addEventToForm(event);
@@ -121,7 +125,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
     const currentLength = this.eventsArray.length;
     const incomingLength = incomingEvents.length;
 
-    // Ako je neko dodao novi event, mi moramo da dodamo novi FormGroup u naš FormArray
+   
     if (currentLength < incomingLength) {
       for (let i = currentLength; i < incomingLength; i++) {
         this.eventsArray.push(this.fb.group({
@@ -133,7 +137,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
         this.editingStates.push(false);
       }
     }
-    // Ako je neko obrisao event, moramo da ga obrišemo i kod nas
+   
     else if (currentLength > incomingLength) {
       for (let i = currentLength - 1; i >= incomingLength; i--) {
         this.eventsArray.removeAt(i, { emitEvent: false });
@@ -141,7 +145,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Kada smo sigurni da imamo isti broj redova, primeni nove vrednosti
+    
     this.eventsArray.patchValue(incomingEvents, { emitEvent: false });
   }
   filterPlayers(searchTerm: string | null) {
@@ -289,14 +293,14 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
   }
 
   private restoreOriginalState() {
-    // 1. Vrati prosta polja na original
+    
     this.form.patchValue({
       predictedAwayScore: this.prediction.predictedAwayScore ?? '-',
       predictedHomeScore: this.prediction.predictedHomeScore ?? '-',
       predictedWinner: this.prediction.winner ?? ''
     }, { emitEvent: false });
 
-    // 2. Očisti trenutni FormArray i vrati originalne događaje
+    
     this.eventsArray.clear({ emitEvent: false });
     this.editingStates = [];
 
@@ -312,7 +316,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
       });
     }
 
-    // 3. Emituj ovaj "očišćen" originalni state svima u sobi
+    
     this.socketService.emit('form_value_changed', {
       predictionId: this.data.prediction.id,
       data: this.form.getRawValue()

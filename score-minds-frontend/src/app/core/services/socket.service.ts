@@ -108,7 +108,7 @@ export class SocketService {
       });
     });
   }
-  onPredictionListUpdate():Observable<any>{
+  onPredictionListUpdate(): Observable<any> {
     console.log("uso sam u socket");
     return new Observable(observer => {
       if (!this.socket) return;
@@ -118,8 +118,7 @@ export class SocketService {
       });
     });
   }
-  onPersonalListUpdate():Observable<any>
-  {
+  onPersonalListUpdate(): Observable<any> {
     return new Observable(observer => {
       if (!this.socket) return;
       this.socket.on('personal-list-changed', (data) => {
@@ -128,8 +127,25 @@ export class SocketService {
     });
   }
 
+  joinMatchRooms(matchIds: number[]) {
+    if (!matchIds || matchIds.length === 0) return;
+
+    const roomsToJoin = matchIds
+      .map(id => `match_${id}`)
+
+    this.socket?.emit('join_match_rooms', roomsToJoin);
+  }
+
+  leaveMatchRooms(matchIds: number[]) {
+    if (!matchIds || matchIds.length === 0) return;
+
+    const roomsToLeave = matchIds.map(id => `match_${id}`);
+
+    this.socket?.emit('leave_match_rooms', roomsToLeave);
+  }
+
   onAddedToGroup(): Observable<any> {
-    return this.on('added_to_group'); 
+    return this.on('added_to_group');
   }
 
   joinRoom(roomName: string) {

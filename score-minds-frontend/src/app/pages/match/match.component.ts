@@ -43,16 +43,16 @@ export class MatchComponent implements OnInit, OnDestroy {
     hasMore = signal<boolean>(true);
 
 
-    paginatedMatches = computed(() => {
-        const matches = this.displayedMatches();
-        const startIndex = (this.currentPage() - 1) * this.itemsPerPage();
-        const endIndex = startIndex + this.itemsPerPage();
-        return matches.slice(startIndex, endIndex);
-    });
+    // paginatedMatches = computed(() => {
+    //     const matches = this.displayedMatches();
+    //     const startIndex = (this.currentPage() - 1) * this.itemsPerPage();
+    //     const endIndex = startIndex + this.itemsPerPage();
+    //     return matches.slice(startIndex, endIndex);
+    // });
 
-    totalPages = computed(() => {
-        return Math.ceil(this.displayedMatches().length / this.itemsPerPage());
-    });
+    // totalPages = computed(() => {
+    //     return Math.ceil(this.displayedMatches().length / this.itemsPerPage());
+    // });
 
     ngOnInit() {
         this.loadMatches();

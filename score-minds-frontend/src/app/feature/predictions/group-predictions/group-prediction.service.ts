@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../../environment/environment";
 import { ErrorService } from "../../../core/services/error.service";
@@ -29,8 +29,9 @@ export class GroupPredictionService {
         this.predictionDeletedSource.next(predictionId);
     }
 
-    getAllPrediction(groupId: number) {
-        return this.http.get<BaseGroupPredictionDto[]>(`${this.base}/group-predictions/all/${groupId}`).pipe(
+    getAllPrediction(groupId: number,page:number,totalSize:number,mode:string) {
+        let params = new HttpParams().set('page', page).set('size', totalSize).set('mode', mode);
+        return this.http.get<BaseGroupPredictionDto[]>(`${this.base}/group-predictions/all/${groupId}`, { params }).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }

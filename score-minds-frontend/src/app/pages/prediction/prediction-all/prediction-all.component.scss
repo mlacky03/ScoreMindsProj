@@ -1,18 +1,61 @@
+$primary: #2bb907;
+$bg-dark: #0f172a;
+$surface: #1e293b;
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
 .layout-container {
     display: flex;
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
-    overflow: visible;
+    overflow: hidden;
     transition: all 0.3s ease;
     margin-top: 12px;
+
     // --- 1. DEFAULT STANJE (GRID MODE) ---
     .list-panel {
         width: 100%;
         height: 100%;
-        background-color: #121212;
-      
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
 
-     
+        .filter-header {
+            margin-bottom: 1.5rem;
+            background: #121212;
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+            .filter-tabs {
+                display: flex;
+                gap: 0.5rem;
+
+                button {
+                    flex: 1;
+                    padding: 0.75rem 1rem;
+                    border: none;
+                    background: transparent;
+                    color: #94a3b8;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: $transition;
+                    white-space: nowrap;
+
+                    &:hover {
+                        background: rgba(255, 255, 255, 0.05);
+                        color: white;
+                    }
+
+                    &.active {
+                        background: $primary;
+                        color: $bg-dark;
+                        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+                    }
+                }
+            }
+        }
+
         &::-webkit-scrollbar {
             width: 8px;
         }
@@ -29,10 +72,52 @@
         app-prediction-list {
             display: block;
             width: 100%;
-            min-height: 100%;
-        
+            flex: 1;
+
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            .page-info {
+                font-size: 0.875rem;
+                color: #94a3b8;
+                font-weight: 500;
+            }
+
+            .page-btn {
+                background: #1e293b;
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 0.5rem 1rem;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+
+                &:hover:not(:disabled) {
+                    background: #10b981; // Fudbalska zelena na hover
+                    color: #0f172a;
+                    border-color: #10b981;
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                    background: transparent;
+                }
+            }
         }
     }
+
+
+
+
 
     .detail-panel {
         width: 0;
@@ -43,16 +128,18 @@
         transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.2s ease;
     }
 
+
+
     // --- 2. SPLIT STANJE (SIDEBAR MODE) ---
     &.is-split-view {
 
-        
+
         .list-panel {
             width: 400px;
             flex-shrink: 0;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
 
-          
+
         }
 
         .detail-panel {
@@ -94,7 +181,7 @@
             display: none;
         }
 
-        
+
         .detail-panel {
             width: 100%;
             flex: none;

@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../../../environment/environment";
 import { ErrorService } from "../../../core/services/error.service";
@@ -30,11 +30,13 @@ export class PersonalPredictionService {
         this.predictionDeletedSource.next(predictionId);
     }
 
-    getAllPredictions() {
-        return this.http.get<BaseUserPredictionDto[]>(`${this.base}/personal-predictions/all`).pipe(
+    getAllPredictions(page:number,totalSize:number,mode:string) {
+        let params = new HttpParams().set('page', page).set('size', totalSize).set('mode', mode);
+        return this.http.get<BaseUserPredictionDto[]>(`${this.base}/personal-predictions/all`, { params }).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
+
 
     getOnePrediction(predictionId: number,) {
         return this.http.get<FullUserPredictionDto>(`${this.base}/personal-predictions/find/${predictionId}`).pipe(

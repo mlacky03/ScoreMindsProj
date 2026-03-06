@@ -15,11 +15,11 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
         super(typeOrmRepo, new GroupPredictionMapper());
     }
 
-    
+
     async findById(id: number): Promise<GroupPrediction | null> {
-        const entity = await this.typeOrmRepo.findOne({ 
+        const entity = await this.typeOrmRepo.findOne({
             where: { id },
-            relations: ['predictedEvents'] 
+            relations: ['predictedEvents']
         });
         return entity ? this.mapper.toDomain(entity) : null;
     }
@@ -31,7 +31,7 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
         });
         return entity ? this.mapper.toDomain(entity) : null;
     }
-    
+
     async findByGroupId(groupId: number): Promise<GroupPrediction[]> {
         const entities = await this.typeOrmRepo.find({
             where: { groupId },
@@ -40,17 +40,41 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
         return entities.map(entity => this.mapper.toDomain(entity));
     }
 
-    async findPredictionByGroupIdWithRelations(groupId: number,predictionId: number): Promise<GroupPrediction|null>
-    {
+    async findByGroupIdUpcoming(groupId: number,page:number,size:number): Promise<GroupPrediction[]> {
+        const entities = await this.typeOrmRepo.find({
+            where: { groupId ,match: { status: 'NS' } },
+            relations: ['predictedEvents','match'],
+            order:{match:{startTime:'ASC'}},
+            skip: (page - 1) * size,
+            take: size
+        });
+        return entities.map(entity => this.mapper.toDomain(entity));
+    }
+
+    async findByGroupIdHistory(groupId: number,page:number,size:number): Promise<GroupPrediction[]> {
+        const entities = await this.typeOrmRepo.find({
+            where: { groupId ,match: { status: 'FT' } },
+            relations: ['predictedEvents','match'],
+            order: {
+                match: {
+                    startTime: 'DESC' 
+                }
+            },
+            take: size,
+            skip: (page - 1) * size
+        });
+        return entities.map(entity => this.mapper.toDomain(entity));
+    }
+
+    async findPredictionByGroupIdWithRelations(groupId: number, predictionId: number): Promise<GroupPrediction | null> {
         const entity = await this.typeOrmRepo.findOne({
             where: { groupId, id: predictionId },
-            relations: ['predictedEvents','match']
+            relations: ['predictedEvents', 'match']
         });
         return entity ? this.mapper.toDomain(entity) : null;
     }
 
-    async findByGroupIdWithoutRelations(groupId:number,predictionId:number):Promise<GroupPrediction|null>
-    {
+    async findByGroupIdWithoutRelations(groupId: number, predictionId: number): Promise<GroupPrediction | null> {
         const entity = await this.typeOrmRepo.findOne({
             where: { groupId, id: predictionId },
         });
@@ -61,8 +85,7 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
         await this.typeOrmRepo.delete(predictionIds);
     }
 
-    async findByMatchId(matchId: number):Promise<GroupPrediction[]>
-    {
+    async findByMatchId(matchId: number): Promise<GroupPrediction[]> {
         const entities = await this.typeOrmRepo.find({
             where: { matchId },
             relations: ['predictedEvents']

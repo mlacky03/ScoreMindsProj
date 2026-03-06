@@ -41,7 +41,7 @@ export class UserService {
     async findOne(id: number): Promise<FullUserDto> {
         const [user, predictions, ownedGroups, groups] = await Promise.all([
             this.repo.findById(id),
-            this.predictionRepo.findByUserId(id),
+            this.predictionRepo.findByUserIdUpcoming(id, 1, 10),
             this.groupUserRepo.findByUserId(id),
             this.groupRepo.findByOwner(id)
 

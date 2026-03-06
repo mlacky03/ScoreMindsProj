@@ -72,19 +72,17 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`prediction_${predictionId}`).emit('prediction_computed', data);
   }
 
-  brodcastPredictionListChagne(data: any,groupId:number) {
+  brodcastPredictionListChagne(data: any, groupId: number) {
     const roomName = `all_predictions_list_${groupId}`;
 
     this.server.to(roomName).emit('prediction-list-changed', data);
   }
 
-  brodcastPersonalListChange(data:any)
-  {
+  brodcastPersonalListChange(data: any) {
     this.server.to('personal_list_changed_' + data.userId).emit('personal-list-changed', data);
   }
 
-  brodcastUserAddedToGroup(userId:number,groupId:number)
-  { 
+  brodcastUserAddedToGroup(userId: number, groupId: number) {
     this.server.to(`user_${userId}`).emit('added_to_group', { groupId });
   }
 
@@ -132,7 +130,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const queue = this.activeLocks.get(payload.predictionId);
 
-    
+
     if (queue && queue.length > 0 && queue[0].socketId === client.id) {
       client.to(`prediction_${payload.predictionId}`).emit('live_form_update', payload.data);
     }
@@ -154,22 +152,22 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const updatedQueue = queue.filter(req => req.socketId !== socketId);
 
     if (updatedQueue.length === 0) {
-      
+
       this.activeLocks.delete(predictionId);
       if (wasFirst) {
         this.server.to(`prediction_${predictionId}`).emit('edit_lock_status', { locked: false, isMe: false });
       }
     } else {
       this.activeLocks.set(predictionId, updatedQueue);
-      
+
       if (wasFirst) {
-        
+
         const nextUser = updatedQueue[0];
-        
-       
+
+
         this.server.to(nextUser.socketId).emit('edit_lock_status', { locked: true, isMe: true });
-        
-      
+
+
         this.server.to(`prediction_${predictionId}`).except(nextUser.socketId).emit('edit_lock_status', {
           locked: true,
           isMe: false,
@@ -189,6 +187,16 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleLeaveRoom(client: Socket, room: string) {
     client.leave(room);
     console.log(`Socket ${client.id} izašao iz sobe: ${room}`);
+  }
+
+  @SubscribeMessage('join_match_rooms')
+  handleJoinMatchRooms(client: Socket, rooms: string[]) {
+    client.join(rooms); 
+  }
+
+  @SubscribeMessage('leave_match_rooms')
+  handleLeaveMatchRooms(client: Socket, rooms: string[]) {
+    rooms.forEach(room => client.leave(room));
   }
 
 }

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, effect, inject, signal } from "@angular/core";
 import { PredictionListComponent } from "../../../components/prediction-list/predicton-list.component";
 import { PredictionViewComponent } from "../../../components/prediction-view/prediction-view.component";
 import { CommonModule, NgIf } from "@angular/common";
@@ -15,7 +15,7 @@ import { AuthService } from "../../../core/auth/auth.service";
 @Component({
     selector: 'app-prediction-all',
     standalone: true,
-    imports: [PredictionListComponent,  NgIf, RouterOutlet, CommonModule],
+    imports: [PredictionListComponent, NgIf, RouterOutlet, CommonModule],
     templateUrl: './prediction-all.component.html',
     styleUrls: ['./prediction-all.component.scss']
 })
@@ -27,12 +27,18 @@ export class PredictionAllComponent {
     private updateSub = new Subscription();
     private socketService = inject(SocketService);
     private authService = inject(AuthService);
+    private activeMatchRooms: number[] = [];
+
     predictions = signal<BaseUserPredictionDto[]>([]);
     matches = signal<MatchBaseDto[]>([]);
     selectedPredictionId = signal<number | null>(null);
 
+    page = signal<number>(1);
+    pageSize = signal<number>(8);
+    totalItems = signal<number>(0);
+    filterMode = signal<'upcoming' | 'history'>('upcoming');
 
-    currenUser=this.authService.currentUser;
+    currenUser = this.authService.currentUser;
     loading = signal(true);
     isDetailsOpen = signal(false);
 
@@ -43,13 +49,19 @@ export class PredictionAllComponent {
             const hasChild = this.route.children.length > 0;
             this.isDetailsOpen.set(hasChild);
         });
+        effect(() => {
+            const currentMode = this.filterMode();
+
+            this.fetchData(this.page(), currentMode);
+
+        }, { allowSignalWrites: true });
     }
 
     ngOnInit() {
-       this.updateSub.add(
+        this.updateSub.add(
             this.socketService.onMatchListUpdate().subscribe((data: { id: number, status: string }) => {
                 console.log('Stigao update statusa meča u listu predikcija:', data);
-                
+
                 this.matches.update((currentMatches) => {
                     return currentMatches.map(match => {
                         if (match.id === data.id) {
@@ -64,20 +76,20 @@ export class PredictionAllComponent {
         this.updateSub.add(
             this.socketService.onPersonalListUpdate().subscribe((data) => {
                 console.log('Stigao update personalne liste predikcija:', data);
-                this.predictions.update((cp)=>{
+                this.predictions.update((cp) => {
                     return cp.map((item) => {
                         if (item.id === data.predictionId) {
-                            return { ...item, status: data.status,totalPoints:data.points };
+                            return { ...item, status: data.status, totalPoints: data.points };
                         }
                         return item;
                     });
                 });
             })
         );
-        
-        this.socketService.joinRoom('all_matches_list');
 
-        this.socketService.joinRoom('personal_list_changed_'+this.currenUser()?.id);
+
+
+        this.socketService.joinRoom('personal_list_changed_' + this.currenUser()?.id);
 
 
         this.updateSub.add(
@@ -94,39 +106,72 @@ export class PredictionAllComponent {
         );
 
         this.updateSub.add(
-        this.predictionService.predictionDeleted$.subscribe((deletedId) => {
-            this.predictions.update((currentList) => 
-                currentList.filter(item => item.id !== deletedId)
-            );
-        })
-    );
+            this.predictionService.predictionDeleted$.subscribe((deletedId) => {
+                this.predictions.update((currentList) =>
+                    currentList.filter(item => item.id !== deletedId)
+                );
+            })
+        );
+        // this.loading.set(true);
+        // this.predictionService.getAllPredictions()
+        //     .pipe(
+        //         tap((predictions) => {
+        //             this.predictions.set(predictions);
+        //         }),
+
+        //         switchMap((predictions) => {
+        //             const allMatchIds = predictions.map(p => p.matchId);
+
+        //             if (allMatchIds.length === 0) {
+        //                 return of([]);
+        //             }
+
+        //             return this.matchService.getMatchesByIds(allMatchIds);
+        //         }),
+        //         finalize(() => this.loading.set(false))
+        //     )
+        //     .subscribe({
+        //         next: (matches) => {
+        //             this.matches.set(matches as MatchBaseDto[]);
+        //         },
+        //         error: (error) => {
+        //             console.error('Error loading data:', error);
+        //         }
+        //     });
+
+    }
+    private fetchData(page: number, mode: 'upcoming' | 'history') {
         this.loading.set(true);
-        this.predictionService.getAllPredictions()
+
+
+        this.predictionService.getAllPredictions(page, this.pageSize(), mode)
             .pipe(
-                tap((predictions) => {
-                    this.predictions.set(predictions);
+                tap((response: any) => {
+                    this.predictions.set(response);
                 }),
-
-                switchMap((predictions) => {
-                    const allMatchIds = predictions.map(p => p.matchId);
-
-                    if (allMatchIds.length === 0) {
-                        return of([]);
-                    }
-
-                    return this.matchService.getMatchesByIds(allMatchIds);
+                switchMap((response) => {
+                    const allMatchIds = response.map((p: any) => p.matchId);
+                    return allMatchIds.length > 0
+                        ? this.matchService.getMatchesByIds(allMatchIds)
+                        : of([]);
                 }),
                 finalize(() => this.loading.set(false))
             )
             .subscribe({
                 next: (matches) => {
                     this.matches.set(matches as MatchBaseDto[]);
+                    if (this.activeMatchRooms.length > 0) {
+                        this.socketService.leaveMatchRooms(this.activeMatchRooms);
+                        this.activeMatchRooms = [];
+                    }
+                    if (mode === 'upcoming') {
+                        const newMatchIds = matches.map((m: any) => m.id);
+                        this.socketService.joinMatchRooms(newMatchIds);
+                        this.activeMatchRooms = newMatchIds;
+                    }
                 },
-                error: (error) => {
-                    console.error('Error loading data:', error);
-                }
+                error: (err) => console.error(err)
             });
-
     }
 
     onActivate() {
@@ -143,12 +188,23 @@ export class PredictionAllComponent {
         }
         this.router.navigate([predictionId], { relativeTo: this.route });
     }
+    changePage(step: number) {
+        const newPage = this.page() + step;
+
+
+        if (newPage > 0) {
+            this.page.set(newPage);
+        }
+    }
 
     ngOnDestroy() {
         if (this.updateSub) {
             this.updateSub.unsubscribe();
         }
-        this.socketService.leaveRoom('all_matches_list');
+        if (this.activeMatchRooms.length > 0) {
+            this.socketService.leaveMatchRooms(this.activeMatchRooms);
+        }
+        this.socketService.leaveRoom('personal_list_changed_' + this.currenUser()?.id);
     }
 
 }
