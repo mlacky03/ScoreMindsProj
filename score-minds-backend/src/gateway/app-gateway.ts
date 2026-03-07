@@ -178,25 +178,20 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('join_room')
-  handleJoinRoom(client: Socket, room: string) {
+  handleJoinRoom(client: Socket, room: string|string[]) {
     client.join(room);
     console.log(`Socket ${client.id} ušao u sobu: ${room}`);
   }
 
   @SubscribeMessage('leave_room')
-  handleLeaveRoom(client: Socket, room: string) {
-    client.leave(room);
+  handleLeaveRoom(client: Socket, room: string|string[]) {
+    if (Array.isArray(room)) {
+        room.forEach(room => client.leave(room));
+    } else {
+        client.leave(room);
+    }
     console.log(`Socket ${client.id} izašao iz sobe: ${room}`);
   }
 
-  @SubscribeMessage('join_match_rooms')
-  handleJoinMatchRooms(client: Socket, rooms: string[]) {
-    client.join(rooms); 
-  }
-
-  @SubscribeMessage('leave_match_rooms')
-  handleLeaveMatchRooms(client: Socket, rooms: string[]) {
-    rooms.forEach(room => client.leave(room));
-  }
 
 }

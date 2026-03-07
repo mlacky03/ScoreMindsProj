@@ -40,8 +40,8 @@ export class PersonalPredictionRepository extends BaseRepository<PersonalPredict
         return entities.map(entity => this.mapper.toDomain(entity));
     }
     
-    async findByUserIdUpcoming(userId: number,page:number,size:number): Promise<PersonalPrediction[]> {
-        const entities = await this.typeOrmRepo.find({
+    async findByUserIdUpcoming(userId: number,page:number,size:number): Promise<[PersonalPrediction[], number]> {
+        const [entities, total] = await this.typeOrmRepo.findAndCount({
             where: { userId, match: { status: 'NS' } },
             relations: ['predictedEvents','match'],
             order: {
@@ -52,10 +52,11 @@ export class PersonalPredictionRepository extends BaseRepository<PersonalPredict
             take: size,
             skip: (page - 1) * size
         });
-        return entities.map(entity => this.mapper.toDomain(entity));
+        const domainModels = entities.map(entity => this.mapper.toDomain(entity));
+        return [domainModels,total];
     }
-    async findByUserIdHistory(userId: number,page:number,size:number): Promise<PersonalPrediction[]> {
-        const entities = await this.typeOrmRepo.find({
+    async findByUserIdHistory(userId: number,page:number,size:number): Promise<[PersonalPrediction[], number]> {
+        const [entities, total] = await this.typeOrmRepo.findAndCount({
             where: { userId, match: { status: 'FT' } },
             relations: ['predictedEvents','match'],
             order: {
@@ -66,7 +67,8 @@ export class PersonalPredictionRepository extends BaseRepository<PersonalPredict
             take: size,
             skip: (page - 1) * size
         });
-        return entities.map(entity => this.mapper.toDomain(entity));
+        const domainModels = entities.map(entity => this.mapper.toDomain(entity));
+        return [domainModels,total];
     }
 
     async findPredictionByUserWithRelations(userId: number,predictionId: number): Promise<PersonalPrediction|null>

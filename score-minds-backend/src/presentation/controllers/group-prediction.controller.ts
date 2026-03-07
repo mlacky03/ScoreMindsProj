@@ -7,6 +7,7 @@ import { CreatePredictionDto } from "src/application/dtos/group-prediction-dto/c
 import { FullPredictionDto } from "src/application/dtos/group-prediction-dto/full-prediction.dto";
 import { UpdatePredictionDto } from "src/application/dtos/group-prediction-dto/update-prediction.dto";
 import { BasePredictionDto } from "src/application/dtos/group-prediction-dto/base-prediction.dto";
+import { PaginatedResponse } from "src/application/dtos/pagination-dto/paginatio.dto";
 
 @ApiTags('Group Predictions')
 @ApiBearerAuth('JWT-auth')
@@ -25,7 +26,7 @@ export class GroupPredictionController {
     @Get('all/:groupId')
     @UseGuards(JwtAuthGuard)
     async findAll(@CurrentUser() id: number, @Param('groupId') groupId: number,@Query('page') page: string,
-            @Query('size') size: string,@Query('mode') mode:string):Promise<BasePredictionDto[]> {
+            @Query('size') size: string,@Query('mode') mode:string):Promise<PaginatedResponse<BasePredictionDto>> {
         const pageNumber = page ? parseInt(page, 10) : 1;
         const sizeNumber = size ? parseInt(size, 10) : 10;
         const predictions = await this.groupPredictionService.findAll(groupId,id,pageNumber,sizeNumber,mode);

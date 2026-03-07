@@ -15,6 +15,7 @@ import { PredictionStatus } from "src/infrastucture/persistence/entities/group-p
 import { GroupService } from "./group.service";
 import { UserService } from "./user.service";
 import { ClientProxy } from "@nestjs/microservices";
+import { PaginatedResponse } from "../dtos/pagination-dto/paginatio.dto";
 
 
 @Injectable()
@@ -31,16 +32,17 @@ export class GroupPredictionService {
         private readonly rabbitClient: ClientProxy,
     ) { }
 
-    async findAll(id: number, userId: number, page: number, size: number, mode: string): Promise<BasePredictionDto[]> {
+    async findAll(id: number, userId: number, page: number, size: number, mode: string): Promise<PaginatedResponse<BasePredictionDto>> {
         await this.groupService.chackMembership(userId, id);
         let res: GroupPrediction[];
+        let  total:number;
         if(mode=='upcoming'){
-            res = await this.repo.findByGroupIdUpcoming(id, page, size);
+            [res,total] = await this.repo.findByGroupIdUpcoming(id, page, size);
         }
         else {
-            res = await this.repo.findByGroupIdHistory(id, page, size);
+            [res,total] = await this.repo.findByGroupIdHistory(id, page, size);
         }
-        return res.map((p) => new BasePredictionDto(p));
+        return { data: res.map((p) => new BasePredictionDto(p)), total };
         
     }
 

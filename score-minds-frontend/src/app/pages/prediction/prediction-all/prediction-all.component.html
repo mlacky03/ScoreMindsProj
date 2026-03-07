@@ -24,13 +24,13 @@
       [personal]="true">
     </app-prediction-list>
     <div class="pagination-controls">
-      <button class="page-btn" [disabled]="page() === 1" (click)="changePage(-1)">
+      <button class="page-btn" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
         <i class="icon-arrow-left"></i> Back
       </button>
 
       <span class="page-info">Page {{ page() }}</span>
 
-      <button class="page-btn" [disabled]="predictions().length < pageSize()" (click)="changePage(1)">
+      <button class="page-btn" [disabled]="page() * pageSize() >= totalItems()" (click)="page.update(p => p + 1)">
         Forward <i class="icon-arrow-right"></i>
       </button>
     </div>

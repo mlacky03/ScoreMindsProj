@@ -129,11 +129,10 @@ export class SocketService {
 
   joinMatchRooms(matchIds: number[]) {
     if (!matchIds || matchIds.length === 0) return;
-
-    const roomsToJoin = matchIds
-      .map(id => `match_${id}`)
-
-    this.socket?.emit('join_match_rooms', roomsToJoin);
+    
+    const roomsToJoin = matchIds.map(id => `match_${id}`);
+    
+    this.socket?.emit('join_room', roomsToJoin);
   }
 
   leaveMatchRooms(matchIds: number[]) {
@@ -141,7 +140,7 @@ export class SocketService {
 
     const roomsToLeave = matchIds.map(id => `match_${id}`);
 
-    this.socket?.emit('leave_match_rooms', roomsToLeave);
+    this.socket?.emit('leave_room', roomsToLeave);
   }
 
   onAddedToGroup(): Observable<any> {

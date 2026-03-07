@@ -12,6 +12,7 @@ import { PlayerService } from "./player.service";
 import { FullMatchDto } from "../dtos/matches-dto/full-match.dto";
 import { PredictionStatus } from "src/infrastucture/persistence/entities/personal-prediction.entity";
 import { UserService } from "./user.service";
+import { PaginatedResponse } from "../dtos/pagination-dto/paginatio.dto";
 @Injectable()
 export class PersonalPredictionService {
     constructor(
@@ -26,15 +27,16 @@ export class PersonalPredictionService {
 
     }
 
-    async findAll(id: number,page:number,size:number,mode:string): Promise<BasePredictionDto[]> {
+    async findAll(id: number,page:number,size:number,mode:string): Promise<PaginatedResponse<BasePredictionDto>> {
         let res: PersonalPrediction[];
+        let total: number;
         if (mode === 'upcoming') {
-            res = await this.repo.findByUserIdUpcoming(id,page,size);
+            [res, total] = await this.repo.findByUserIdUpcoming(id,page,size);
         } else {
-            res = await this.repo.findByUserIdHistory(id,page,size);
+            [res, total] = await this.repo.findByUserIdHistory(id,page,size);
         }
 
-        return res.map((p) => new BasePredictionDto(p));
+        return { data: res.map((p) => new BasePredictionDto(p)), total };
     }
 
     async createPrediction(userId: number, prediction: CreatePredictionDto): Promise<FullPredictionDto> {

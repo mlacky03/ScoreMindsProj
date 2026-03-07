@@ -38,7 +38,7 @@ export class PredictionAllComponent {
 
     page = signal<number>(1);
     pageSize = signal<number>(8);
-    totalItems = signal<number>(0);
+     totalItems = signal<number>(0);
     filterMode = signal<'upcoming' | 'history'>('upcoming');
 
     loading = signal(true);
@@ -58,27 +58,38 @@ export class PredictionAllComponent {
         effect(() => {
 
             this.fetchData();
-            
 
-        }, { allowSignalWrites: true });        
+
+        }, { allowSignalWrites: true });
     }
 
     ngOnInit() {
         this.updateSub.add(
-            this.socketService.onMatchListUpdate().subscribe((data: { id: number, status: string }) => {
-                console.log('Stigao update statusa meča u listu predikcija:', data);
-
-                this.matches.update((currentMatches) => {
-                    return currentMatches.map(match => {
-                        if (match.id === data.id) {
-                            return { ...match, status: data.status };
+            this.socketService.onMatchUpdate().subscribe((updateData) => {
+                console.log('Stigao update statusa meča u listu predikcija:', updateData);
+                if (this.filterMode() === 'upcoming') {
+                    if (updateData.status === 'FT') {
+                        this.matches.update((currentMatches) => {
+                            return currentMatches.filter(match => match.id !== updateData.id);
+                        });
+                        if (this.matches().length < this.pageSize()) {
+                            this.fetchData();
                         }
-                        return match;
-                    });
-                });
+                    }
+                    else {
+                        this.matches.update((currentMatches) => {
+                            return currentMatches.map(match => {
+                                if (match.id === updateData.id) {
+                                    return { ...match, ...updateData };
+                                }
+                                return match;
+                            });
+                        });
+                    }
+                }
             })
         );
-         this.updateSub.add(
+        this.updateSub.add(
             this.socketService.onPredictionListUpdate().subscribe((data: any) => {
                 console.log('Stigao update statusa meča u listu predikcija:', data);
 
@@ -86,15 +97,27 @@ export class PredictionAllComponent {
                     const index = currentPredictions.findIndex(p => p.id === data.id);
                     if (index !== -1) {
                         return currentPredictions.map(prediction =>
-                            prediction.id === data.id ? { ...prediction, ...data} : prediction
+                            prediction.id === data.id ? { ...prediction, ...data } : prediction
                         );
                     } else {
                         this.matches.update((currentMatches) => {
-                            const index= currentMatches.findIndex(m=>m.id === data.matchId);
+                            const index = currentMatches.findIndex(m => m.id === data.matchId);
                             if (index !== -1) {
                                 return currentMatches;
                             }
-                            return [data.match,...currentMatches]
+                            const updatedMatches = [data.match, ...currentMatches];
+                            this.activeMatchRooms.push(data.matchId);
+                            this.socketService.joinRoom('match_' + data.matchId);
+                            this.socketService.leaveRoom('match_' + data.matchId);
+                            if (updatedMatches.length > this.pageSize()) {
+
+                                const discardedMatch = updatedMatches[this.pageSize()];
+
+                                this.socketService.leaveMatchRooms([discardedMatch.id]);
+
+                                this.activeMatchRooms = this.activeMatchRooms.filter(id => id !== discardedMatch.id);
+                            }
+                            return updatedMatches.slice(0, this.pageSize());
                         });
                         const p: BaseGroupPredictionDto = {
                             id: data.id,
@@ -106,12 +129,12 @@ export class PredictionAllComponent {
                             predictionEvents: data.predictionEvents,
                             status: data.status
                         };
-                        return [p, ...currentPredictions];
+                        return [p, ...currentPredictions].slice(0, this.pageSize());
                     }
                 });
             })
         );
-       
+
 
 
 
@@ -135,13 +158,12 @@ export class PredictionAllComponent {
                 );
             })
         );
-        
-        
+
+
 
     }
 
-    fetchData()
-    {
+    fetchData() {
         this.loading.set(true);
         this.groupService.searchGroups().subscribe({
             next: (groups) => {
@@ -168,7 +190,7 @@ export class PredictionAllComponent {
             }
         });
     }
-    
+
     onGroupChange(newGroupIdStr: string | number) {
         const newGroupId = Number(newGroupIdStr);
 
@@ -207,10 +229,11 @@ export class PredictionAllComponent {
         this.predictionService.getAllPrediction(groupId, this.page(), this.pageSize(), this.filterMode())
             .pipe(
                 tap((predictions) => {
-                    this.predictions.set(predictions);
+                    this.predictions.set(predictions.data);
+                    this.totalItems.set(predictions.total);
                 }),
                 switchMap((predictions) => {
-                    const allMatchIds = predictions.map(p => p.matchId);
+                    const allMatchIds = predictions.data.map(p => p.matchId);
 
                     if (allMatchIds.length === 0) {
                         return of([]);
@@ -223,7 +246,6 @@ export class PredictionAllComponent {
             )
             .subscribe({
                 next: (matches) => {
-                    this.matches.set(matches as MatchBaseDto[]);
                     this.matches.set(matches as MatchBaseDto[]);
                     if (this.activeMatchRooms.length > 0) {
                         this.socketService.leaveMatchRooms(this.activeMatchRooms);
@@ -240,7 +262,7 @@ export class PredictionAllComponent {
                 }
             });
     }
-   
+
 
     onActivate() {
         this.isDetailsOpen.set(true);
@@ -254,7 +276,7 @@ export class PredictionAllComponent {
         if (!predictionId || this.selectedPredictionId() === predictionId) {
             return;
         }
-        
+
         this.router.navigate([predictionId], {
             relativeTo: this.route,
             queryParams: { groupId: this.selectedGroupId() }

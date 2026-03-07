@@ -26,6 +26,8 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { FullPredictionDto } from '../../application/dtos/personal-prediction-dto/full-prediction.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { BasePredictionDto } from '../../application/dtos/personal-prediction-dto/base-prediction.dto';
+import { PaginatedResponse } from '../../application/dtos/pagination-dto/paginatio.dto';
+import { BaseUserDto } from 'src/application/dtos/user-dto/base-user.dto';
 @ApiTags('Personal Predictions')
 @ApiBearerAuth('JWT-auth')
 @Controller('personal-predictions')
@@ -43,7 +45,7 @@ export class PersonalPredictionController {
     @Get('all')
     @UseGuards(JwtAuthGuard)
     async findAll(@CurrentUser() id: number,@Query('page') page: string,
-        @Query('size') size: string,@Query('mode') mode:string):Promise<BasePredictionDto[]> {
+        @Query('size') size: string,@Query('mode') mode:string):Promise<PaginatedResponse<BasePredictionDto>> {
         const pageNumber = page ? parseInt(page, 10) : 1;
         const sizeNumber = size ? parseInt(size, 10) : 10;
         const predictions = await this.predictionService.findAll(id,pageNumber,sizeNumber,mode);

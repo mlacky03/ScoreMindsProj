@@ -59,17 +59,30 @@ export class PredictionAllComponent {
 
     ngOnInit() {
         this.updateSub.add(
-            this.socketService.onMatchListUpdate().subscribe((data: { id: number, status: string }) => {
-                console.log('Stigao update statusa meča u listu predikcija:', data);
-
-                this.matches.update((currentMatches) => {
-                    return currentMatches.map(match => {
-                        if (match.id === data.id) {
-                            return { ...match, status: data.status };
+            this.socketService.onMatchUpdate().subscribe((updateData) => {
+                console.log('Stigao update statusa meča u listu predikcija:', updateData);
+                if (this.filterMode() === 'upcoming') {
+                    if (updateData.status === 'FT') {
+                        this.matches.update((currentMatches) => {
+                            return currentMatches.filter(match => match.id !== updateData.id);
+                        });
+                        if (this.matches().length < this.pageSize()) {
+                            this.fetchData(this.page(), this.filterMode());
                         }
-                        return match;
-                    });
-                });
+                    }
+                    else {
+                        this.matches.update((currentMatches) => {
+                            return currentMatches.map(match => {
+                                if (match.id === updateData.id) {
+                                    return { ...match, ...updateData };
+                                }
+                                return match;
+                            });
+
+                        });
+                    }
+
+                }
             })
         );
 
@@ -112,33 +125,6 @@ export class PredictionAllComponent {
                 );
             })
         );
-        // this.loading.set(true);
-        // this.predictionService.getAllPredictions()
-        //     .pipe(
-        //         tap((predictions) => {
-        //             this.predictions.set(predictions);
-        //         }),
-
-        //         switchMap((predictions) => {
-        //             const allMatchIds = predictions.map(p => p.matchId);
-
-        //             if (allMatchIds.length === 0) {
-        //                 return of([]);
-        //             }
-
-        //             return this.matchService.getMatchesByIds(allMatchIds);
-        //         }),
-        //         finalize(() => this.loading.set(false))
-        //     )
-        //     .subscribe({
-        //         next: (matches) => {
-        //             this.matches.set(matches as MatchBaseDto[]);
-        //         },
-        //         error: (error) => {
-        //             console.error('Error loading data:', error);
-        //         }
-        //     });
-
     }
     private fetchData(page: number, mode: 'upcoming' | 'history') {
         this.loading.set(true);
@@ -146,11 +132,12 @@ export class PredictionAllComponent {
 
         this.predictionService.getAllPredictions(page, this.pageSize(), mode)
             .pipe(
-                tap((response: any) => {
-                    this.predictions.set(response);
+                tap((response) => {
+                    this.predictions.set(response.data);
+                    this.totalItems.set(response.total);
                 }),
                 switchMap((response) => {
-                    const allMatchIds = response.map((p: any) => p.matchId);
+                    const allMatchIds = response.data.map((p: any) => p.matchId);
                     return allMatchIds.length > 0
                         ? this.matchService.getMatchesByIds(allMatchIds)
                         : of([]);

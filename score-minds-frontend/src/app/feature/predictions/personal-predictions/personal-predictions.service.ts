@@ -32,7 +32,7 @@ export class PersonalPredictionService {
 
     getAllPredictions(page:number,totalSize:number,mode:string) {
         let params = new HttpParams().set('page', page).set('size', totalSize).set('mode', mode);
-        return this.http.get<BaseUserPredictionDto[]>(`${this.base}/personal-predictions/all`, { params }).pipe(
+        return this.http.get<{ data: BaseUserPredictionDto[], total: number }>(`${this.base}/personal-predictions/all`, { params }).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }

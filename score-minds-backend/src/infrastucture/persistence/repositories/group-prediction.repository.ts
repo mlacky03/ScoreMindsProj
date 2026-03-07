@@ -40,19 +40,20 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
         return entities.map(entity => this.mapper.toDomain(entity));
     }
 
-    async findByGroupIdUpcoming(groupId: number,page:number,size:number): Promise<GroupPrediction[]> {
-        const entities = await this.typeOrmRepo.find({
+    async findByGroupIdUpcoming(groupId: number,page:number,size:number): Promise<[GroupPrediction[],number]> {
+        const [entities,total] = await this.typeOrmRepo.findAndCount({
             where: { groupId ,match: { status: 'NS' } },
             relations: ['predictedEvents','match'],
             order:{match:{startTime:'ASC'}},
             skip: (page - 1) * size,
             take: size
         });
-        return entities.map(entity => this.mapper.toDomain(entity));
+        const e= entities.map(entity => this.mapper.toDomain(entity));
+        return [e,total];
     }
 
-    async findByGroupIdHistory(groupId: number,page:number,size:number): Promise<GroupPrediction[]> {
-        const entities = await this.typeOrmRepo.find({
+    async findByGroupIdHistory(groupId: number,page:number,size:number): Promise<[GroupPrediction[],number]> {
+        const [entities,total ]= await this.typeOrmRepo.findAndCount({
             where: { groupId ,match: { status: 'FT' } },
             relations: ['predictedEvents','match'],
             order: {
@@ -63,7 +64,8 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
             take: size,
             skip: (page - 1) * size
         });
-        return entities.map(entity => this.mapper.toDomain(entity));
+        const e=entities.map(entity => this.mapper.toDomain(entity));
+        return [e,total]
     }
 
     async findPredictionByGroupIdWithRelations(groupId: number, predictionId: number): Promise<GroupPrediction | null> {

@@ -31,7 +31,7 @@ export class GroupPredictionService {
 
     getAllPrediction(groupId: number,page:number,totalSize:number,mode:string) {
         let params = new HttpParams().set('page', page).set('size', totalSize).set('mode', mode);
-        return this.http.get<BaseGroupPredictionDto[]>(`${this.base}/group-predictions/all/${groupId}`, { params }).pipe(
+        return this.http.get<{ data: BaseGroupPredictionDto[], total: number }>(`${this.base}/group-predictions/all/${groupId}`, { params }).pipe(
             catchError((err) => this.errorService.handleHttpError(err))
         );
     }
