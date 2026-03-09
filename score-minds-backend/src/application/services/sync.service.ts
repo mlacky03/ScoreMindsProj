@@ -61,7 +61,7 @@ export class SyncService {
         match.finishMatch();
         await this.matchRepo.save(match);
 
-        this.notifySystem(match,minutesPlayed);
+        this.notifySystem(match,90);
         this.logger.log(`Match FINISHED: ${match.homeTeamName} ${match.finalScoreHome}-${match.finalScoreAway} ${match.awayTeamName} 🏁`);
         continue; 
       }
@@ -72,7 +72,7 @@ export class SyncService {
       if (this.b===0) { 
         this.scoreGoal(match,minutesPlayed);
         await this.matchRepo.save(match);
-        this.notifySystem(match,minutesPlayed);
+        this.notifySystem(match,42);
         this.b++;
       }
     }
@@ -122,7 +122,7 @@ export class SyncService {
     const match = await this.matchRepo.playerSync(43);
 
     //const teamIds = match.flatMap(m => [m.homeTeamId, m.awayTeamId]);
-    const teamIds = [540,530,529,548,531];
+    const teamIds = [541];
     const uniqueTeamIds = new Set(teamIds);
     
     for (const teamId of uniqueTeamIds) {
@@ -184,6 +184,7 @@ export class SyncService {
       actualScorersIds: dto.scorerIds, 
       actualAssistantsIds: dto.assistIds, 
     };
+   
 
     this.rabbitClient.emit('update_match', payload);
 
@@ -201,13 +202,22 @@ export class SyncService {
       events: match.events,
       minutes: minutesPlayed
     };
+    const payload2 = {
+      id: match.id, 
+      status: match.status,
+      finalScoreHome: match.finalScoreHome,
+      finalScoreAway: match.finalScoreAway,
+      minutes: minutesPlayed,
+
+    };
+     
+  
 
     if(match.status === 'FT') {
       this.rabbitClient.emit('match_finished', payload);
     }
     this.rabbitClient.emit('update_match', payload);
-    this.rabbitClient.emit('update_match_list', { id: match.id, status: match.status,finalScoreHome: match.finalScoreHome,
-      finalScoreAway: match.finalScoreAway,minutes:minutesPlayed });
+    this.rabbitClient.emit('update_match_list',payload2);
 
   }
 

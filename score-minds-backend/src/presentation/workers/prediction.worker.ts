@@ -23,4 +23,10 @@ export class PredictionWorker{
         this.appGateway.brodcastPersonalListChange(data);
 
     }
+    @EventPattern('delete_group_prediction')
+    handleGroupPredictionDelete(@Payload() data:any)
+    {
+        console.log(`📡 RabbitMQ -> WebSocket: Group prediction deleted ${data}`);
+        this.appGateway.brodcastGroupPredictionDelete(data);
+    }
 }

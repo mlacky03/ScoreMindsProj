@@ -8,7 +8,7 @@ export class SocketService {
   private socket: Socket | undefined;
   private readonly URL = 'http://localhost:3000';
 
-
+  private activeRooms = new Set<string>();
 
   private readonly instanceId = Math.floor(Math.random() * 10000);
 
@@ -32,18 +32,31 @@ export class SocketService {
       reconnection: true,
       autoConnect: true
     });
+    this.socket.on('connect', () => {
+      console.log('✅ Socket povezan! ID:', this.socket?.id);
+      this.rejoinRooms();
+    });
 
-
-    this.socket.on('connect', () => console.log('Socket povezan! ID:', this.socket?.id));
     this.socket.on('connect_error', (err) => console.error('Socket greška:', err));
   }
 
   disconnect() {
     if (this.socket) {
+      console.log("diskonektovan si");
       this.socket.disconnect();
+      this.socket = undefined;  
+      this.activeRooms.clear();
     }
   }
 
+  private rejoinRooms() {
+    if (this.activeRooms.size > 0 && this.socket?.connected) {
+      console.log('🔄 Vraćam se u sobe:', Array.from(this.activeRooms));
+      this.activeRooms.forEach(room => {
+        this.joinRoom(room);
+      });
+    }
+  }
 
   onNotification(): Observable<any> {
     return new Observable(observer => {
@@ -95,7 +108,7 @@ export class SocketService {
   onMatchListUpdate(): Observable<any> {
     return new Observable(observer => {
       if (!this.socket) return;
-      this.socket.on('match_status_changed', (data) => {
+      this.socket.on('match_list_changed', (data) => {
         observer.next(data);
       });
     });
@@ -126,21 +139,41 @@ export class SocketService {
       });
     });
   }
+  onGroupPredictionDelete():Observable<any>
+  {
+    return new Observable(observer => {
+      if (!this.socket) return;
+      this.socket.on('prediction_deleted', (data) => {
+        observer.next(data);
+      });
+    });
+  }
 
   joinMatchRooms(matchIds: number[]) {
     if (!matchIds || matchIds.length === 0) return;
     
     const roomsToJoin = matchIds.map(id => `match_${id}`);
-    
-    this.socket?.emit('join_room', roomsToJoin);
+    roomsToJoin.forEach(room => this.activeRooms.add(room));
+    if (this.socket?.connected) {
+      this.socket.emit('join_room', roomsToJoin); 
+    } else {
+      console.log(`⏳ Paket soba stavljen na čekanje (socket se još povezuje).`);
+    }
   }
 
   leaveMatchRooms(matchIds: number[]) {
     if (!matchIds || matchIds.length === 0) return;
 
     const roomsToLeave = matchIds.map(id => `match_${id}`);
+    roomsToLeave.forEach(room => this.activeRooms.delete(room));
 
-    this.socket?.emit('leave_room', roomsToLeave);
+    if (this.socket?.connected) {
+      this.socket.emit('leave_room', roomsToLeave);
+    }
+    else{
+      console.log("izbugljena konekcija niste u sobi");
+    }
+
   }
 
   onAddedToGroup(): Observable<any> {
@@ -148,10 +181,23 @@ export class SocketService {
   }
 
   joinRoom(roomName: string) {
-    this.socket?.emit('join_room', roomName);
+    this.activeRooms.add(roomName);
+    if (this.socket?.connected) {
+      console.log('🔄 Vraćam se u sobe:', Array.from(this.activeRooms));
+
+      this.socket.emit('join_room', roomName);
+      
+    } else {
+      console.log(`⏳ Soba '${roomName}' stavljena na čekanje (socket se još povezuje).`);
+    }
   }
 
   leaveRoom(roomName: string) {
-    this.socket?.emit('leave_room', roomName);
+    this.activeRooms.delete(roomName);
+    if (this.socket?.connected) {
+      console.log('🔄 Izlazim iz sobe:', roomName);
+
+      this.socket.emit('leave_room', roomName);
+    }
   }
 }

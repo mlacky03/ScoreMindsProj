@@ -9,34 +9,29 @@
           <ng-template #playerFallback>
             <div class="fallback-icon">👤</div>
           </ng-template>
+          <span class="player-name">{{ player.name }}</span>
+          <span class="player-position">{{ player.position }}</span>
         </div>
-        <span class="player-name">{{ player.name }}</span>
-        <span class="player-position">{{ player.position }}</span>
+
       </div>
 
       <div class="player-actions" *ngIf="matchStatus === 'NS'">
         <div class="action-icon" (click)="startEdit('GOAL')" title="Add Goal">
           ⚽
+          <span class="stat-badge goal" *ngIf="addedGoals > 0">
+            {{ addedGoals }}
+          </span>
         </div>
 
         <div class="action-icon" (click)="startEdit('ASSIST')" title="Add Assist">
           👟
-        </div>
-      </div>
-
-      <div class="player-stats-display" *ngIf="matchStatus == 'NS'">
-
-        <div class="player-stats-summary">
-          <span class="stat-badge goal" *ngIf="addedGoals > 0">
-            ⚽ {{ addedGoals }}
-          </span>
-
           <span class="stat-badge assist" *ngIf="addedAssists > 0">
-            👟 {{ addedAssists }}
+            {{ addedAssists }}
           </span>
         </div>
-
       </div>
+
+
     </ng-container>
     <ng-container *ngIf="isEditing">
 

@@ -5,11 +5,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .layout-container {
     display: flex;
+    flex-direction: column;
     min-height: 90vh;
     width: 100%;
     overflow: visible;
     transition: all 0.3s ease;
     margin-top: 12px;
+    
 
 
 
@@ -19,6 +21,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         padding: 1.5rem;
         display: flex;
         flex-direction: column;
+        flex:1;
 
         &::-webkit-scrollbar {
             width: 8px;
@@ -166,12 +169,14 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     // --- 2. SPLIT STANJE (SIDEBAR MODE) ---
     &.is-split-view {
 
-
+       
+            flex-direction: row;
+        
         .list-panel {
             width: 400px;
             flex-shrink: 0;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
-
+            flex:0;
 
         }
 

@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from "@angular/core";
+import { Component, effect, inject, signal, untracked } from "@angular/core";
 import { PredictionListComponent } from "../../../components/prediction-list/predicton-list.component";
 import { PredictionViewComponent } from "../../../components/prediction-view/prediction-view.component";
 import { CommonModule, NgIf } from "@angular/common";
@@ -38,7 +38,7 @@ export class PredictionAllComponent {
 
     page = signal<number>(1);
     pageSize = signal<number>(8);
-     totalItems = signal<number>(0);
+    totalItems = signal<number>(0);
     filterMode = signal<'upcoming' | 'history'>('upcoming');
 
     loading = signal(true);
@@ -56,43 +56,71 @@ export class PredictionAllComponent {
             this.selectedGroupId.set(routerState['passedGroupId']);
         }
         effect(() => {
+            const groupId = this.selectedGroupId();
+            const mode = this.filterMode();
 
-            this.fetchData();
+            if (groupId !== null) {
+                untracked(() => {
+                    this.loadDataForGroup(groupId);
+                });
+            }
 
 
         }, { allowSignalWrites: true });
+        effect((onCleanup) => {
+            const groupId = this.selectedGroupId();
+            const mode = this.filterMode();
+
+
+            if (groupId !== null && mode === 'upcoming') {
+                const roomName = `all_predictions_list_${groupId}`;
+                this.socketService.joinRoom(roomName);
+
+                onCleanup(() => {
+                    this.socketService.leaveRoom(roomName);
+                });
+            }
+        });
     }
 
     ngOnInit() {
+        this.fetchData();
         this.updateSub.add(
             this.socketService.onMatchUpdate().subscribe((updateData) => {
+                if (this.filterMode() !== 'upcoming') return;
                 console.log('Stigao update statusa meča u listu predikcija:', updateData);
-                if (this.filterMode() === 'upcoming') {
-                    if (updateData.status === 'FT') {
-                        this.matches.update((currentMatches) => {
-                            return currentMatches.filter(match => match.id !== updateData.id);
-                        });
-                        if (this.matches().length < this.pageSize()) {
-                            this.fetchData();
-                        }
+                if (updateData.status === 'FT') {
+
+                    this.matches.update((currentMatches) => {
+                        return currentMatches.filter(match => match.id !== updateData.id);
+                    });
+                    this.predictions.update((currentPredictions) => {
+                        return currentPredictions.filter(prediction => prediction.matchId !== updateData.id);
+                    });
+
+                    this.totalItems.update(t => t > 0 ? t - 1 : 0);
+
+                    if (this.totalItems() >= this.page() * this.pageSize()) {
+                        this.loadDataForGroup(this.selectedGroupId()!);
                     }
-                    else {
-                        this.matches.update((currentMatches) => {
-                            return currentMatches.map(match => {
-                                if (match.id === updateData.id) {
-                                    return { ...match, ...updateData };
-                                }
-                                return match;
-                            });
-                        });
-                    }
+
                 }
+                else {
+                    this.matches.update((currentMatches) => {
+                        return currentMatches.map(match => {
+                            if (match.id === updateData.id) {
+                                return { ...match, ...updateData };
+                            }
+                            return match;
+                        });
+                    });
+                }
+
             })
         );
         this.updateSub.add(
             this.socketService.onPredictionListUpdate().subscribe((data: any) => {
-                console.log('Stigao update statusa meča u listu predikcija:', data);
-
+                console.log('Stigao update predikcije u listu predikcija:', data);
                 this.predictions.update((currentPredictions) => {
                     const index = currentPredictions.findIndex(p => p.id === data.id);
                     if (index !== -1) {
@@ -101,22 +129,38 @@ export class PredictionAllComponent {
                         );
                     } else {
                         this.matches.update((currentMatches) => {
+                            const noviMec = data.match;
                             const index = currentMatches.findIndex(m => m.id === data.matchId);
                             if (index !== -1) {
                                 return currentMatches;
                             }
-                            const updatedMatches = [data.match, ...currentMatches];
+                            const mapiranMec: MatchBaseDto = {
+                                id: noviMec._id,
+                                externalId: noviMec._externalId,
+                                homeTeamName: noviMec._homeTeamName,
+                                awayTeamName: noviMec._awayTeamName,
+                                awayTeamLogo: noviMec._awayTeamLogo,
+                                homeTeamLogo: noviMec._homeTeamLogo,
+                                startTime: noviMec._startTime,
+                                status: noviMec._status,
+                                finalScoreHome: noviMec._finalScoreHome,
+                                finalScoreAway: noviMec._finalScoreAway,
+                                minutes: noviMec._minutes
+                            };
+                            const updatedMatches = [mapiranMec, ...currentMatches];
+
                             this.activeMatchRooms.push(data.matchId);
                             this.socketService.joinRoom('match_' + data.matchId);
-                            this.socketService.leaveRoom('match_' + data.matchId);
                             if (updatedMatches.length > this.pageSize()) {
 
                                 const discardedMatch = updatedMatches[this.pageSize()];
 
-                                this.socketService.leaveMatchRooms([discardedMatch.id]);
+                                this.socketService.leaveRoom('match_' + discardedMatch.id);
 
                                 this.activeMatchRooms = this.activeMatchRooms.filter(id => id !== discardedMatch.id);
                             }
+
+
                             return updatedMatches.slice(0, this.pageSize());
                         });
                         const p: BaseGroupPredictionDto = {
@@ -174,11 +218,8 @@ export class PredictionAllComponent {
                     const defaultGroupId = groups[0].id;
                     if (this.selectedGroupId() === null) {
                         this.selectedGroupId.set(defaultGroupId);
-                        this.socketService.joinRoom('all_predictions_list_' + this.selectedGroupId());
 
                     }
-
-                    this.loadDataForGroup(this.selectedGroupId()!);
                 } else {
 
                     this.loading.set(false);
@@ -198,28 +239,12 @@ export class PredictionAllComponent {
         if (this.selectedGroupId() === newGroupId) {
             return;
         }
-        this.socketService.leaveRoom(`all_predictions_list_${this.selectedGroupId()}`);
-
-
-        this.selectedGroupId.set(newGroupId);
-        this.socketService.joinRoom(`all_predictions_list_${this.selectedGroupId()}`);
-
         this.predictions.set([]);
         this.matches.set([]);
 
         this.page.set(1);
-        this.loadDataForGroup(newGroupId);
-    }
-    changePage(step: number) {
-        const newPage = this.page() + step;
 
-
-        if (newPage > 0) {
-            this.page.set(newPage);
-
-
-            this.loadDataForGroup(this.selectedGroupId()!);
-        }
+        this.selectedGroupId.set(newGroupId)
     }
 
     loadDataForGroup(groupId: number) {
@@ -294,7 +319,7 @@ export class PredictionAllComponent {
         if (this.activeMatchRooms.length > 0) {
             this.socketService.leaveMatchRooms(this.activeMatchRooms);
         }
-        this.socketService.leaveRoom(`all_predictions_list_${this.selectedGroupId()}`);
     }
 
 }
+

@@ -37,7 +37,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const personalRoom = `user_${userId}`;
       client.join(personalRoom);
 
-      console.log(`Korisnik ${userId} se povezao na globalni socket.`);
+      console.log(`Korisnik ${userId} se povezao na globalni socket. ${client.id}`);
 
       client.emit('init-data', { message: 'Dobrodošao nazad!' });
 
@@ -48,7 +48,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    console.log('Korisnik diskonektovan');
+    const userId = client['user']?.sub
+    console.log(`Korisnik ${userId} se diskonektovao.${client.id}`);
     for (const predictionId of this.activeLocks.keys()) {
       this.removeUserFromQueue(predictionId, client.id);
     }
@@ -64,8 +65,8 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`user_${userId}`).emit('notification', data);
   }
 
-  broadcastMatchStatusChange(matchId: number, status: string) {
-    this.server.to('all_matches_list').emit('match_status_changed', { id: matchId, status });
+  broadcastMatchListChange(data: any) {
+    this.server.to('all_matches_list').emit('match_list_changed', data);
   }
 
   brodcastPredictionComputedChange(predictionId: number, data: any) {
@@ -84,6 +85,10 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   brodcastUserAddedToGroup(userId: number, groupId: number) {
     this.server.to(`user_${userId}`).emit('added_to_group', { groupId });
+  }
+
+  brodcastGroupPredictionDelete(predictionId: number) {
+    this.server.to(`prediction_${predictionId}`).emit('prediction_deleted', { predictionId });
   }
 
   @SubscribeMessage('request_edit_lock')

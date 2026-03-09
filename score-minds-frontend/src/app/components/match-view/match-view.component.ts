@@ -54,7 +54,7 @@ export class MatchViewComponent implements OnInit, OnDestroy {
   predictionAwayScore = signal<number | null>(null);
   selectedWinner = signal<'HOME' | 'AWAY' | 'DRAW' | null>(null);
   hasPersonalPrediction =signal<boolean>(false);
-  
+
   selectWinner(side: 'HOME' | 'AWAY' | 'DRAW') {
 
     if (this.selectedWinner() === side) {

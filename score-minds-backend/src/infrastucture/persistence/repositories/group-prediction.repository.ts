@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { BaseRepository } from './base.repository';
 import { GroupPrediction } from 'src/domain/models/group-prediction.model';
 import { GroupPrediction as PredictionEntity } from '../entities/group-prediction.entity';
@@ -42,7 +42,7 @@ export class GroupPredictionRepository extends BaseRepository<GroupPrediction, P
 
     async findByGroupIdUpcoming(groupId: number,page:number,size:number): Promise<[GroupPrediction[],number]> {
         const [entities,total] = await this.typeOrmRepo.findAndCount({
-            where: { groupId ,match: { status: 'NS' } },
+            where: { groupId ,match: { status: In(['NS', 'LIVE']) } },
             relations: ['predictedEvents','match'],
             order:{match:{startTime:'ASC'}},
             skip: (page - 1) * size,

@@ -214,6 +214,7 @@ export class GroupPredictionService {
             throw new ForbiddenException("You are not the creator of this prediction");
         }
         await this.repo.delete(predictionId);
+        this.rabbitClient.emit("delete_group_prediction", predictionId);
         return { message: 'Prediction deleted successfully' };
     }
 

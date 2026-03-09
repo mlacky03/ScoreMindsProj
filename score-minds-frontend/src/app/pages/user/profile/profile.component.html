@@ -22,10 +22,14 @@
               {{ (user.username || user.email).charAt(0) | uppercase }}
             </div>
           </ng-template>
-          
+
           <div class="avatar-info">
             <h2 class="user-name">{{ user.username || 'User' }}</h2>
             <p class="user-email">{{ user.email }}</p>
+          </div>
+          <div class="points-badge" title="Total Points">
+            <span class="points-icon">⭐</span>
+            <span class="points-value">{{ user.totalPoints || 0 }} pts</span>
           </div>
         </div>
 
@@ -33,7 +37,7 @@
         <div class="profile-details">
           <div class="detail-section">
             <h3 class="section-title">Account Information</h3>
-            
+
             <div class="detail-grid">
               <div class="detail-item">
                 <div class="detail-label">
@@ -65,7 +69,7 @@
           <!-- Account Stats -->
           <div class="stats-section">
             <h3 class="section-title">Account Statistics</h3>
-            
+
             <div class="stats-grid">
               <div class="stat-card">
                 <div class="stat-icon">💰</div>
@@ -93,12 +97,12 @@
             <span class="button-icon">✏️</span>
             Update Profile
           </button>
-          
+
           <button class="action-button secondary" (click)="onUpdateProfile()">
             <span class="button-icon">⚙️</span>
             Settings
           </button>
-          
+
           <button class="action-button danger" (click)="onLogout()">
             <span class="button-icon">🚪</span>
             Log Out

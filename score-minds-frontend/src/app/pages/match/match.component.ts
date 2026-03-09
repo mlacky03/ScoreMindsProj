@@ -1,13 +1,13 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { NgIf, NgClass } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, distinctUntilChanged, switchMap, debounceTime } from 'rxjs/operators';
 import { MatchListComponent } from '../../components/match-list/match-list.component';
 import { MatchService } from '../../feature/match/match.service';
 import { MatchBaseDto } from '../../feature/match/data/match-base.dto';
-import { interval, Subject, Subscription } from 'rxjs';
+import {  Subject, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { MatchViewComponent } from '../../components/match-view/match-view.component';
+
 import { SocketService } from '../../core/services/socket.service';
 
 
@@ -27,11 +27,11 @@ export class MatchComponent implements OnInit, OnDestroy {
 
     private socketService = inject(SocketService);
     private socketSub?: Subscription;
-
+    private httpSub?: Subscription;
 
     private silentRefreshTrigger = new Subject<void>();
     private refreshSub?: Subscription;
-    
+
     displayedMatches = signal<MatchBaseDto[]>([]);
 
     currentPage = signal<number>(1);
@@ -43,35 +43,27 @@ export class MatchComponent implements OnInit, OnDestroy {
     hasMore = signal<boolean>(true);
 
 
-    // paginatedMatches = computed(() => {
-    //     const matches = this.displayedMatches();
-    //     const startIndex = (this.currentPage() - 1) * this.itemsPerPage();
-    //     const endIndex = startIndex + this.itemsPerPage();
-    //     return matches.slice(startIndex, endIndex);
-    // });
-
-    // totalPages = computed(() => {
-    //     return Math.ceil(this.displayedMatches().length / this.itemsPerPage());
-    // });
 
     ngOnInit() {
-        this.loadMatches();
-        this.refreshSub = this.silentRefreshTrigger.pipe(
-            debounceTime(500) 
-        ).subscribe(() => {
-            this.loadMatches(true); 
-        });
         this.socketService.joinRoom('all_matches_list');
 
+        this.loadMatches();
+        this.refreshSub = this.silentRefreshTrigger.pipe(
+            debounceTime(500)
+        ).subscribe(() => {
+            this.loadMatches(true);
+        });
+
         this.socketSub = this.socketService.onMatchListUpdate().subscribe(data => {
+            console.log('Stigli su podaci za mec u live:', data);
             const currentFilter = this.filter();
             let needsSilentRefresh = false;
             this.displayedMatches.update(currentMatches => {
                 const index = currentMatches.findIndex(m => m.id === data.id);
-                
+
                 if (index === -1) {
                     if (currentFilter === 'live' && data.status === 'LIVE') {
-                        needsSilentRefresh = true; 
+                        needsSilentRefresh = true;
                     }
                     if (currentFilter === 'all' && data.status === 'FT') {
                         needsSilentRefresh = true;
@@ -79,22 +71,25 @@ export class MatchComponent implements OnInit, OnDestroy {
                     return currentMatches;
                 }
                 const newMatches = [...currentMatches];
-                newMatches[index] = { ...newMatches[index], ...data };// ako ne radi vrati status nisi stigo ovo da testiras status:data.status tako bilo pre
-                
+                newMatches[index] = { ...newMatches[index], ...data };
+
                 if (currentFilter === 'upcoming' && data.status === 'LIVE') {
                     newMatches.splice(index, 1);
                     needsSilentRefresh = true;
+                   
                 }
 
                 if (currentFilter === 'live' && data.status === 'FT') {
                     newMatches.splice(index, 1);
                     needsSilentRefresh = true;
+                   
                 }
+
                 return newMatches;
             });
-            
+
             if (needsSilentRefresh) {
-                this.loadMatches(true);
+                this.silentRefreshTrigger.next();
             }
         });
 
@@ -109,9 +104,14 @@ export class MatchComponent implements OnInit, OnDestroy {
 
     loadMatches(isSilent: boolean = false) {
         if (!isSilent) {
-            this.loading.set(true); 
+            this.loading.set(true);
         }
-       
+        if (this.httpSub) {
+            this.httpSub.unsubscribe();
+        }
+
+
+
         const page = this.currentPage();
         const size = this.itemsPerPage();
         const currentFilter = this.filter();
@@ -121,16 +121,16 @@ export class MatchComponent implements OnInit, OnDestroy {
         if (currentFilter === 'all') {
             request$ = this.matchService.getHistoryMatches(page, size);
         }
-        else if(currentFilter=='live')
-        {
-            request$=this.matchService.getLiveMathes(page,size);
+        else if (currentFilter == 'live') {
+            request$ = this.matchService.getLiveMathes(page, size);
         }
         else {
             request$ = this.matchService.getUpcomingMatches(page, size);
         }
 
-        request$.subscribe({
+        this.httpSub = request$.subscribe({
             next: (ms) => {
+                console.log("Mecevi Povuceni: ", ms);
                 this.displayedMatches.set(ms);
                 this.hasMore.set(ms.length === size);
                 this.loading.set(false);
@@ -169,5 +169,8 @@ export class MatchComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.socketService.leaveRoom('all_matches_list');
         this.socketSub?.unsubscribe();
+
+        this.refreshSub?.unsubscribe();
+        this.httpSub?.unsubscribe();
     }
 }

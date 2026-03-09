@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { BaseRepository } from './base.repository';
 import { PersonalPrediction } from 'src/domain/models/personal-prediction.model';
 import { PersonalPrediction as PredictionEntity } from '../entities/personal-prediction.entity';
@@ -42,7 +42,7 @@ export class PersonalPredictionRepository extends BaseRepository<PersonalPredict
     
     async findByUserIdUpcoming(userId: number,page:number,size:number): Promise<[PersonalPrediction[], number]> {
         const [entities, total] = await this.typeOrmRepo.findAndCount({
-            where: { userId, match: { status: 'NS' } },
+            where: { userId, match: { status: In(['NS', 'LIVE']) } },
             relations: ['predictedEvents','match'],
             order: {
             match: {

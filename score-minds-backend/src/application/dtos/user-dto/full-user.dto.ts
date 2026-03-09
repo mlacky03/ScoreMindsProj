@@ -12,6 +12,7 @@ export class FullUserDto {
     predictions: (number|null)[];
     groups: (number|null)[];
     ownedGroups: (number|null)[];
+    totalPoints:number;
 
     constructor(user: User,predictions: PersonalPrediction[], groups: Group[], ownedGroups: GroupUser[]) {
         this.id = user.id!;
@@ -22,5 +23,6 @@ export class FullUserDto {
         this.predictions = predictions?.map(p=>p.id) ;
         this.groups = groups?.map(g=>g.id) ;
         this.ownedGroups = ownedGroups?.map(g=>g.groupId);
+        this.totalPoints=user.personalPoints;
     }
 }

@@ -7,4 +7,5 @@ export interface UserDto{
     groups: number[];
     ownedGroups: number[];
     predictions: number[];
+    totalPoints:number[];
 }

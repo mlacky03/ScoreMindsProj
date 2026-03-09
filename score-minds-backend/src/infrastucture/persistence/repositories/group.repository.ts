@@ -117,7 +117,7 @@ export class GroupRepository extends BaseRepository<Group, GroupEntity> {
             order: {
                 groupPoints: 'DESC'
             },
-            take: 10
+            take: 5
 
         });
         return this.mapper.toDomainList(groups);

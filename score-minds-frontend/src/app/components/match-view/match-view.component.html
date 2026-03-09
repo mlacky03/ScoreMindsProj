@@ -1,88 +1,93 @@
-<div class="match-view" *ngIf="match(); else loading">
+<ng-container *ngIf="!loading(); else loadingTemplate">
 
-  <div class="match-grid">
+  <div class="match-view" >
+    <div class="match-grid">
 
-    <div class="team-column home">
-      <div class="team-header">
-        <div class="team-logo-wrapper" [class.selected]="selectedWinner() === 'HOME'" (click)="selectWinner('HOME')"
-          [class.locked]="match()?.status !== 'NS' ">
-          <img [ngSrc]="match()?.homeTeamLogo || 'assets/group-placeholder.webp'" width="120" height="120" priority
-            alt="{{ match()?.homeTeamName }}" (error)="onImgError($event)" />
-          <div class="check-mark" *ngIf="selectedWinner() === 'HOME'">✔</div>
+      <div class="team-column home">
+        <div class="team-header">
+          <div class="team-logo-wrapper" [class.selected]="selectedWinner() === 'HOME'" (click)="selectWinner('HOME')"
+            [class.locked]="match()?.status !== 'NS' ">
+            <img [ngSrc]="match()?.homeTeamLogo || 'assets/group-placeholder.webp'" width="120" height="120" priority
+              alt="{{ match()?.homeTeamName }}" (error)="onImgError($event)" />
+            <div class="check-mark" *ngIf="selectedWinner() === 'HOME'">✔</div>
+          </div>
+          <h2 class="team-name">{{ match()?.homeTeamName }}</h2>
         </div>
-        <h2 class="team-name">{{ match()?.homeTeamName }}</h2>
+
+        <div class="players-list-wrapper">
+          <h3 class="list-title">Squad</h3>
+          <app-players-list [players]="homeTeamPlayers()" [matchStatus]="match()?.status"
+            (playerEvent)="handlePlayerEvent($event)"></app-players-list>
+        </div>
       </div>
 
-      <div class="players-list-wrapper">
-        <h3 class="list-title">Squad</h3>
-        <app-players-list [players]="homeTeamPlayers()" [matchStatus]="match()?.status"
-          (playerEvent)="handlePlayerEvent($event)"></app-players-list>
-      </div>
-    </div>
+      <div class="match-info-column">
 
-    <div class="match-info-column">
+        <div class="score-input-container">
+          <ng-container *ngIf="match()?.status === 'NS'; else liveScore">
+            <input type="number" class="score-box" min="0" max="20" placeholder="0" [(ngModel)]="predictionHomeScore">
+            <div class="divider">-</div>
+            <input type="number" class="score-box" min="0" max="20" placeholder="0" [(ngModel)]="predictionAwayScore">
+          </ng-container>
 
-      <div class="score-input-container">
-        <ng-container *ngIf="match()?.status === 'NS'; else liveScore">
-          <input type="number" class="score-box" min="0" max="20" placeholder="0" [(ngModel)]="predictionHomeScore">
-          <div class="divider">-</div>
-          <input type="number" class="score-box" min="0" max="20" placeholder="0" [(ngModel)]="predictionAwayScore">
-        </ng-container>
+          <ng-template #liveScore>
+            <div class="score-box read-only">{{ match()?.finalScoreHome ?? 0 }}</div>
+            <div class="divider">-</div>
+            <div class="score-box read-only">{{ match()?.finalScoreAway ?? 0 }}</div>
+          </ng-template>
+        </div>
 
-        <ng-template #liveScore>
-          <div class="score-box read-only">{{ match()?.finalScoreHome ?? 0 }}</div>
-          <div class="divider">-</div>
-          <div class="score-box read-only">{{ match()?.finalScoreAway ?? 0 }}</div>
-        </ng-template>
-      </div>
-
-      <div class="match-details">
-        <div class="detail-item">
-          <div class="match-time-info">
-            @if (match()?.status === 'LIVE') {
-            <span class="icon live-dot">●</span>
-            <span class="live-minutes">{{ match()?.minutes ?? 0 }}'</span>
-            } @else {
-            <span class="icon">📅</span>
-            <span>{{ match()?.startTime | date:'dd.MM.yyyy HH:mm' }}</span>
-            }
+        <div class="match-details">
+          <div class="detail-item">
+            <div class="match-time-info">
+              @if (match()?.status === 'LIVE') {
+              <span class="live-minutes">min:{{ match()?.minutes ?? 0 }}'</span>
+              } @else {
+              <span class="icon">📅</span>
+              <span>{{ match()?.startTime | date:'dd.MM.yyyy HH:mm' }}</span>
+              }
+            </div>
+          </div>
+          <div class="detail-item status">
+            <span class="status-dot"></span>
+            <span>{{ match()?.status }}</span>
           </div>
         </div>
-        <div class="detail-item status">
-          <span class="status-dot"></span>
-          <span>{{ match()?.status }}</span>
+
+        <button class="action-button primary" *ngIf="match()?.status !== 'FT' && match()?.status !== 'LIVE'"
+          (click)="onCreatePrediction()" [disabled]="!selectedWinner() || hasPersonalPrediction()">
+          {{ hasPersonalPrediction() ? 'Prediction already exists' : 'Create Prediction' }}
+        </button>
+        <button class="action-button primary" *ngIf="match()?.status !== 'FT' && match()?.status !== 'LIVE'"
+          (click)="onCreateGroupPrediction()" [disabled]="!selectedWinner() ">
+          {{'Create Group Prediction' }}
+        </button>
+
+      </div>
+      <div class="team-column away">
+        <div class="team-header">
+          <div class="team-logo-wrapper" [class.selected]="selectedWinner() === 'AWAY'" (click)="selectWinner('AWAY')"
+            [class.locked]="match()?.status !== 'NS' ">
+            <img [ngSrc]="match()?.awayTeamLogo || 'assets/group-placeholder.webp'" width="120" height="120" priority
+              alt="{{ match()?.awayTeamName }}" (error)="onImgError($event)" />
+            <div class="check-mark" *ngIf="selectedWinner() === 'AWAY'">✔</div>
+          </div>
+          <h2 class="team-name">{{ match()?.awayTeamName }}</h2>
+        </div>
+
+        <div class="players-list-wrapper">
+          <h3 class="list-title">Squad</h3>
+          <app-players-list [players]="awayTeamPlayers()" [matchStatus]="match()?.status"
+            (playerEvent)="handlePlayerEvent($event)"></app-players-list>
         </div>
       </div>
 
-      <button class="action-button primary" *ngIf="match()?.status !== 'FT'" (click)="onCreatePrediction()"
-        [disabled]="!selectedWinner() || hasPersonalPrediction()">
-        {{ hasPersonalPrediction() ? 'Prediction already exists' : 'Create Prediction' }}
-      </button>
-      <button class="action-button primary" *ngIf="match()?.status !== 'FT'" (click)="onCreateGroupPrediction()"
-        [disabled]="!selectedWinner() ">
-        {{'Create Group Prediction' }}
-      </button>
-
     </div>
-    <div class="team-column away">
-      <div class="team-header">
-        <div class="team-logo-wrapper" [class.selected]="selectedWinner() === 'AWAY'" (click)="selectWinner('AWAY')"
-          [class.locked]="match()?.status !== 'NS' ">
-          <img [ngSrc]="match()?.awayTeamLogo || 'assets/group-placeholder.webp'" width="120" height="120" priority
-            alt="{{ match()?.awayTeamName }}" (error)="onImgError($event)" />
-          <div class="check-mark" *ngIf="selectedWinner() === 'AWAY'">✔</div>
-        </div>
-        <h2 class="team-name">{{ match()?.awayTeamName }}</h2>
-      </div>
-
-      <div class="players-list-wrapper">
-        <h3 class="list-title">Squad</h3>
-        <app-players-list [players]="awayTeamPlayers()" [matchStatus]="match()?.status"
-          (playerEvent)="handlePlayerEvent($event)"></app-players-list>
-      </div>
-    </div>
-
   </div>
-</div> <ng-template #loading>
-  <div class="loading-text">Loading match data...</div>
+</ng-container>
+<ng-template #loadingTemplate>
+  <div class="loading-overlay">
+    <div class="spinner"></div>
+    <p class="loading-text">Učitavanje podataka o meču...</p>
+  </div>
 </ng-template>

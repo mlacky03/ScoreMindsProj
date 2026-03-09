@@ -36,18 +36,19 @@
                 [currentGroupId]="getSelectedGroupId()">
             </app-prediction-list>
 
-            <div class="pagination-controls">
-                <button class="page-btn" [disabled]="page() === 1" (click)="page.update(p => p - 1)">
-                    <i class="icon-arrow-left"></i> Nazad
-                </button>
 
-                <span class="page-info">Strana {{ page() }}</span>
-
-                <button class="page-btn" [disabled]="page() * pageSize() >= totalItems()" (click)="page.update(p => p + 1)">
-                    Napred <i class="icon-arrow-right"></i>
-                </button>
-            </div>
         </ng-template>
+        <div class="pagination-controls">
+            <button class="page-btn" [disabled]="page() === 1" (click)="page.set(page() - 1)">
+                <i class="icon-arrow-left"></i> Backward
+            </button>
+
+            <span class="page-info">Page {{ page() }}</span>
+
+            <button class="page-btn" [disabled]="page() * pageSize() >= totalItems()" (click)="page.set(page()+ 1)">
+                Forward <i class="icon-arrow-right"></i>
+            </button>
+        </div>
     </div>
 
     <div class="detail-panel">

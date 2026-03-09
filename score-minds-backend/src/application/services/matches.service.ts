@@ -50,7 +50,7 @@ export class MatchService {
 
   async findLiveMatches(page: number, size: number): Promise<BaseMatchDto[]> {
     const skip = (page - 1) * size;
-    const res = await this.matchRepository.findLiveMatchesPagginated(skip, page);
+    const res = await this.matchRepository.findLiveMatchesPagginated(skip, size);
     return res.map((m) => new BaseMatchDto(m));
   }
 }

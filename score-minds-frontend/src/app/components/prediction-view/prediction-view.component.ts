@@ -25,12 +25,13 @@ import { GroupPredictionService } from '../../feature/predictions/group-predicti
 import { FullGroupPredictionDto } from '../../feature/predictions/group-predictions/data/full-g-predicton.dto';
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { AuthService } from '../../core/auth/auth.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'
 
 
 @Component({
   selector: 'app-prediction-view',
   standalone: true,
-  imports: [NgIf, NgFor, MatDialogModule, NgClass, DatePipe],
+  imports: [NgIf, NgFor, MatDialogModule, NgClass, DatePipe, MatSnackBarModule],
   templateUrl: './prediction-view.component.html',
   styleUrl: './prediction-view.component.scss',
 })
@@ -43,7 +44,9 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private socketService = inject(SocketService);
   private router = inject(Router);
-  private authService=inject(AuthService);
+  private authService = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+  private isDeleting = false;
 
   mode: 'personal' | 'group' = 'personal';
 
@@ -93,19 +96,26 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
           return this.activePredictionService(pId, gId).pipe(
             tap((pred: any) => {
+              if (this.currentPredictionId && this.currentPredictionId !== pId && this.prediction()?.status !== 'PROCESSED') {
+                this.socketService.leaveRoom(`prediction_${this.currentPredictionId}`);
+              }
               this.prediction.set(pred);
+
+              // this.isLockedByOther.set(false);
+              // this.activeEditorName.set(null);
+
 
               if (this.mode === 'group') {
                 this.currentGroupId = gId;
-                this.listenForLiveUpdates();
 
               }
 
               this.currentPredictionId = pId;
-              this.socketService.joinRoom(`prediction_${pId}`);
+              if (pred.status !== 'PROCESSED') {
+                this.socketService.joinRoom(`prediction_${pId}`);
+              }
 
               this.currentMatchId = pred.matchId;
-              this.socketService.joinRoom(`match_${pred.matchId}`);
             }),
 
             switchMap((pred: FullUserPredictionDto | FullGroupPredictionDto) => {
@@ -145,6 +155,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
     this.subs.add(
       this.socketService.onPredictionUpdate().subscribe((data: any) => {
+        if (this.isDeleting) return;
         console.log('Stigao update za predikciju:', data);
         if (this.currentPredictionId && data.predictionId === this.currentPredictionId) {
           this.prediction.update((current) => {
@@ -173,7 +184,9 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
       })
     );
 
-    
+    if (this.mode === 'group') {
+      this.listenForLiveUpdates();
+    }
   }
 
   private listenForLiveUpdates() {
@@ -191,14 +204,34 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
       })
     );
 
-
+    this.subs.add(
+      this.socketService.onGroupPredictionDelete().subscribe((data: any) => {
+        console.log('Stigao update za brisanje predikcije:', data);
+        if (this.currentPredictionId && Number(data.predictionId) === Number(this.currentPredictionId)) {
+          this.prediction.set(null);
+          this.snackBar.open('Ova predikcija je upravo obrisana.', 'Zatvori', {
+            duration: 4000, 
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-info'] 
+          });
+          this.groupPredictions.notifyPredictionDelete(this.currentPredictionId);
+          this.router.navigate(['/groupPredictions']);
+        }
+      })
+    )
     this.subs.add(
       this.socketService.on('live_form_update').subscribe((newData: any) => {
-
-        this.prediction.update((current) => {
-          if (!current) return null;
-          return { ...current, ...newData, predictedEvents: newData.events, winner: newData.predictedWinner };
-        });
+        const currentPred = this.prediction();
+        if (!currentPred) return;
+        const updatedPrediction = {
+          ...currentPred,
+          ...newData,
+          predictedEvents: newData.events,
+          winner: newData.predictedWinner
+        };
+        this.prediction.set(updatedPrediction);
+        this.mode === 'personal' ? this.personalPredictions.notifyPredictionUpdate(updatedPrediction) : this.groupPredictions.notifyPredictionUpdate(updatedPrediction);
       })
     );
   }
@@ -228,7 +261,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
     return this.prediction()?.createdByName || null;
   }
 
-  getUsername():string{
+  getUsername(): string {
     return this.currentUser()?.username || '';
   }
 
@@ -271,6 +304,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
     ref.afterClosed().subscribe((confirmed) => {
       if (confirmed) {
+        this.isDeleting = true;
         if (this.mode === 'personal') {
           this.personalPredictions.deletePrediction(p.id).subscribe({
             next: () => {
@@ -300,30 +334,10 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
   }
 
-  private refreshCurrent() {
-    const g = this.prediction();
-    if (!g) return;
-    this.loading.set(true);
-    this.personalPredictions
-      .getOnePrediction(g.id)
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: (v) => this.prediction.set(v),
-        error: (err) => {
-          // Error handling is done by ErrorService
-        },
-      });
-  }
-
   ngOnDestroy(): void {
     this.subs.unsubscribe();
     if (this.currentPredictionId) {
       this.socketService.leaveRoom(`prediction_${this.currentPredictionId}`);
-    }
-    if (this.currentMatchId) {
-      //this.socketService.emit('release_edit_lock', { predictionId: this.currentPredictionId });
-      this.socketService.leaveRoom(`prediction_${this.currentPredictionId}`);
-      this.socketService.leaveRoom(`match_${this.currentMatchId}`);
     }
   }
 }

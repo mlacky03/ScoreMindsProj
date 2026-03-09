@@ -55,39 +55,56 @@ export class PredictionAllComponent {
             this.fetchData(this.page(), currentMode);
 
         }, { allowSignalWrites: true });
+        effect((onCleanup) => {
+            const user = this.currenUser();
+            const mode = this.filterMode();
+            if ( mode === 'upcoming' && user) {
+                const roomName = `all_predictions_list_${user.id}`;
+                this.socketService.joinRoom(roomName);
+
+                onCleanup(() => {
+                    this.socketService.leaveRoom(roomName);
+                });
+            }
+        });
     }
 
     ngOnInit() {
         this.updateSub.add(
             this.socketService.onMatchUpdate().subscribe((updateData) => {
                 console.log('Stigao update statusa meča u listu predikcija:', updateData);
-                if (this.filterMode() === 'upcoming') {
-                    if (updateData.status === 'FT') {
-                        this.matches.update((currentMatches) => {
-                            return currentMatches.filter(match => match.id !== updateData.id);
-                        });
-                        if (this.matches().length < this.pageSize()) {
-                            this.fetchData(this.page(), this.filterMode());
-                        }
-                    }
-                    else {
-                        this.matches.update((currentMatches) => {
-                            return currentMatches.map(match => {
-                                if (match.id === updateData.id) {
-                                    return { ...match, ...updateData };
-                                }
-                                return match;
-                            });
 
-                        });
+                if (updateData.status === 'FT') {
+                    this.matches.update((currentMatches) => {
+                        return currentMatches.filter(match => match.id !== updateData.id);
+                    });
+                    this.predictions.update((currentPredictions) => {
+                        return currentPredictions.filter(prediction => prediction.matchId !== updateData.id);
+                    });
+                    this.totalItems.update(t => t > 0 ? t - 1 : 0);
+                    if (this.totalItems() >= this.page() * this.pageSize()) {
+                        this.fetchData(this.page(), this.filterMode());
                     }
-
                 }
+                else {
+                    this.matches.update((currentMatches) => {
+                        return currentMatches.map(match => {
+                            if (match.id === updateData.id) {
+                                return { ...match, ...updateData };
+                            }
+                            return match;
+                        });
+
+                    });
+                }
+
+
             })
         );
 
         this.updateSub.add(
             this.socketService.onPersonalListUpdate().subscribe((data) => {
+                if (this.filterMode() !== 'upcoming') return;
                 console.log('Stigao update personalne liste predikcija:', data);
                 this.predictions.update((cp) => {
                     return cp.map((item) => {
@@ -101,8 +118,6 @@ export class PredictionAllComponent {
         );
 
 
-
-        this.socketService.joinRoom('personal_list_changed_' + this.currenUser()?.id);
 
 
         this.updateSub.add(
@@ -126,6 +141,7 @@ export class PredictionAllComponent {
             })
         );
     }
+
     private fetchData(page: number, mode: 'upcoming' | 'history') {
         this.loading.set(true);
 
@@ -169,19 +185,12 @@ export class PredictionAllComponent {
     onDeactivate() {
         this.isDetailsOpen.set(false);
     }
-    onSelect(predictionId: number, matchId: number) {
+    onSelect(predictionId: number) {
         if (!predictionId || this.selectedPredictionId() === predictionId) {
             return;
         }
+
         this.router.navigate([predictionId], { relativeTo: this.route });
-    }
-    changePage(step: number) {
-        const newPage = this.page() + step;
-
-
-        if (newPage > 0) {
-            this.page.set(newPage);
-        }
     }
 
     ngOnDestroy() {
@@ -191,7 +200,6 @@ export class PredictionAllComponent {
         if (this.activeMatchRooms.length > 0) {
             this.socketService.leaveMatchRooms(this.activeMatchRooms);
         }
-        this.socketService.leaveRoom('personal_list_changed_' + this.currenUser()?.id);
     }
 
 }

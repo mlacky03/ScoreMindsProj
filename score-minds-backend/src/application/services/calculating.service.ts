@@ -111,7 +111,7 @@ export class CalculatingService {
         match.computed();
         await this.matchRepo.save(match);
 
-        this.logger.log(`Match ${match.id} calculation DONE.`);
+
     }
 
     private async processGroupPredictions(match:Match,actualWinner:string){
@@ -153,7 +153,7 @@ export class CalculatingService {
         match.computed();
         await this.matchRepo.save(match);
 
-        this.logger.log(`Match ${match.id} calculation DONE.`);
+
     }
 
 

@@ -1,2 +1,8 @@
-<app-nav-bar/>
-<router-outlet/>
+@if (isAuthResolved()) {
+  <app-nav-bar/>
+  <router-outlet/>
+} @else {
+  <div style="height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #121212; color: white;">
+    <h2>ScoreMinds se učitava...</h2>
+    </div>
+}

@@ -4,44 +4,45 @@ import { environment } from '../../../environment/environment';
 import { LoginDto } from './data/login.dto';
 import { TokenDto } from './data/token.dto';
 import { UserDto } from '../../feature/users/data/user.dto';
-import { catchError } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { UserCreateDto } from '../../feature/users/data/user-create.dto';
 import { ErrorService } from '../services/error.service';
 import { tap } from 'rxjs/operators';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
-export class AuthService{
-    currentUser = signal<UserDto | null>(null);
-    getToken() {
-        return localStorage.getItem('access_token');
-    }
-    private http=inject(HttpClient);
-    private errorService=inject(ErrorService);
-    private base=environment.apiUrl;
+export class AuthService {
+  currentUser = signal<UserDto | null>(null);
+  getToken() {
+    return localStorage.getItem('access_token');
+  }
+  private http = inject(HttpClient);
+  private errorService = inject(ErrorService);
+  private base = environment.apiUrl;
 
-    login(dto: LoginDto)
-    {
-        return this.http.post<TokenDto>(`${this.base}/auth/login`,dto).pipe(
-          tap(response => {
-            if (response && response.access_token) {
-                localStorage.setItem('access_token', response.access_token);
-            }
-        }),
-            catchError((err)=>this.errorService.handleHttpError(err))
-        );
-    }
+  login(dto: LoginDto) {
+    return this.http.post<TokenDto>(`${this.base}/auth/login`, dto).pipe(
+      tap(response => {
+        if (response && response.access_token) {
+          localStorage.setItem('access_token', response.access_token);
+        }
+      }),
+      catchError((err) => this.errorService.handleHttpError(err))
+    );
+  }
 
-    me()
-    {
-        return this.http.get<UserDto>(`${this.base}/users/profile`).pipe(
-          tap(user => this.currentUser.set(user)),
-            catchError((err)=>this.errorService.handleHttpError(err))
-        );
+  me() {
+    if (this.currentUser()) {
+      return of(this.currentUser()!);
     }
+    return this.http.get<UserDto>(`${this.base}/users/profile`).pipe(
+      tap(user => this.currentUser.set(user)),
+      catchError((err) => this.errorService.handleHttpError(err))
+    );
+  }
 
-    register(dto: UserCreateDto, image?: File) {
+  register(dto: UserCreateDto, image?: File) {
     const url = `${this.base}/auth/register`;
 
     const request$ = image
@@ -53,7 +54,7 @@ export class AuthService{
     );
   }
 
-    private toFormData(dto: UserCreateDto, image: File): FormData {
+  private toFormData(dto: UserCreateDto, image: File): FormData {
     const fd = new FormData();
     Object.entries(dto).forEach(([k, v]) => {
       if (v !== undefined && v !== null) fd.append(k, String(v));

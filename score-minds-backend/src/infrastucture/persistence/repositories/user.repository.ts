@@ -26,7 +26,7 @@ export class UserRepository extends BaseRepository<User, UserEntity> {
             order: {
                 personalPoints: 'DESC'
             },
-            take: 10
+            take: 5
 
         });
 

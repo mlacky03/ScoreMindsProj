@@ -21,7 +21,7 @@
       <span class="match-date">
         @if (match?.status === 'LIVE') {
         <span class="live-minutes">
-          {{ match?.minutes }}' <span class="blink">●</span>
+          {{ match.minutes ? match.minutes :0}}' <span class="blink">●</span>
         </span>
         } @else {
         {{ match?.startTime | date:'dd.MM.yyyy HH:mm' }}

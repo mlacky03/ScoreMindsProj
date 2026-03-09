@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit, signal } from "@angular/core";
-import { CommonModule,  NgIf } from "@angular/common";
+import { CommonModule, NgIf } from "@angular/common";
 import { forkJoin, Subscription } from "rxjs";
 
 import { RankListComponent } from "../../components/rank-list/rank-list.component";
@@ -10,7 +10,7 @@ import { RankActions } from "../../feature/rank/state/rank.actions";
 @Component({
     selector: 'app-rank',
     standalone: true,
-    imports: [RankListComponent,CommonModule,NgIf   ],
+    imports: [RankListComponent, CommonModule, NgIf],
     templateUrl: './rank.component.html',
     styleUrl: './rank.component.scss'
 })
@@ -20,16 +20,22 @@ export class RankComponent implements OnInit, OnDestroy {
 
     users = this.store.selectSignal(selectAllRankUsers);
     groups = this.store.selectSignal(selectAllRankGroups);
-    loading = this.store.selectSignal(selectRankLoading);   
-    
-    
+    loading = this.store.selectSignal(selectRankLoading);
+
+
     activeTab = signal<'users' | 'groups'>('users');
 
     ngOnInit() {
-        this.store.dispatch(RankActions.loadLeaderboards());
+        const currentUsers = this.users();
+        const currentGroups = this.groups();
+        if ((!currentUsers || currentUsers.length === 0) && (!currentGroups || currentGroups.length === 0)) {
+            this.store.dispatch(RankActions.loadLeaderboards());
+        } else {
+            console.log('Podaci su već u Store-u, preskačem HTTP zahtev!');
+        }
     }
 
-    
+
     switchTab(tab: 'users' | 'groups') {
         this.activeTab.set(tab);
         console.log(this.users());

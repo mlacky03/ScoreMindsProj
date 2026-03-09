@@ -31,14 +31,13 @@ export class SyncWorker {
 
 
         this.appGateway.broadcastMatchUpdate(data.id, data);
-        this.appGateway.broadcastMatchStatusChange(data.id, data.status);
     }
 
     @EventPattern('update_match_list')
     handleMatchListUpdate(@Payload() data: any) {
         console.log(`📡 RabbitMQ -> WebSocket: Update liste mečeva`);
 
-        this.appGateway.broadcastMatchStatusChange(data.id, data.status);
+        this.appGateway.broadcastMatchListChange(data);
     }
 
     
