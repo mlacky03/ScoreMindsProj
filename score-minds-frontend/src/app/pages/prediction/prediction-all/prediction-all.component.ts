@@ -53,6 +53,7 @@ export class PredictionAllComponent {
             const currentMode = this.filterMode();
 
             this.fetchData(this.page(), currentMode);
+            
 
         }, { allowSignalWrites: true });
         effect((onCleanup) => {

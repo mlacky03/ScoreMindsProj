@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { TokenState } from '../auth/token.state';
 
-const SSE_PATHS = ['/expenses/expense-stream', '/expenses/countdown/'];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const state = inject(TokenState);
@@ -17,10 +16,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     undefined;
   const isPublicPath = ['/login', '/register','/rank'].some((p) => req.url.includes(p));
   
-  // 2) Skip SSE endpoints (EventSource can’t use these headers anyway)
-  const isSse = SSE_PATHS.some((p) => req.url.includes(p));
 
-  const authReq = !isSse && token && !isPublicPath
+
+  const authReq = token && !isPublicPath
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
 

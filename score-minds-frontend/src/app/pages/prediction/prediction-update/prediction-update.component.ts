@@ -83,7 +83,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
           }
         })
       );
-     
+
       this.subs.add(
         this.socketService.on('live_form_update').subscribe((newData: any) => {
           this.form.patchValue(newData, { emitEvent: false });
@@ -106,9 +106,9 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
         })
       );
     }
-     else{
-        this.hasLock=true;
-      }
+    else {
+      this.hasLock = true;
+    }
 
     if (this.prediction.predictedEvents) {
       this.prediction.predictedEvents.forEach(event => {
@@ -125,7 +125,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
     const currentLength = this.eventsArray.length;
     const incomingLength = incomingEvents.length;
 
-   
+
     if (currentLength < incomingLength) {
       for (let i = currentLength; i < incomingLength; i++) {
         this.eventsArray.push(this.fb.group({
@@ -137,7 +137,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
         this.editingStates.push(false);
       }
     }
-   
+
     else if (currentLength > incomingLength) {
       for (let i = currentLength - 1; i >= incomingLength; i--) {
         this.eventsArray.removeAt(i, { emitEvent: false });
@@ -145,7 +145,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
       }
     }
 
-    
+
     this.eventsArray.patchValue(incomingEvents, { emitEvent: false });
   }
   filterPlayers(searchTerm: string | null) {
@@ -230,11 +230,18 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
     const formValue = this.form.getRawValue();
     //const eventsP: PredictionEventUpdateDto[] = this.isEventsEqual(this.prediction.predictedEvents, formValue.events as unknown as PredictionEventUpdateDto[]);
     const p = this.updateMode();
-    p.predictedAwayScore = (formValue.predictedAwayScore === '-' || formValue.predictedAwayScore === ' ') ? undefined : Number(formValue.predictedAwayScore);
-    p.predictedHomeScore = (formValue.predictedHomeScore === '-' || formValue.predictedHomeScore === ' ') ? undefined : Number(formValue.predictedHomeScore);
-    p.winner = formValue.predictedWinner!;
-    p.events = formValue.events as unknown as PredictionEventUpdateDto[]; 
+    p.predictedAwayScore = formValue.predictedAwayScore !== null &&
+      formValue.predictedAwayScore !== undefined &&
+      formValue.predictedAwayScore !== ''
+      ? Number(formValue.predictedAwayScore) : undefined;
 
+    p.predictedHomeScore = formValue.predictedHomeScore !== null &&
+      formValue.predictedHomeScore !== undefined &&
+      formValue.predictedHomeScore !== ''
+      ? Number(formValue.predictedHomeScore) : undefined;
+    p.winner = formValue.predictedWinner!;
+    p.events = formValue.events as unknown as PredictionEventUpdateDto[];
+    
     this.activePredictionService(p).subscribe({
       next: (prediction: any) => {
         this.isSaved = true;
@@ -293,14 +300,14 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
   }
 
   private restoreOriginalState() {
-    
+
     this.form.patchValue({
       predictedAwayScore: this.prediction.predictedAwayScore ?? '-',
       predictedHomeScore: this.prediction.predictedHomeScore ?? '-',
       predictedWinner: this.prediction.winner ?? ''
     }, { emitEvent: false });
 
-    
+
     this.eventsArray.clear({ emitEvent: false });
     this.editingStates = [];
 
@@ -316,7 +323,7 @@ export class PredictionUpdateComponent implements OnInit, OnDestroy {
       });
     }
 
-    
+
     this.socketService.emit('form_value_changed', {
       predictionId: this.data.prediction.id,
       data: this.form.getRawValue()

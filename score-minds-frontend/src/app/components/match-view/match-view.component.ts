@@ -53,7 +53,7 @@ export class MatchViewComponent implements OnInit, OnDestroy {
   predictionHomeScore = signal<number | null>(null);
   predictionAwayScore = signal<number | null>(null);
   selectedWinner = signal<'HOME' | 'AWAY' | 'DRAW' | null>(null);
-  hasPersonalPrediction =signal<boolean>(false);
+  hasPersonalPrediction = signal<boolean>(false);
 
   selectWinner(side: 'HOME' | 'AWAY' | 'DRAW') {
 
@@ -143,6 +143,14 @@ export class MatchViewComponent implements OnInit, OnDestroy {
     this.predictionEvents.update(events => events.filter((_, i) => i !== index));
   }
   onCreatePrediction() {
+    const home = this.predictionHomeScore();
+    const away = this.predictionAwayScore();
+    const winner = this.selectedWinner();
+
+    if (home && away && ((home > away && winner === 'AWAY') || (away > home && winner === 'HOME'))) {
+      alert('Error: Winner selection does not match the predicted score!');
+      return;
+    }
     const prediction: CreateUserPredictionDto = {
       matchId: this.match()!.id,
       predictedHomeScore: this.predictionHomeScore() || null,
@@ -167,36 +175,43 @@ export class MatchViewComponent implements OnInit, OnDestroy {
 
   }
   onCreateGroupPrediction() {
-    
-    this.onOpenSearchDialog().subscribe((selectedGroupId:number|undefined) => {
-        
-       
-        if (selectedGroupId==undefined) {
-            return; 
+
+    this.onOpenSearchDialog().subscribe((selectedGroupId: number | undefined) => {
+
+
+      if (selectedGroupId == undefined) {
+        return;
+      }
+      const home = this.predictionHomeScore();
+      const away = this.predictionAwayScore();
+      const winner = this.selectedWinner();
+
+      if (home && away && ((home > away && winner === 'AWAY') || (away > home && winner === 'HOME'))) {
+        alert('Greška: Ne možeš odabrati pobednika koji nije u skladu sa rezultatom!');
+        return;
+      }
+
+      const prediction: CreateGroupPredictionDto = {
+        matchId: this.match()!.id,
+        predictedHomeScore: this.predictionHomeScore() || null,
+        predictedAwayScore: this.predictionAwayScore() || null,
+        winner: this.selectedWinner() || "DRAW",
+        events: this.predictionEvents()
+      };
+
+      this.groupPredictions.createPredicton(prediction, selectedGroupId).subscribe({
+        next: (prediction) => {
+          console.log('Prediction created:', prediction);
+
+        },
+        error: (err) => {
+          console.error('Greška pri kreiranju predikcije:', err);
+
         }
-
-        
-        const prediction: CreateGroupPredictionDto = {
-            matchId: this.match()!.id,
-            predictedHomeScore: this.predictionHomeScore() || null,
-            predictedAwayScore: this.predictionAwayScore() || null,
-            winner: this.selectedWinner() || "DRAW",
-            events: this.predictionEvents()
-        };
-
-        this.groupPredictions.createPredicton(prediction, selectedGroupId).subscribe({
-            next: (prediction) => {
-                console.log('Prediction created:', prediction);
-                
-            },
-            error: (err) => {
-                console.error('Greška pri kreiranju predikcije:', err);
-                
-            }
-        });
+      });
     });
-}
-  onOpenSearchDialog() :Observable<number|undefined> {
+  }
+  onOpenSearchDialog(): Observable<number | undefined> {
     const ref = this.dialog.open(GroupSearchComponent, {
       disableClose: false,
       width: '720px',
@@ -207,14 +222,14 @@ export class MatchViewComponent implements OnInit, OnDestroy {
     return ref.afterClosed().pipe(
       map((result) => {
         if (result && result !== 'cancel') {
-          this.groupId = result as number; 
-          return result as number;         
+          this.groupId = result as number;
+          return result as number;
         }
-        
-        return undefined; 
+
+        return undefined;
       })
     );
-   
+
   }
 
 

@@ -33,9 +33,9 @@ export class AuthService {
   }
 
   me() {
-    if (this.currentUser()) {
-      return of(this.currentUser()!);
-    }
+    // if (this.currentUser()) {
+    //   return of(this.currentUser()!);
+    // }
     return this.http.get<UserDto>(`${this.base}/users/profile`).pipe(
       tap(user => this.currentUser.set(user)),
       catchError((err) => this.errorService.handleHttpError(err))

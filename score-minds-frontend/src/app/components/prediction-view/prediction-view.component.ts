@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, WritableSignal, inject, signal } from '@angular/core';
 import { NgIf, NgFor, NgOptimizedImage, NgClass, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, withComponentInputBinding } from '@angular/router';
 import {
@@ -9,6 +9,7 @@ import {
   filter,
   tap,
   debounceTime,
+
 } from 'rxjs/operators';
 import { PersonalPredictionService } from '../../feature/predictions/personal-predictions/personal-predictions.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,7 +17,7 @@ import { FullUserPredictionDto } from '../../feature/predictions/personal-predic
 import { MatchFullDto } from '../../feature/match/data/match-full.dto';
 import { MatchService } from '../../feature/match/match.service';
 import { PlayerFullDto } from '../../feature/players/data/player-full.dto';
-import { combineLatest, forkJoin, of, Subscription } from 'rxjs';
+import { combineLatest, forkJoin, of, Subscription, interval, EMPTY, Observable } from 'rxjs';
 import { PlayerService } from '../../feature/players/player.service';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PredictionUpdateComponent } from '../../pages/prediction/prediction-update/prediction-update.component';
@@ -26,6 +27,11 @@ import { FullGroupPredictionDto } from '../../feature/predictions/group-predicti
 import { DeleteConfirmationDialogComponent } from '../delete-confirmation-dialog/delete-confirmation-dialog.component';
 import { AuthService } from '../../core/auth/auth.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'
+import { toObservable } from '@angular/core/rxjs-interop';
+import { GameDto } from '../../feature/match/data/game.dto';
+import { ComputedMessage } from '../../feature/socket-message/computed.message';
+import { LockStatusMessage } from '../../feature/socket-message/lock-status.message';
+import { DeletedPredictionMessage } from '../../feature/socket-message/deleted-prediction.message';
 
 
 @Component({
@@ -49,8 +55,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
   private isDeleting = false;
 
   mode: 'personal' | 'group' = 'personal';
-
-  private activePredictionService(pId: number, gId: number): any {
+  private activePredictionService(pId: number, gId: number): Observable<FullUserPredictionDto | FullGroupPredictionDto> {
     return this.mode === 'personal'
       ? this.personalPredictions.getOnePrediction(pId)
       : this.groupPredictions.getOnePrediction(pId, gId);
@@ -60,6 +65,9 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
   prediction = signal<FullUserPredictionDto | FullGroupPredictionDto | null>(null);
   match = signal<MatchFullDto | null>(null);
   loading = signal(false);
+  private match$ = toObservable(this.match);
+
+  showLiveResult = signal<boolean>(true);
 
   private subs = new Subscription();
   private currentPredictionId?: number;
@@ -95,7 +103,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
 
           return this.activePredictionService(pId, gId).pipe(
-            tap((pred: any) => {
+            tap((pred: FullUserPredictionDto | FullGroupPredictionDto) => {
               if (this.currentPredictionId && this.currentPredictionId !== pId && this.prediction()?.status !== 'PROCESSED') {
                 this.socketService.leaveRoom(`prediction_${this.currentPredictionId}`);
               }
@@ -110,6 +118,29 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
               }
 
+              this.subs.add(
+                this.match$.pipe(
+
+                  map(m => m?.status),
+
+                  distinctUntilChanged(),
+
+                  switchMap(status => {
+                    if (status === 'LIVE') {
+
+                      return interval(6000);
+                    } else {
+
+                      this.showLiveResult.set(false);
+                      return EMPTY;
+                    }
+                  })
+                ).subscribe(() => {
+
+                  this.showLiveResult.update(trenutno => !trenutno);
+                })
+              );
+
               this.currentPredictionId = pId;
               if (pred.status !== 'PROCESSED') {
                 this.socketService.joinRoom(`prediction_${pId}`);
@@ -121,18 +152,16 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
             switchMap((pred: FullUserPredictionDto | FullGroupPredictionDto) => {
               return this.matches.getOneMatch(pred.matchId).pipe(
 
-                switchMap((match) => {
+                switchMap((match:MatchFullDto) => {
                   return forkJoin({
                     match: of(match),
                     homePlayers: this.playersS.findByTeam(match.hometeamId),
                     awayPlayers: this.playersS.findByTeam(match.awayteamId),
                   }).pipe(
-                    map((result) => {
-                      return {
-                        match: result.match,
-                        players: [...result.homePlayers, ...result.awayPlayers]
-                      };
-                    })
+                    map((result): GameDto => ({
+                      match: result.match,
+                      players: [...result.homePlayers, ...result.awayPlayers]
+                    }))
                   );
                 })
               );
@@ -144,7 +173,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
       .subscribe({
 
 
-        next: (g: any) => {
+        next: (g: GameDto) => {
           this.match.set(g.match);
           this.players.set(g.players)
         },
@@ -154,7 +183,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
       });
 
     this.subs.add(
-      this.socketService.onPredictionUpdate().subscribe((data: any) => {
+      this.socketService.onPredictionUpdate().subscribe((data: ComputedMessage) => {
         if (this.isDeleting) return;
         console.log('Stigao update za predikciju:', data);
         if (this.currentPredictionId && data.predictionId === this.currentPredictionId) {
@@ -172,7 +201,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
 
 
     this.subs.add(
-      this.socketService.onMatchUpdate().subscribe((matchData: any) => {
+      this.socketService.onMatchUpdate().subscribe((matchData: Partial<MatchFullDto>) => {
         console.log('Stigao update za meč:', matchData);
 
 
@@ -192,7 +221,7 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
   private listenForLiveUpdates() {
 
     this.subs.add(
-      this.socketService.on('edit_lock_status').subscribe((status: any) => {
+      this.socketService.on('edit_lock_status').subscribe((status: Partial<LockStatusMessage>) => {
         if (status.locked && !status.isMe) {
           this.isLockedByOther.set(true);
           this.activeEditorName.set(status.editorName || 'Neko drugi');
@@ -205,15 +234,15 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
     );
 
     this.subs.add(
-      this.socketService.onGroupPredictionDelete().subscribe((data: any) => {
+      this.socketService.onGroupPredictionDelete().subscribe((data: DeletedPredictionMessage) => {
         console.log('Stigao update za brisanje predikcije:', data);
         if (this.currentPredictionId && Number(data.predictionId) === Number(this.currentPredictionId)) {
           this.prediction.set(null);
           this.snackBar.open('Ova predikcija je upravo obrisana.', 'Zatvori', {
-            duration: 4000, 
+            duration: 4000,
             horizontalPosition: 'center',
             verticalPosition: 'top',
-            panelClass: ['snackbar-info'] 
+            panelClass: ['snackbar-info']
           });
           this.groupPredictions.notifyPredictionDelete(this.currentPredictionId);
           this.router.navigate(['/groupPredictions']);
@@ -286,6 +315,12 @@ export class PredictionViewComponent implements OnInit, OnDestroy {
         this.mode === 'personal' ? this.personalPredictions.notifyPredictionUpdate(result) : this.groupPredictions.notifyPredictionUpdate(result);
       }
     });
+  }
+  toggleResultView() {
+    const currentMatch = this.match();
+    if (currentMatch && currentMatch.status === 'FT') {
+      this.showLiveResult.update(trenutno => !trenutno);
+    }
   }
 
   onDelete() {

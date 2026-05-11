@@ -133,13 +133,8 @@ export class AuthController {
     
     if (image) {
       const { path } = await this.storageService.uploadUserAvatar(created.id.toString(), image);
-      user.profileImageUrl=path
+      await this.userService.updateAvatar(created.id,path);
     }
-
-
-
-    
-
 
 
     return created;

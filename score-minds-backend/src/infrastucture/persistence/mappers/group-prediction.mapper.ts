@@ -11,9 +11,9 @@ export class GroupPredictionMapper extends BaseMapper<GroupPrediction, GroupPred
     private eventMapper = new PredictionEventMapper();
     private matchMapper = new MatchMapper();
     toDomain(entity: GroupPredictionEntity): GroupPrediction {
-       
-        const events = entity.predictedEvents 
-            ? entity.predictedEvents.map(e => this.eventMapper.toDomain(e)) 
+
+        const events = entity.predictedEvents
+            ? entity.predictedEvents.map(e => this.eventMapper.toDomain(e))
             : [];
         const match = entity.match ? this.matchMapper.toDomain(entity.match) : null;
         return new GroupPrediction(
@@ -25,7 +25,7 @@ export class GroupPredictionMapper extends BaseMapper<GroupPrediction, GroupPred
             entity.pointsWon,
             entity.createdAt,
             entity.updatedAt,
-            events ,
+            events,
             match,
             entity.groupId,
             entity.status,
@@ -37,22 +37,22 @@ export class GroupPredictionMapper extends BaseMapper<GroupPrediction, GroupPred
     toPersistence(domain: GroupPrediction): GroupPredictionEntity {
         const entity = new GroupPredictionEntity();
         if (domain.id) entity.id = domain.id;
-        
-        entity.predictedHomeScore = domain.predictedHomeScore;
-        entity.predictedAwayScore = domain.predictedAwayScore;
+
+        entity.predictedHomeScore = domain.predictedHomeScore ?? null;
+        entity.predictedAwayScore = domain.predictedAwayScore ?? null;
         entity.pointsWon = domain.pointsWon;
         entity.winner = domain.winner;
-        
-        
-        entity.group={id:domain.groupId} as Group;
+
+
+        entity.group = { id: domain.groupId } as Group;
         entity.match = { id: domain.matchId } as Match;
-        entity.updatedAt=new Date();
-        entity.status=domain.status;
-        entity.createdBy={id:domain.createdById} as User;
-        entity.lastUpdatedBy={id:domain.lastUpdatedById} as User;
-        
+        entity.updatedAt = new Date();
+        entity.status = domain.status;
+        entity.createdBy = { id: domain.createdById } as User;
+        entity.lastUpdatedBy = { id: domain.lastUpdatedById } as User;
+
         if (domain.predictedEvents.length > 0) {
-            entity.predictedEvents = domain.predictedEvents.map(e => 
+            entity.predictedEvents = domain.predictedEvents.map(e =>
                 this.eventMapper.toPersistence(e)
             );
         }

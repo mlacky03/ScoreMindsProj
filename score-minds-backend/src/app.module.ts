@@ -18,7 +18,6 @@ import { SyncModule } from './modules/sync.module';
 import { PersonalPredictionModule } from './modules/personal-predictition.module';
 import { PredictionAuditModule } from './modules/prediction-audit.module';
 import { GroupPredictionModule } from './modules/group-prediction.module';
-import { AppGateway } from './gateway/app-gateway';
 import { CalculatingModule } from './modules/calculating.module';
 import { AppGatewayModule } from './modules/app-gateway.module';
 

@@ -89,7 +89,7 @@ export const routes: Routes = [
         path: ':id',
         data: { mode: 'personal' },
         loadComponent: () => import('./components/prediction-view/prediction-view.component').then(m => m.PredictionViewComponent)
-      }
+      } 
     ]
   },
   {

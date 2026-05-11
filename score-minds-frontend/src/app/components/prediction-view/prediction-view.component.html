@@ -15,21 +15,34 @@
                             [alt]="match()?.hometeamId" class="team-logo" (error)="onImgError($event)">
                         <div *ngIf="prediction()?.winner === 'HOME'" class="winner-badge">🏆</div>
                     </div>
-                    <span class="prediction-score">{{ prediction()?.predictedHomeScore ?? '-' }}</span>
 
-                    <span class="real-score" *ngIf="match()?.status==='FT'">{{ match()?.finalScoreHome }}</span>
+                    <span class="prediction-score fade-in"
+                        *ngIf="!showLiveResult() || (match()?.status !== 'LIVE' && match()?.status !== 'FT')">
+                        {{ prediction()?.predictedHomeScore ?? '-' }}
+                    </span>
 
-
+                    <span class="prediction-score live-score fade-in"
+                        *ngIf="showLiveResult() && (match()?.status === 'LIVE' || match()?.status === 'FT')">
+                        <span [style.color]="match()?.status === 'FT' ? '#2ecc71' : ''">
+                            {{ match()?.finalScoreHome ?? '-' }}
+                        </span>
+                    </span>
                 </div>
             </div>
 
-            <div class="match-center">
+            <div class="match-center" [class.match-center-clickable]="match()?.status === 'FT'"
+                >
+
                 <div class="vs-badge">VS</div>
                 <div class="match-meta">
                     <span class="match-date">{{ match()?.startTime | date:'dd.MM HH:mm' }}</span>
                     <span class="match-status" [ngClass]="'status-' + match()?.status?.toLowerCase()">
                         {{ match()?.status }}
                     </span>
+
+                    <!-- <span class="click-hint fade-in" *ngIf="match()?.status === 'FT'">
+                        {{ showLiveResult() ? 'Vidi predikciju 🔄' : 'Vidi rezultat 🔄' }}
+                    </span> -->
 
                     <button class="btn-action" [disabled]="match()?.status !== 'NS'" (click)="onUpdate()"
                         title="Edit Prediction">
@@ -40,17 +53,17 @@
                         <div class="status-side">
                             <span *ngIf="prediction()?.status === 'PROCESSED'; else pendingBadge"
                                 class="badge status-processed">
-                                Završeno
+                                PROCESSED
                             </span>
                             <ng-template #pendingBadge>
-                                <span class="badge status-pending">U toku</span>
+                                <span class="badge status-pending">SUBMITTED</span>
                             </ng-template>
                         </div>
 
                         <div class="points-divider" *ngIf="prediction()?.status === 'PROCESSED'"></div>
 
                         <div class="points-container" *ngIf="prediction()?.status === 'PROCESSED'">
-                            <span class="label">Osvojeno</span>
+                            <span class="label">Won</span>
                             <span class="value" [class.won]="(prediction()?.totalPoints || 0) > 0"
                                 [class.lost]="(prediction()?.totalPoints || 0) === 0">
                                 {{ prediction()?.totalPoints || 0 }}
@@ -65,8 +78,17 @@
                 <h2 class="team-name">{{ match()?.awayTeamName }}</h2>
 
                 <div class="team-body">
-                    <span class="real-score" *ngIf="match()?.status==='FT'">{{ match()?.finalScoreAway }}</span>
-                    <span class="prediction-score">{{ prediction()?.predictedAwayScore ?? '-' }}</span>
+                    <span class="prediction-score live-score fade-in"
+                        *ngIf="showLiveResult() && (match()?.status === 'LIVE' || match()?.status === 'FT')">
+                        <span [style.color]="match()?.status === 'FT' ? '#2ecc71' : ''">
+                            {{ match()?.finalScoreAway ?? '-' }}
+                        </span>
+                    </span>
+
+                    <span class="prediction-score fade-in"
+                        *ngIf="!showLiveResult() || (match()?.status !== 'LIVE' && match()?.status !== 'FT')">
+                        {{ prediction()?.predictedAwayScore ?? '-' }}
+                    </span>
 
                     <div class="team-logo-wrapper" [class.winner-glow]="prediction()?.winner === 'AWAY'">
                         <img [src]="match()?.awayTeamLogo || 'assets/shield-placeholder.png'"
@@ -77,7 +99,17 @@
             </div>
 
         </div>
+        <button *ngIf="match()?.status === 'LIVE' || match()?.status === 'FT'" class="btn-flip-view"
+            (click)="toggleResultView()"
+            [title]="showLiveResult() ? 'Prikaži moju predikciju' : 'Prikaži stvarni rezultat'">
 
+            <span class="icon" [class.rotate]="showLiveResult()">
+                {{ showLiveResult() ? '🎯' : '📊' }}
+            </span>
+            <span class="text">
+                {{ showLiveResult() ? 'Prediction' : 'Result' }}
+            </span>
+        </button>
         <button *ngIf="getMode()==='personal' || (getMode()==='group' && getOwnerName()==currentUser()?.username)"
             class="btn-delete" [disabled]="match()?.status !== 'NS'" (click)="onDelete()" title="Delete Prediction">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
@@ -93,44 +125,103 @@
 
     <div class="events-section">
         <div class="section-header">
-            <h2 class="section-title">Predicted Events</h2>
-            <div class="event-count">
+            <h2 class="section-title fade-in"
+                *ngIf="!showLiveResult() || (match()?.status !== 'LIVE' && match()?.status !== 'FT')">
+                Predicted Events
+            </h2>
+
+            <h2 class="section-title fade-in" [style.color]="match()?.status === 'FT' ? '#2ecc71' : '#ef4444'"
+                *ngIf="showLiveResult() && (match()?.status === 'LIVE' || match()?.status === 'FT')">
+                {{ match()?.status === 'FT' ? '🏁 Final Match Events' : '🔴 Live Match Events' }}
+            </h2>
+
+            <div class="event-count fade-in"
+                *ngIf="!showLiveResult() || (match()?.status !== 'LIVE' && match()?.status !== 'FT')">
                 <span class="count-number">{{ prediction()?.predictedEvents?.length || 0 }}</span>
+                <span class="count-label">events</span>
+            </div>
+
+            <div class="event-count fade-in"
+                [style.border]="match()?.status === 'FT' ? '1px solid #2ecc7133' : '1px solid #ef444433'"
+                *ngIf="showLiveResult() && (match()?.status === 'LIVE' || match()?.status === 'FT')">
+                <span class="count-number" [style.color]="match()?.status === 'FT' ? '#2ecc71' : '#ef4444'">
+                    {{ match()?.events?.length || 0 }}
+                </span>
                 <span class="count-label">events</span>
             </div>
         </div>
 
-        <div class="events-grid" *ngIf="prediction()?.predictedEvents?.length ?? 0 > 0; else noEvents">
-            <div class="event-card" *ngFor="let event of prediction()?.predictedEvents">
+        <ng-container *ngIf="!showLiveResult() || (match()?.status !== 'LIVE' && match()?.status !== 'FT')">
+            <div class="events-grid fade-in" *ngIf="prediction()?.predictedEvents?.length; else noEvents">
+                <div class="event-card" *ngFor="let event of prediction()?.predictedEvents">
+                    <div class="player-avatar">
+                        <img *ngIf="getPlayerPhoto(event.playerId) as photoUrl; else placeholder" [src]="photoUrl"
+                            alt="Player" class="avatar-img" (error)="onImgError($event)">
+                        <ng-template #placeholder>
+                            <div class="avatar-placeholder">👤</div>
+                        </ng-template>
 
-                <div class="player-avatar">
-                    <img *ngIf="getPlayerPhoto(event.playerId) as photoUrl; else placeholder" [src]="photoUrl"
-                        alt="Player" class="avatar-img" (error)="onImgError($event)"> <ng-template #placeholder>
-                        <div class="avatar-placeholder">👤</div>
-                    </ng-template>
+                        <div class="event-type-icon" [title]="event.type" [class.goal]="event.type === 'GOAL'"
+                            [class.assist]="event.type === 'ASSIST'">
+                            {{ event.type === 'GOAL' ? '⚽' : '👟' }}
+                        </div>
+                    </div>
 
-                    <div class="event-type-icon" [title]="event.type" [class.goal]="event.type === 'GOAL'"
-                        [class.assist]="event.type === 'ASSIST'">
-                        {{ event.type === 'GOAL' ? '⚽' : '👟' }}
+                    <div class="event-details">
+                        <div class="player-name">{{ getPlayerName(event.playerId) }}</div>
+                        <div class="event-meta">
+                            <span class="event-minute" *ngIf="event.minute">{{ event.minute }}'</span>
+                            <span class="event-type-text">{{ event.type }}</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class="event-details">
-                    <div class="player-name">{{ getPlayerName(event.playerId) }}</div>
-                    <div class="event-meta">
-                        <span class="event-minute" *ngIf="event.minute">{{ event.minute }}'</span>
-                        <span class="event-type-text">{{ event.type }}</span>
-                    </div>
-                </div>
-
             </div>
-        </div>
+        </ng-container>
+
+        <ng-container *ngIf="showLiveResult() && (match()?.status === 'LIVE' || match()?.status === 'FT')">
+            <div class="events-grid fade-in" *ngIf="match()?.events?.length; else noLiveEvents">
+                <div class="event-card"
+                    [style.border]="match()?.status === 'FT' ? '1px solid #2ecc7133' : '1px solid #ef444433'"
+                    *ngFor="let liveEvent of match()?.events">
+                    <div class="player-avatar">
+                        <img *ngIf="getPlayerPhoto(liveEvent.playerId) as photoUrl; else placeholder" [src]="photoUrl"
+                            alt="Player" class="avatar-img" (error)="onImgError($event)">
+                        <ng-template #placeholder>
+                            <div class="avatar-placeholder">👤</div>
+                        </ng-template>
+
+                        <div class="event-type-icon" [title]="liveEvent.type" [class.goal]="liveEvent.type === 'GOAL'"
+                            [class.assist]="liveEvent.type === 'ASSIST'">
+                            {{ liveEvent.type === 'GOAL' ? '⚽' : '👟' }}
+                        </div>
+                    </div>
+
+                    <div class="event-details">
+                        <div class="player-name">{{ getPlayerName(liveEvent.playerId) }}</div>
+                        <div class="event-meta">
+                            <span class="event-minute" [style.color]="match()?.status === 'FT' ? '#2ecc71' : '#ef4444'"
+                                *ngIf="liveEvent.minute">{{
+                                liveEvent.minute }}'</span>
+                            <span class="event-type-text">{{ liveEvent.type }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
 
         <ng-template #noEvents>
             <div class="empty-state">
                 <div class="empty-icon">📝</div>
                 <h3 class="empty-title">No Events Predicted</h3>
                 <p class="empty-description">Only the final score was predicted for this match.</p>
+            </div>
+        </ng-template>
+
+        <ng-template #noLiveEvents>
+            <div class="empty-state fade-in">
+                <div class="empty-icon">⏳</div>
+                <h3 class="empty-title">Nema pogodaka</h3>
+                <p class="empty-description">Mreže još uvek miruju. Čekamo prvi događaj na meču!</p>
             </div>
         </ng-template>
     </div>

@@ -13,5 +13,12 @@ export interface MatchFullDto{
     actualAssistantsIds: number[];
     hometeamId: number;
     awayteamId: number;
-    minutes:number|null;   
+    minutes:number|null;  
+    events: EventRecord[];
+}
+
+export interface EventRecord {
+  playerId: number;
+  minute: number;
+  type?: 'GOAL' | 'ASSIST'; 
 }

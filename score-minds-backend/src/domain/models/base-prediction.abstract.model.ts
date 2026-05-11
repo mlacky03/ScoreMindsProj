@@ -29,10 +29,14 @@ export abstract class BasePrediction {
 
         if (home > away) {
             this._winner = WinnerOption.HOME;
+            
         } else if (away > home) {
+
             this._winner = WinnerOption.AWAY;
-        } else {
+            
+        } else if (home === away) {
             this._winner = WinnerOption.DRAW;
+            
         }
     }
 
@@ -48,15 +52,7 @@ export abstract class BasePrediction {
     private validateScores(home: number | null, away: number | null): void {
         if (home !== null && home < 0) throw new Error("Domaći rezultat ne može biti negativan.");
         if (away !== null && away < 0) throw new Error("Gostujući rezultat ne može biti negativan.");
-        if (home !== null && away !== null && home > away) {
-            this._winner = WinnerOption.HOME;
-        }
-        else if (home !== null && away !== null && away > home) {
-            this._winner = WinnerOption.AWAY;
-        }
-        else if (home !== null && away !== null && home === away) {
-            this._winner = WinnerOption.DRAW;
-        }
+        
     }
 
     public updateMatchId(matchId: number): void {
@@ -68,12 +64,13 @@ export abstract class BasePrediction {
     }
 
     public updatePrediction(hScore: number, aScore: number, winner: WinnerOption): boolean {
+        
         if (this._predictedHomeScore === hScore && this._predictedAwayScore === aScore && this._winner === winner) {
             return false;
         }
         this._predictedAwayScore = aScore;
         this._predictedHomeScore = hScore;
-        if (this._predictedAwayScore !== null && this._predictedHomeScore !== null) {
+        if (this._predictedAwayScore !== null && this._predictedHomeScore !== null && this._predictedAwayScore!=undefined &&  this._predictedHomeScore!=undefined) {
             this.updateScore(this._predictedHomeScore, this._predictedAwayScore);
         }
         else {

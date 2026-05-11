@@ -55,7 +55,7 @@ export class SyncService {
       
       const minutesPlayed = Math.floor((now.getTime() - match.startTime.getTime()) / 60000);
 
-      const MATCH_DURATION = 2; 
+      const MATCH_DURATION = 1; 
       
       if (minutesPlayed >= MATCH_DURATION) {
         match.finishMatch();
@@ -200,7 +200,7 @@ export class SyncService {
       finalScoreHome: match.finalScoreHome,
       finalScoreAway: match.finalScoreAway,
       events: match.events,
-      minutes: minutesPlayed
+      minutes: minutesPlayed,
     };
     const payload2 = {
       id: match.id, 

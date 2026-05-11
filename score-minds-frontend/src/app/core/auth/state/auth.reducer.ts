@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import { UserDto } from '../../../feature/users/data/user.dto';
 import { AuthActions } from './auth.actions';
 
-export type AuthStatus = 'anonymous' | 'authenticated' | 'loading' | 'error';
+export type AuthStatus = 'pending' |'anonymous' | 'authenticated' | 'loading' | 'error';
 
 export interface AuthState {
   user: UserDto | null;
@@ -34,7 +34,7 @@ export const authReducer = createReducer(
   })),
   on(AuthActions.loadUser, (state) => ({
     ...state,
-    status: 'loading',
+    status: 'pending',
   })),
   on(AuthActions.loadUserSuccess, (state, { user }) => ({
     ...state,

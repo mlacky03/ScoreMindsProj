@@ -26,12 +26,12 @@ export class AppComponent implements OnInit, OnDestroy {
   private authState = this.store.selectSignal(selectAuth);
   isAuthResolved = computed(() => {
     const status = this.authState()?.status;
-    return status === 'authenticated' || status === 'unauthenticated' || status === 'error';
+    return status !== 'pending';
   });
   ngOnInit() {
 
     this.authSubscription = this.store.select(selectAuth).pipe(
-
+     // filter(auth => auth?.status !== 'pending'),
       map(authState => authState?.status === 'authenticated'),
 
       distinctUntilChanged()

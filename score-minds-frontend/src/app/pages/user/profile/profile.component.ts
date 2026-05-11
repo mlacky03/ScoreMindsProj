@@ -25,6 +25,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   
   user$ = this.store.select(selectUser);
   user: UserDto | null = null;
+  
 
   ngOnInit() {
     this.sub.add(

@@ -21,7 +21,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: ['amqp://guest:guest@rabbitmq:5672'], // Koristimo 'rabbitmq' ime servisa iz Dockera
-      queue: 'prediction_queue', // ⚠️ PAŽNJA: Ovo ime mora biti identično onom u RabbitMQModule!
+      queue: 'prediction_queue', // Ovo ime mora biti identično onom u RabbitMQModule!
       queueOptions: {
         durable: true,
       },
