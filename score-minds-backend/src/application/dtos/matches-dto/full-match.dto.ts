@@ -14,8 +14,8 @@ export class FullMatchDto{
     finalScoreAway: number|null;
     actualScorersIds: number[];
     actualAssistantsIds: number[];
-    hometeamId: number;
-    awayteamId: number;
+    homeTeamId: number;
+    awayTeamId: number;
     isComputed:boolean;
     events:EventRecord[]
 
@@ -31,8 +31,8 @@ export class FullMatchDto{
         this.finalScoreHome=m.finalScoreHome;
         this.finalScoreAway=m.finalScoreAway;
         this.events=m.events;
-        this.hometeamId=m.homeTeamId;
-        this.awayteamId=m.awayTeamId;
+        this.homeTeamId=m.homeTeamId;
+        this.awayTeamId=m.awayTeamId;
         this.isComputed=m.isComputed;
     }
 }

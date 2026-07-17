@@ -11,7 +11,6 @@ import { PersonalPredictionRepository } from "src/infrastucture/persistence/repo
 import { PlayerService } from "./player.service";
 import { FullMatchDto } from "../dtos/matches-dto/full-match.dto";
 import { PredictionStatus } from "src/infrastucture/persistence/entities/personal-prediction.entity";
-import { UserService } from "./user.service";
 import { PaginatedResponse } from "../dtos/pagination-dto/paginatio.dto";
 @Injectable()
 export class PersonalPredictionService {
@@ -22,81 +21,79 @@ export class PersonalPredictionService {
         private readonly matchService: MatchService,
         private readonly predictionAuditService: PredictionAuditService,
         private readonly playerService: PlayerService,
-        private readonly userService:UserService
     ) {
 
     }
 
-    async findAll(id: number,page:number,size:number,mode:string): Promise<PaginatedResponse<BasePredictionDto>> {
+    async findAll(id: number, page: number, size: number, mode: string): Promise<PaginatedResponse<BasePredictionDto>> {
         let res: PersonalPrediction[];
         let total: number;
         if (mode === 'upcoming') {
-            [res, total] = await this.repo.findByUserIdUpcoming(id,page,size);
+            [res, total] = await this.repo.findByUserIdUpcoming(id, page, size);
         } else {
-            [res, total] = await this.repo.findByUserIdHistory(id,page,size);
+            [res, total] = await this.repo.findByUserIdHistory(id, page, size);
         }
 
         return { data: res.map((p) => new BasePredictionDto(p)), total };
     }
 
     async createPrediction(userId: number, prediction: CreatePredictionDto): Promise<FullPredictionDto> {
-        try {
-
-
-            const match = await this.matchService.findOneModel(prediction.matchId);
-            if (!match) {
-                throw new NotFoundException(`Meč sa ID-jem ${prediction.matchId} nije pronađen.`);
-            }
-            match.submitPrediction();
-            
-            if (prediction.events && prediction.events.length > 0) {
-                for (const eventDto of prediction.events) {
-
-                    const player = await this.playerService.findOne(eventDto.playerId);
-                    if (!player) {
-                        throw new BadRequestException(`Igrač sa ID ${eventDto.playerId} ne postoji.`);
-                    }
-
-                    if (player.teamId !== match.homeTeamId && player.teamId !== match.awayTeamId) {
-                        throw new BadRequestException(`Igrač ${player.name} ne igra za timove u ovom meču.`);
-                    }
-                }
-            }
-            const data = new PersonalPrediction(
-                null,
-                prediction.matchId,
-                prediction.predictedHomeScore,
-                prediction.predictedAwayScore,
-                prediction.winner,
-                0,
-                new Date(),
-                null,
-                [],
-                null,
-                userId,
-                PredictionStatus.SUBMITTED
-            );
-            const savedPrediction = await this.repo.save(data);
-
-
-            if (prediction.events && prediction.events.length > 0) {
-                for (const eventDto of prediction.events) {
-                    await this.predictionEventService.createPredictionEvent({ ...eventDto, predictionId: savedPrediction.id! }, false);
-                }
-            }
-
-            const fullPrediction = await this.findOne(savedPrediction.id!, userId);
-            await this.predictionAuditService.createAudit(fullPrediction);
-
-
-            return fullPrediction;
+        const match = await this.matchService.findOneModel(prediction.matchId);
+        if (!match) {
+            throw new NotFoundException(`Meč sa ID-jem ${prediction.matchId} nije pronađen.`);
         }
-        catch (err) {
+        match.submitPrediction();
+
+        if (prediction.events && prediction.events.length > 0) {
+            for (const eventDto of prediction.events) {
+                const player = await this.playerService.findOne(eventDto.playerId);
+                if (!player) {
+                    throw new BadRequestException(`Igrač sa ID ${eventDto.playerId} ne postoji.`);
+                }
+                if (player.teamId !== match.homeTeamId && player.teamId !== match.awayTeamId) {
+                    throw new BadRequestException(`Igrač ${player.name} ne igra za timove u ovom meču.`);
+                }
+            }
+        }
+
+        const data = new PersonalPrediction(
+            null,
+            prediction.matchId,
+            prediction.predictedHomeScore,
+            prediction.predictedAwayScore,
+            prediction.winner,
+            0,
+            new Date(),
+            null,
+            [],
+            null,
+            userId,
+            PredictionStatus.SUBMITTED
+        );
+
+        let savedPrediction: PersonalPrediction;
+        try {
+            savedPrediction = await this.repo.save(data);
+        } catch (err) {
             if (err.code === '23505') {
                 throw new ConflictException('Već imate sačuvanu predikciju za ovaj meč.');
             }
             throw err;
         }
+
+        if (prediction.events && prediction.events.length > 0) {
+            for (const eventDto of prediction.events) {
+                await this.predictionEventService.createPredictionEvent(
+                    { ...eventDto, predictionId: savedPrediction.id! },
+                    false
+                );
+            }
+        }
+
+        const fullPrediction = await this.findOne(savedPrediction.id!, userId);
+        await this.predictionAuditService.createAudit(fullPrediction);
+
+        return fullPrediction;
     }
 
     async findOne(id: number, userId: number): Promise<FullPredictionDto> {
@@ -108,11 +105,6 @@ export class PersonalPredictionService {
         }
         return new FullPredictionDto(prediction);
     }
-
-   
-
-    
-
 
     async updatePrediction(predictionId: number, userId: number, predictionDto: UpdatePredictionDto): Promise<FullPredictionDto> {
         const prediction = await this.repo.findPredictionByUserWithRelations(userId, predictionId);
@@ -144,7 +136,7 @@ export class PersonalPredictionService {
             if (players.length !== uniquePlayerIds.length) {
                 throw new BadRequestException('Jedan ili više igrača ne postoje.');
             }
-            const validTeamIds = [match.hometeamId, match.awayteamId];
+            const validTeamIds = [match.homeTeamId, match.awayTeamId];
             for (const player of players) {
                 if (!validTeamIds.includes(player.teamId)) {
                     throw new BadRequestException(`Igrač ${player.name} ne igra za timove u ovom meču.`);
@@ -152,7 +144,6 @@ export class PersonalPredictionService {
             }
         }
 
-        //Object.assign(prediction, restData);
         const changed = prediction.updatePrediction(restData.predictedHomeScore, restData.predictedAwayScore, restData.winner);
 
         if (events) {
